@@ -10,3 +10,19 @@
     </tr>
   {%- endfor %}
 </table>
+
+
+{%- if debug %}
+  {%- autoescape false %}
+<hr />
+<div>
+  {{ debug }}
+</div>
+  {%- endautoescape %}
+{%- endif %}
+
+{%- if error %}
+<div>
+  Error: {{ error }}
+</div>
+{%- endif %}

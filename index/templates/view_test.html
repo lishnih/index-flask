@@ -13,3 +13,19 @@
     <li><a href="{{ url }}">{{ name }}</a>
   {%- endfor %}
 </ul>
+
+
+{%- if debug %}
+  {%- autoescape false %}
+<hr />
+<div>
+  {{ debug }}
+</div>
+  {%- endautoescape %}
+{%- endif %}
+
+{%- if error %}
+<div>
+  Error: {{ error }}
+</div>
+{%- endif %}

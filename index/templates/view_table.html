@@ -43,8 +43,10 @@
     <a href="/db/">Список баз данных</a>
 </p>
 
-{%- if debug is not none %}
+
+{%- if debug %}
   {%- autoescape false %}
+<hr />
 <div>
   {{ debug }}
 </div>
