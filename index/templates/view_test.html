@@ -1,5 +1,6 @@
-<!doctype html>
-<title>Path: {{ path }}</title>
+{% extends "_layout.html" %}
+
+{% block body %}
 
 <h1>{{ path }}</h1>
 <ul>
@@ -14,18 +15,4 @@
   {%- endfor %}
 </ul>
 
-
-{%- if debug %}
-  {%- autoescape false %}
-<hr />
-<div>
-  {{ debug }}
-</div>
-  {%- endautoescape %}
-{%- endif %}
-
-{%- if error %}
-<div>
-  Error: {{ error }}
-</div>
-{%- endif %}
+{% endblock %}

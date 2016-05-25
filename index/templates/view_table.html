@@ -1,5 +1,6 @@
-<!doctype html>
-<title>Databases</title>
+{% extends "_layout.html" %}
+
+{% block body %}
 
 <div>
   Count: {{ count }}
@@ -43,18 +44,4 @@
     <a href="/db/">Список баз данных</a>
 </p>
 
-
-{%- if debug %}
-  {%- autoescape false %}
-<hr />
-<div>
-  {{ debug }}
-</div>
-  {%- endautoescape %}
-{%- endif %}
-
-{%- if error %}
-<div>
-  Error: {{ error }}
-</div>
-{%- endif %}
+{% endblock %}

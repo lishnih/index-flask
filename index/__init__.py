@@ -23,7 +23,7 @@ def get_conn():
     if 'engine' not in g:
         s = Settings()
         g.db_uri = "{0}:///{1}/{2}".format('sqlite', s.system.path, 'xls0p3.sqlite')
-        g.engine, g.metadata, g.tables, g.relationships = initDb(g.db_uri)
+        g.engine, g.metadata, g.relationships = initDb(g.db_uri)
     return g.engine.connect()
 
 
@@ -38,7 +38,12 @@ def view_test(path=''):
     if not path or path[-1] == '/':
         test_url = '/test/{0}'.format(path)
         dirlist, filelist = list_files(test_url, app.root_path)
-        return render_template('view_test.html', path=test_url, dirlist=dirlist, filelist=filelist)
+        return render_template('view_test.html',
+                 title = 'Testing directory',
+                 path = test_url,
+                 dirlist = dirlist,
+                 filelist = filelist,
+               )
     else:
         return send_from_directory('test', path)
 
@@ -67,16 +72,20 @@ def view_g():
 @app.route('/dbinfo/')
 def view_dbinfo():
     get_conn()
-    urls = g.tables
 #   return g.db_uri + '<br />' + html(g.metadata)
 #   return render_template('dump_dict.html', obj=g.tables)
-    return render_template('view_dbinfo.html', uri=g.db_uri, dbs=g.tables, debug=html(g.metadata))
+    return render_template('view_dbinfo.html',
+             title = 'Databases info',
+             uri=g.db_uri,
+             dbs=g.metadata.tables.keys(),
+             debug=html(g.metadata),
+           )
 
 
 @app.route('/dbinfo/<table>')
 def view_tableinfo(table=None):
     get_conn()
-    if table in g.tables:
+    if table in g.metadata.tables.keys():
         return html(g.metadata.tables.get(table))
     else:
         return 'No such table!'
@@ -100,13 +109,19 @@ def view_debug():
         url = url_for(rule.endpoint, **options)
         output.append([rule.endpoint, methods, url])
 
-    return render_template('view_debug.html', urls=sorted(output))
+    return render_template('view_debug.html',
+             title = 'Url mapping',
+             urls=sorted(output),
+           )
 
 
 @app.route('/db/')
 def view_db():
     get_conn()
-    return render_template('view_db.html', dbs=g.tables)
+    return render_template('view_db.html', 
+             title = 'Databases',
+             dbs = g.metadata.tables.keys(),
+           )
 
 
 @app.route('/db/<table1>/')
@@ -142,12 +157,20 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     count = conn.execute(s_count.select_from(mtable).count())
     count = count.first()[0]
 
-
     names = [[column.table.name, column.name] for name, column in s._columns_plus_names]
     extratables = [i.column.table.name for i in s.foreign_keys]
     lasttable = tables[0] if len(tables) > 1 else None
-    return render_template('view_table.html', count=count, rows=rows, names=names, tables=tables,
-                           extratables=extratables, lasttable=lasttable, error=error, debug=unicode(s))
+    return render_template('view_table.html',
+             title = 'Database: {0}'.format(table1),
+             count=count,
+             rows=rows,
+             names=names,
+             tables=tables,
+             extratables=extratables,
+             lasttable=lasttable,
+             error=error,
+             debug=unicode(s),
+           )
 
 
 

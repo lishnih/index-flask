@@ -1,5 +1,6 @@
-<!doctype html>
-<title>Databases</title>
+{% extends "_layout.html" %}
+
+{% block body %}
 
 <p>{{ uri }}</p>
 
@@ -13,18 +14,4 @@
   {%- endfor %}
 </table>
 
-
-{%- if debug %}
-  {%- autoescape false %}
-<hr />
-<div>
-  {{ debug }}
-</div>
-  {%- endautoescape %}
-{%- endif %}
-
-{%- if error %}
-<div>
-  Error: {{ error }}
-</div>
-{%- endif %}
+{% endblock %}

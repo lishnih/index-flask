@@ -1,5 +1,6 @@
-<!doctype html>
-<title>Urls</title>
+{% extends "_layout.html" %}
+
+{% block body %}
 
 <table border=1>
   {%- for endpoint, methods, url in urls %}
@@ -11,18 +12,4 @@
   {%- endfor %}
 </table>
 
-
-{%- if debug %}
-  {%- autoescape false %}
-<hr />
-<div>
-  {{ debug }}
-</div>
-  {%- endautoescape %}
-{%- endif %}
-
-{%- if error %}
-<div>
-  Error: {{ error }}
-</div>
-{%- endif %}
+{% endblock %}

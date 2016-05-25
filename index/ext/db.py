@@ -27,4 +27,4 @@ def initDb(db_uri):
                     relationships[first_table] = dict()
                 relationships[first_table][table.name] = [unique_key, column.name]
 
-    return engine, metadata, tables, relationships
+    return engine, metadata, relationships
