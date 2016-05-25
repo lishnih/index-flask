@@ -9,11 +9,11 @@ import logging
 from flask import Flask, g, url_for, render_template, send_from_directory
 from sqlalchemy.sql import select
 
-from .lib.backwardcompat import *
-from .lib.db import initDb
-from .lib.dump_html import html
-from .lib.fileman import list_files
-from .lib.settings import Settings
+from .ext.backwardcompat import *
+from .ext.db import initDb
+from .ext.dump_html import html
+from .ext.fileman import list_files
+from .ext.settings import Settings
 
 
 app = Flask(__name__, static_url_path='')
