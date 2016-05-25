@@ -1,0 +1,10 @@
+<!doctype html>
+<title>Databases</title>
+
+<table border=1>
+  {%- for key in dbs %}
+    <tr>
+        <td><a href="{{ key }}">{{ key }}</a></td>
+    </tr>
+  {%- endfor %}
+</table>

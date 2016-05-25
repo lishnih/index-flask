@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Urls</title>
+
+<table border=1>
+  {%- for endpoint, methods, url in urls %}
+    <tr>
+        <td><a href="{{ url }}">{{ url }}</a></td>
+        <td>{{ endpoint }}</td>
+        <td>{{ methods }}</td>
+    </tr>
+  {%- endfor %}
+</table>

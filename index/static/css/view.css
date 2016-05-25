@@ -1,0 +1,13 @@
+@import url("index.css");
+
+div#tabs {
+	font-size: 70%;
+}
+
+TR:hover {
+  background-color: Azure;
+}
+
+TD:hover {
+  color: blue;
+}

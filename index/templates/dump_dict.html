@@ -1,0 +1,9 @@
+<!doctype html>
+<title>Dump</title>
+
+<dl>
+  {%- for key, value in obj | dictsort %}
+    <dt>{{ key }}</dt>
+    <dd>{{ value }}</dd>
+  {%- endfor %}
+</dl>

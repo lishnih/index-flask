@@ -1,0 +1,58 @@
+<!doctype html>
+<title>Databases</title>
+
+<div>
+  Count: {{ count }}
+</div>
+
+<table border=1>
+  {%- if names %}
+    <tr>
+      {%- for table, name in names %}
+        <th>{{ table }}<br />{{ name }}</th>
+      {%- endfor %}
+    </tr>
+  {%- endif %}
+
+  {%- for row in rows %}
+    <tr>
+      {%- for col in row %}
+        <td>{{ col }}</td>
+      {%- endfor %}
+    </tr>
+  {%- endfor %}
+</table>
+
+{%- if extratables %}
+<p>
+  {%- for table in extratables %}
+    {%- if table not in tables %}
+    <a href="{{ table }}">+{{ table }}</a>
+    {%- endif %}
+  {%- endfor %}
+</p>
+{%- endif %}
+
+{%- if lasttable %}
+<p>
+    <a href="..">-{{ lasttable }}</a>
+</p>
+{%- endif %}
+
+<p>
+    <a href="/db/">Список баз данных</a>
+</p>
+
+{%- if debug is not none %}
+  {%- autoescape false %}
+<div>
+  {{ debug }}
+</div>
+  {%- endautoescape %}
+{%- endif %}
+
+{%- if error %}
+<div>
+  Error: {{ error }}
+</div>
+{%- endif %}
