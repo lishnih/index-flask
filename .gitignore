@@ -60,3 +60,21 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+
+# mine
+*.sh
+*.bat
+*.lnk
+*.sqlite
+*.ppr
+*.e4p
+*.npp
+*~
+backup
+archive.list
+
+
+# index-flask
+index/test/
+index/static/ver.txt
