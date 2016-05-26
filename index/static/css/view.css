@@ -1,8 +1,4 @@
-@import url("index.css");
-
-div#tabs {
-	font-size: 70%;
-}
+@import url("default.css");
 
 TR:hover {
   background-color: Azure;

@@ -6,7 +6,7 @@
   Count: {{ count }}
 </div>
 
-<table border=1>
+<table border="1">
   {%- if names %}
     <tr>
       {%- for table, name in names %}
@@ -22,6 +22,12 @@
       {%- endfor %}
     </tr>
   {%- endfor %}
+
+  {%- if count > offset + limit %}
+    <tr>
+        <td class="a center extendtable" colspan="{{ colspan }}" data-offset="{{ offset + limit }}">Показать ещё</td>
+    </tr>
+  {%- endif %}
 </table>
 
 {%- if extratables %}

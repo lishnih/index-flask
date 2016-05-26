@@ -136,7 +136,15 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
 
     mtables = [g.metadata.tables.get(i) for i in tables]
-    s = select(mtables, offset=0, limit=100, use_labels=True)
+
+    mcolumns = []
+    for i in mtables:
+        mcolumns.extend(j for j in i.c if not j.foreign_keys and not j.primary_key and j.name[0] != '_')
+
+    offset = 0
+    limit = 100
+    colspan = len(mcolumns)
+    s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
     s_count = select(mtables, use_labels=True)
 
     error = None
@@ -158,18 +166,21 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     count = count.first()[0]
 
     names = [[column.table.name, column.name] for name, column in s._columns_plus_names]
-    extratables = [i.column.table.name for i in s.foreign_keys]
+    extratables = [i.column.table.name for i in s_count.foreign_keys]   # s_count!
     lasttable = tables[0] if len(tables) > 1 else None
     return render_template('view_table.html',
              title = 'Database: {0}'.format(table1),
-             count=count,
-             rows=rows,
-             names=names,
-             tables=tables,
-             extratables=extratables,
-             lasttable=lasttable,
-             error=error,
-             debug=unicode(s),
+             count = count,
+             offset = offset,
+             limit = limit,
+             colspan = colspan,
+             rows = rows,
+             names = names,
+             tables = tables,
+             extratables = extratables,
+             lasttable = lasttable,
+             error = error,
+             debug = unicode(s),
            )
 
 

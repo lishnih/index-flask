@@ -1,0 +1,95 @@
+body, input[type="text"], textarea {
+  background-color: #d0d0ff;
+}
+
+table {
+  background-color: #eaeaff;
+  border-collapse: collapse;
+}
+
+tr {
+  vertical-align: top;
+}
+
+th {
+  background-color: #cdeecd;
+  padding: .1em .3em;
+}
+
+td {
+  padding: .05em .3em;
+}
+
+.a {
+  cursor: pointer;
+}
+
+span.a {
+  cursor: pointer;
+  color: #0000ff;
+  border: 0em solid blue;
+  padding: 0em .3em;
+}
+
+.center {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.no-border {
+  padding: 0em 0em 0em 0em;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+div {
+  box-sizing: border-box;
+  padding: .3em .7em;
+}
+
+div.menu {
+  padding: 0em .7em;
+}
+
+div.rmenu {
+  float: right;
+  padding: 0em .7em;
+}
+
+div.serial {
+  float: left;
+}
+
+div.tabular {
+  padding: 0em;
+  display: table;
+}
+
+div.cellular {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+
+div.isolated {
+  border: .1em solid blue;
+  margin: .6em .3em;
+}
+
+div.chamfering {
+  border-radius: 6px;
+ -webkit-border-radius: 6px;
+ -moz-border-radius: 5px;
+ -khtml-border-radius: 10px;
+}
+
+div.debug {
+  border: .1em dashed blue;
+}
