@@ -5,8 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import logging
-from flask import Flask, g, url_for, render_template, send_from_directory
+import os, logging
+from flask import Flask, g, url_for, render_template, send_from_directory, abort, __version__
 from sqlalchemy.sql import select
 
 from .ext.backwardcompat import *
@@ -32,22 +32,6 @@ def hello():
     return app.send_static_file('index.html')
 
 
-@app.route('/test/')
-@app.route('/test/<path:path>')
-def view_test(path=''):
-    if not path or path[-1] == '/':
-        test_url = '/test/{0}'.format(path)
-        dirlist, filelist = list_files(test_url, app.root_path)
-        return render_template('view_test.html',
-                 title = 'Testing directory',
-                 path = test_url,
-                 dirlist = dirlist,
-                 filelist = filelist,
-               )
-    else:
-        return send_from_directory('test', path)
-
-
 @app.route('/user/<username>')
 def profile(username):
     return 'User {0}'.format(username)
@@ -55,50 +39,14 @@ def profile(username):
 
 @app.route('/login')
 def login():
-    pass
-
-
-@app.route('/app')
-def view_app():
-    return html(app)
-
-
-@app.route('/g')
-def view_g():
-    get_conn()
-    return html(g)
-
-
-@app.route('/dbinfo/')
-def view_dbinfo():
-    get_conn()
-#   return g.db_uri + '<br />' + html(g.metadata)
-#   return render_template('dump_dict.html', obj=g.tables)
-    return render_template('view_dbinfo.html',
-             title = 'Databases info',
-             uri=g.db_uri,
-             dbs=g.metadata.tables.keys(),
-             debug=html(g.metadata),
-           )
-
-
-@app.route('/dbinfo/<table>')
-def view_tableinfo(table=None):
-    get_conn()
-    if table in g.metadata.tables.keys():
-        return html(g.metadata.tables.get(table))
-    else:
-        return 'No such table!'
-
-
-@app.route('/rel')
-def view_rel():
-    get_conn()
-    return html(g.relationships)
+    return ''
 
 
 @app.route('/debug')
 def view_debug():
+    if not app.debug:
+        abort(404)
+
     output = []
     for rule in app.url_map.iter_rules():
         options = {}
@@ -113,6 +61,88 @@ def view_debug():
              title = 'Url mapping',
              urls=sorted(output),
            )
+
+
+@app.route('/test/')
+@app.route('/test/<path:path>')
+def view_test(path=''):
+    if not app.debug:
+        abort(404)
+
+    if not path or path[-1] == '/':
+        test_url = '/test/{0}'.format(path)
+        dirlist, filelist = list_files(test_url, app.root_path)
+        return render_template('view_test.html',
+                 title = 'Testing directory',
+                 path = test_url,
+                 dirlist = dirlist,
+                 filelist = filelist,
+               )
+    else:
+        return send_from_directory(os.path.join(app.root_path, 'test'), path)
+#       return send_from_directory('test', path)
+
+
+@app.route('/ver')
+def view_ver():
+    if not app.debug:
+        abort(404)
+
+    return __version__
+
+
+@app.route('/app')
+def view_app():
+    if not app.debug:
+        abort(404)
+
+    return html(app)
+
+
+@app.route('/g')
+def view_g():
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+    return html(g)
+
+
+@app.route('/rel')
+def view_rel():
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+    return html(g.relationships)
+
+
+@app.route('/dbinfo/')
+def view_dbinfo():
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+#   return g.db_uri + '<br />' + html(g.metadata)
+#   return render_template('dump_dict.html', obj=g.tables)
+    return render_template('view_dbinfo.html',
+             title = 'Databases info',
+             uri=g.db_uri,
+             dbs=g.metadata.tables.keys(),
+             debug=html(g.metadata),
+           )
+
+
+@app.route('/dbinfo/<table>')
+def view_tableinfo(table=None):
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+    if table in g.metadata.tables.keys():
+        return html(g.metadata.tables.get(table))
+    else:
+        return 'No such table!'
 
 
 @app.route('/db/')
