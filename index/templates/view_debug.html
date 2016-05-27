@@ -3,6 +3,11 @@
 {% block body %}
 
 <table border="1">
+    <tr>
+        <th>Url</th>
+        <th>Function</th>
+        <th>Methods</th>
+    </tr>
   {%- for endpoint, methods, url in urls %}
     <tr>
         <td><a href="{{ url }}">{{ url }}</a></td>

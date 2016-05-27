@@ -6,7 +6,8 @@ from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
 import os, logging
-from flask import Flask, g, url_for, render_template, send_from_directory, abort, __version__
+from flask import ( Flask, g, request, jsonify, url_for, render_template,
+                    send_from_directory, abort, __version__ )
 from sqlalchemy.sql import select
 
 from .ext.backwardcompat import *
@@ -59,7 +60,7 @@ def view_debug():
 
     return render_template('view_debug.html',
              title = 'Url mapping',
-             urls=sorted(output),
+             urls = sorted(output),
            )
 
 
@@ -127,9 +128,9 @@ def view_dbinfo():
 #   return render_template('dump_dict.html', obj=g.tables)
     return render_template('view_dbinfo.html',
              title = 'Databases info',
-             uri=g.db_uri,
-             dbs=g.metadata.tables.keys(),
-             debug=html(g.metadata),
+             uri = g.db_uri,
+             dbs = g.metadata.tables.keys(),
+             debug = html(g.metadata),
            )
 
 
@@ -154,29 +155,27 @@ def view_db():
            )
 
 
-@app.route('/db/<table1>/')
-@app.route('/db/<table1>/<table2>/')
-@app.route('/db/<table1>/<table2>/<table3>/')
-@app.route('/db/<table1>/<table2>/<table3>/<table4>/')
-@app.route('/db/<table1>/<table2>/<table3>/<table4>/<table5>/')
+@app.route('/db/<table1>/', methods=["GET", "POST"])
+@app.route('/db/<table1>/<table2>/', methods=["GET", "POST"])
+@app.route('/db/<table1>/<table2>/<table3>/', methods=["GET", "POST"])
+@app.route('/db/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
+@app.route('/db/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
 def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     conn = get_conn()
 
     # Обратный порядок - не менять!
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
 
+    # Список таблиц
     mtables = [g.metadata.tables.get(i) for i in tables]
 
+    # Список колонок
     mcolumns = []
     for i in mtables:
         mcolumns.extend(j for j in i.c if not j.foreign_keys and not j.primary_key and j.name[0] != '_')
-
-    offset = 0
-    limit = 100
     colspan = len(mcolumns)
-    s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
-    s_count = select(mtables, use_labels=True)
 
+    # Объединяем таблицы
     error = None
     mtable = g.metadata.tables.get(table1)
 
@@ -189,29 +188,52 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
         else:
             error = 'Error!'
 
-    result = conn.execute(s.select_from(mtable))
-    rows = [row for row in result]
-
+    # Получаем кол-во всех записей в таблице
+    s_count = select(mtables, use_labels=True)
     count = conn.execute(s_count.select_from(mtable).count())
     count = count.first()[0]
 
+    # Получаем записи
+    if 'all' in request.args.keys():
+        offset = 0
+        limit = count
+        s = select(mcolumns, use_labels=True)
+    else:
+        offset = int(request.form.get('offset')) if request.method == 'POST' else 0
+        limit = 100
+        s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
+
+    result = conn.execute(s.select_from(mtable))
+    rows = [row for row in result]
+
+    # Необходимые переменные
     names = [[column.table.name, column.name] for name, column in s._columns_plus_names]
     extratables = [i.column.table.name for i in s_count.foreign_keys]   # s_count!
     lasttable = tables[0] if len(tables) > 1 else None
-    return render_template('view_table.html',
-             title = 'Database: {0}'.format(table1),
-             count = count,
-             offset = offset,
-             limit = limit,
-             colspan = colspan,
-             rows = rows,
-             names = names,
-             tables = tables,
-             extratables = extratables,
-             lasttable = lasttable,
-             error = error,
-             debug = unicode(s),
-           )
+
+    # Выводим
+    if request.method == 'POST':
+        return jsonify(
+                 count = count,
+                 offset = offset,
+                 limit = limit,
+                 rows=[[j for j in i] for i in rows],
+               )
+    else:
+        return render_template('view_table.html',
+                 title = 'Database: {0}'.format(table1),
+                 count = count,
+                 offset = offset,
+                 limit = limit,
+                 colspan = colspan,
+                 rows = rows,
+                 names = names,
+                 tables = tables,
+                 extratables = extratables,
+                 lasttable = lasttable,
+                 error = error,
+#                debug = unicode(s),
+               )
 
 
 

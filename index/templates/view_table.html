@@ -2,9 +2,31 @@
 
 {% block body %}
 
-<div>
+<div class="serial">
   Count: {{ count }}
 </div>
+
+<div class="serial">
+    <a href="/db/">Список баз данных</a>
+</div>
+
+{%- if extratables %}
+<div class="serial">
+  {%- for table in extratables %}
+    {%- if table not in tables %}
+    <a href="{{ table }}">+{{ table }}</a>
+    {%- endif %}
+  {%- endfor %}
+</div>
+{%- endif %}
+
+{%- if lasttable %}
+<div class="serial">
+    <a href="..">-{{ lasttable }}</a>
+</div>
+{%- endif %}
+
+<div>&nbsp;</div>
 
 <table border="1">
   {%- if names %}
@@ -25,29 +47,11 @@
 
   {%- if count > offset + limit %}
     <tr>
-        <td class="a center extendtable" colspan="{{ colspan }}" data-offset="{{ offset + limit }}">Показать ещё</td>
+        <td class="a extendtable" colspan="{{ colspan }}" data-offset="{{ offset + limit }}">
+Показать ещё {{ limit }} (показано <span id="shown">{{ offset + limit }}</span> записей) | <a href="?all">Показать всё</a>
+        </td>
     </tr>
   {%- endif %}
 </table>
-
-{%- if extratables %}
-<p>
-  {%- for table in extratables %}
-    {%- if table not in tables %}
-    <a href="{{ table }}">+{{ table }}</a>
-    {%- endif %}
-  {%- endfor %}
-</p>
-{%- endif %}
-
-{%- if lasttable %}
-<p>
-    <a href="..">-{{ lasttable }}</a>
-</p>
-{%- endif %}
-
-<p>
-    <a href="/db/">Список баз данных</a>
-</p>
 
 {% endblock %}
