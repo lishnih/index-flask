@@ -1,0 +1,75 @@
+{% extends "_layout_jtable.html" %}
+
+{% block body %}
+
+  <script type="text/javascript">
+
+    $(document).ready(function () {
+
+      var query = window.location.search.slice(1);
+      if ( query ) {
+        // Prepare Columns
+        $.ajax({
+          type: "POST",
+          dataType: "json",
+          url: '/j3?action=columns&' + query,
+//        data: data,
+//        async: false,
+          success: function(data) {
+            if (data.debug)
+              debug(data.debug);
+
+
+            // Prepare jTable
+            $('#table1').jtable({
+//            title: 'Table',
+              actions: {
+                listAction:   '/j3?action=list&' + query,
+                createAction: '/j3?action=create&' + query,
+                updateAction: '/j3?action=update&' + query,
+                deleteAction: '/j3?action=delete&' + query,
+              },
+              fields: data.fields,
+            });
+
+
+            // Load Table
+            $('#table1').jtable('load');
+
+
+            // Load extra tables
+            $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: '/j3?action=extratables&' + query,
+//            data: data,
+//            async: false,
+              success: function(data) {
+                if (data.debug)
+                  debug(data.debug);
+
+                if (data.Result == "OK")
+                  $('#extratables').html('<a href="' + window.location.href + ',' + data.extratables + '">' + data.extratables + '</a>');
+              },
+              error: function(data, content) {
+                debug(content);
+              },
+            });
+
+
+          },
+          error: function(data, content) {
+            debug(content);
+          },
+        });
+      } else
+        $('#table1').text('Table is missing!');
+
+    });
+
+  </script>
+
+  <div id="table1" style="width: 100%;"></div>
+  <div id="extratables"></div>
+
+{% endblock %}

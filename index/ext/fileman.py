@@ -8,9 +8,12 @@ from __future__ import ( division, absolute_import,
 import os
 
 
-def list_files(path, root):
+def list_files(path, root, override_url=None):
     if root:
         fullpath = "{0}{1}".format(root, path)
+
+    if override_url:
+        path = override_url
 
     dirlist = []
     filelist = []

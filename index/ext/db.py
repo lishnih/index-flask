@@ -22,9 +22,12 @@ def initDb(db_uri):
             tables[table.name].append(column.name)
 
             if column.name[0:1] == '_':
-                x, first_table, unique_key = column.name.split('_', 2)
-                if first_table not in relationships:
-                    relationships[first_table] = dict()
-                relationships[first_table][table.name] = [unique_key, column.name]
+                try:
+                    x, first_table, unique_key = column.name.split('_', 2)
+                    if first_table not in relationships:
+                        relationships[first_table] = dict()
+                    relationships[first_table][table.name] = [unique_key, column.name]
+                except ValueError:
+                    pass
 
     return engine, metadata, relationships

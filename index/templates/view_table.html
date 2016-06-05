@@ -13,9 +13,7 @@
 {%- if extratables %}
 <div class="serial">
   {%- for table in extratables %}
-    {%- if table not in tables %}
     <a href="{{ table }}">+{{ table }}</a>
-    {%- endif %}
   {%- endfor %}
 </div>
 {%- endif %}

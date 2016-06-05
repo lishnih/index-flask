@@ -33,9 +33,9 @@ def hello():
     return app.send_static_file('index.html')
 
 
-@app.route('/user/<username>')
-def profile(username):
-    return 'User {0}'.format(username)
+# @app.route('/user/<username>')
+# def profile(username):
+#     return 'User {0}'.format(username)
 
 
 @app.route('/login')
@@ -82,6 +82,32 @@ def view_test(path=''):
     else:
         return send_from_directory(os.path.join(app.root_path, 'test'), path)
 #       return send_from_directory('test', path)
+
+
+@app.route('/user/')
+def view_user():
+    if not app.debug:
+        abort(404)
+
+    user_url = '/{0}/user/'.format(app.template_folder)
+    dirlist, filelist = list_files(user_url, app.root_path, '/user/')
+    return render_template('view_test.html',
+             title = 'User templates directory',
+             path = '/user/',
+             dirlist = dirlist,
+             filelist = filelist,
+           )
+
+
+@app.route('/user/<path:path>')
+def view_user_path(path=''):
+    if not app.debug:
+        abort(404)
+
+    user_html = 'user/{0}'.format(path)
+    return render_template(user_html,
+             title = 'User',
+           )
 
 
 @app.route('/ver')
@@ -172,10 +198,12 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     # Список колонок
     mcolumns = []
     for i in mtables:
+        if i is None:
+            abort(404)    # Table not exist
         mcolumns.extend(j for j in i.c if not j.foreign_keys and not j.primary_key and j.name[0] != '_')
     colspan = len(mcolumns)
 
-    # Объединяем таблицы
+    # Join для таблиц
     error = None
     mtable = g.metadata.tables.get(table1)
 
@@ -209,6 +237,7 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
     # Необходимые переменные
     names = [[column.table.name, column.name] for name, column in s._columns_plus_names]
     extratables = [i.column.table.name for i in s_count.foreign_keys]   # s_count!
+    extratables = [i for i in extratables if i not in tables]
     lasttable = tables[0] if len(tables) > 1 else None
 
     # Выводим
@@ -235,6 +264,127 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
 #                debug = unicode(s),
                )
 
+
+@app.route('/jtable')
+def view_jtable():
+    return render_template('view_jtable.html',
+#            debug = unicode(s),
+           )
+
+
+@app.route('/j3', methods=["GET", "POST"])
+def view_j3():
+    conn = get_conn()
+
+    if request.method == 'POST':
+        action = request.args.get('action')
+        tables = request.args.get('t').split(',')
+        table1 = tables[0]
+
+        # Список таблиц
+        mtables = [g.metadata.tables.get(i) for i in tables]
+
+        # Список колонок
+        mcolumns = []
+        for i in mtables:
+            if i is None:
+                return jsonify(Result="ERROR", Message="Table is missing!")
+
+            mcolumns.extend(j for j in i.c)
+
+        # Join для таблиц
+        error = None
+        mtable = g.metadata.tables.get(table1)
+
+        l = len(tables) - 1
+        for i in range(l):
+            for j in mtables[i].foreign_keys:
+                if j.column.table == mtables[i + 1]:
+                    mtable = mtable.join(mtables[i + 1], j.parent==j.column)
+                    break
+            else:
+                error = 'Error!'
+
+        # Получаем кол-во всех записей в таблице
+        s_count = select(mtables, use_labels=True)
+        count = conn.execute(s_count.select_from(mtable).count())
+        count = count.first()[0]
+
+        # Колонки
+        names = []
+        fields = {}
+        for name, column in s_count._columns_plus_names:  # s_count!
+            columnname = "{0}.{1}".format(column.table.name, column.name)
+            names.append(name)
+            key = True if column.foreign_keys or column.primary_key or column.name[0] == '_' else False
+            fields[name] = {
+                'key':    True  if key else False,
+                'create': False if key else True,
+                'edit':   False if key else True,
+                'list':   False if key else True,
+                'title':  columnname,
+            }
+
+        if action == 'list':
+            # Получаем записи
+            offset = 0
+            limit = 100
+            s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
+
+            result = conn.execute(s.select_from(mtable))
+
+            rows = []
+            for row in result:
+                rows.append(dict(zip(names, row)))
+
+            res = {
+              "Result": "OK",
+              "Records": rows,
+            }
+
+        elif action == 'create':
+            res = {
+              "Result": "ERROR",
+              "Message": "Access denied!",
+            }
+
+        elif action == 'update':
+            res = {
+              "Result": "ERROR",
+              "Message": "Access denied!",
+            }
+
+        elif action == 'delete':
+            res = {
+              "Result": "ERROR",
+              "Message": "Access denied!",
+            }
+
+        elif action == 'columns':
+            res = {
+              "Result": "OK",
+              "fields": fields,
+#             "debug": html(request),
+            }
+
+        elif action == 'extratables':
+            extratables = [i.column.table.name for i in s_count.foreign_keys]   # s_count!
+            extratables = [i for i in extratables if i not in tables]
+
+            res = {
+              "Result": "OK",
+              "extratables": extratables,
+#             "debug": html(s_count),
+            }
+
+        else:
+            res = {
+              "Result": "ERROR",
+              "Message": "Action unknown!",
+            }
+
+        return jsonify(**res)
+    return "no output"
 
 
 if __name__ == "__main__":
