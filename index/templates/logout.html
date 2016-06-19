@@ -1,0 +1,16 @@
+{% extends "_layout.html" %}
+
+{% block body %}
+
+<p>
+You are logged as {{ username }}.<br />
+Do you wish to log out?<br />
+</p>
+
+{%- if next %}
+<a href="/logout?next={{ next }}">Logout</a>
+{%- else %}
+<a href="/logout">Logout</a>
+{%- endif %}
+
+{% endblock %}

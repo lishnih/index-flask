@@ -1,0 +1,40 @@
+{% extends "_layout.html" %}
+
+{% block body %}
+
+  <table width="100%" border="1">
+    <tr>
+      <th width="200">
+        <a href="https://github.com/lishnih/index/">NDT Index</a>
+      </th>
+      <th style="text-align: right;">
+        {%- if username %}
+        <a href="/profile">{{ username }}</a>
+        <a href="/logout">[x]</a>
+        {%- else %}
+        <a id="login" href="/login">Вход</a> ::
+        <a id="register" href="/register">Регистрация</a>
+        {%- endif %}
+      </th>
+    </tr>
+
+    <tr>
+      <td>
+        <ul>
+          <li><a href="db/">Просмотр</a></li>
+          <li><a href="utils/">Добавить документ</a></li>
+          <li><a href="about.html">О проекте</a></li>
+          <li><a href="tos.html">Условия использование</a></li>
+        </ul>
+      </td>
+      <td style="vertical-align: bottom;">
+        <div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <div>
+    ©2006-2016 Stan Ovchinnikov, <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html">GNU Lesser General Public License, version 2.1</a>
+  </div>
+
+{% endblock %}

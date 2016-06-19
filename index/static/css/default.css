@@ -2,6 +2,15 @@ body, input[type="text"], textarea {
   background-color: #d0d0ff;
 }
 
+input[type="password"] {
+  background-color: #aaaaaa;
+}
+
+ul.errors {
+  font-weight: bold;
+  color: #ff0000;
+}
+
 table {
   background-color: #eaeaff;
   border-collapse: collapse;
