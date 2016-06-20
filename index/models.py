@@ -16,7 +16,13 @@ from . import app
 db = SQLAlchemy(app)
 
 
-class User(db.Model):
+relationship_user_group = db.Table('rs_user_group',
+    db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
+    db.Column('_group_id', db.Integer, db.ForeignKey('group.id'), nullable=False),
+    db.PrimaryKeyConstraint('_user_id', '_group_id'))
+
+
+class User(db.Model):               # Rev. 2016-06-20
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -27,8 +33,19 @@ class User(db.Model):
     created = db.Column(db.DateTime)
     token = db.Column(db.String)
     verified = db.Column(db.String)
-#   authenticated = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=True)
+    authenticated = db.Column(db.Boolean, default=True)
 #   db.Index('email', email, unique=True)
+
+    home = db.Column(db.String)
+
+    ya_account = db.Column(db.String)
+    gd_account = db.Column(db.String)
+
+    ya_token = db.Column(db.String)
+    gd_token = db.Column(db.String)
+
+    groups = db.relationship('Group', backref=__tablename__, secondary=relationship_user_group)
 
     databases = db.relationship('Database', backref=__tablename__, lazy='dynamic')
 
@@ -78,17 +95,31 @@ class User(db.Model):
     def send_verification(self):
         pass
 
-#     @classmethod
-#     def get(cls, id):
-#         return cls.user_database.get(id)
+#   @classmethod
+#   def get(cls, id):
+#       return cls.user_database.get(id)
 
 
-class Database(db.Model):
+class Group(db.Model):              # Rev. 2016-06-20
+    __tablename__ = 'group'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    created = db.Column(db.DateTime)
+
+    users = db.relationship('User', backref=__tablename__, lazy='dynamic')
+
+    def __init__(self):
+        self.created = datetime.utcnow()
+
+
+class Database(db.Model):           # Rev. 2016-06-20
     __tablename__ = 'database'
 
     id = db.Column(db.Integer, primary_key=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String)
     url = db.Column(db.String)
+
 
 db.create_all()

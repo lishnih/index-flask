@@ -19,6 +19,36 @@ from .ext.fileman import list_files
 from . import app, get_conn
 
 
+@app.route('/dbinfo/')
+@login_required
+def view_dbinfo():
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+#   return g.db_uri + '<br />' + html(g.metadata)
+#   return render_template('dump_dict.html', obj=g.tables)
+    return render_template('view_dbinfo.html',
+             title = 'Databases info',
+             uri = g.db_uri,
+             dbs = g.metadata.tables.keys(),
+             debug = html(g.metadata),
+           )
+
+
+@app.route('/dbinfo/<table>')
+@login_required
+def view_tableinfo(table=None):
+    if not app.debug:
+        abort(404)
+
+    get_conn()
+    if table in g.metadata.tables.keys():
+        return html(g.metadata.tables.get(table))
+    else:
+        return 'No such table!'
+
+
 @app.route('/debug')
 @login_required
 def debug_debug():
@@ -62,32 +92,26 @@ def debug_test(path=''):
 #       return send_from_directory('test', path)
 
 
-@app.route('/user/')
-@login_required
-def debug_user():
-    if not app.debug:
-        abort(404)
-
-    user_url = '/{0}/user/'.format(app.template_folder)
-    dirlist, filelist = list_files(user_url, app.root_path, '/user/')
-    return render_template('debug_test.html',
-             title = 'User templates directory',
-             path = '/user/',
-             dirlist = dirlist,
-             filelist = filelist,
-           )
-
-
-@app.route('/user/<path:path>')
-@login_required
-def debug_user_path(path=''):
-    if not app.debug:
-        abort(404)
-
-    user_html = 'user/{0}'.format(path)
-    return render_template(user_html,
-             title = 'User',
-           )
+# @app.route('/user/')
+# @login_required
+# def debug_user():
+#     user_url = '/{0}/user/'.format(app.template_folder)
+#     dirlist, filelist = list_files(user_url, app.root_path, '/user/')
+#     return render_template('debug_test.html',
+#              title = 'User templates directory',
+#              path = '/user/',
+#              dirlist = dirlist,
+#              filelist = filelist,
+#            )
+#
+#
+# @app.route('/user/<path:path>')
+# @login_required
+# def debug_user_path(path=''):
+#     user_html = 'user/{0}'.format(path)
+#     return render_template(user_html,
+#              title = 'User',
+#            )
 
 
 @app.route('/ver')
@@ -108,14 +132,14 @@ def debug_app():
     return html(app)
 
 
-@app.route('/session')
-@login_required
-def debug_session():
-    if not app.debug:
-        abort(404)
-
-    d = {key: val for key, val in session.viewitems()}
-    return html((session, d))
+# @app.route('/session')
+# @login_required
+# def debug_session():
+#     if not app.debug:
+#         abort(404)
+#
+#     d = {key: val for key, val in session.viewitems()}
+#     return html((session, d))
 
 
 @app.route('/request')

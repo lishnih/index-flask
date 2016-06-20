@@ -26,36 +26,6 @@ def index():
     return render_template('index.html', username=username)
 
 
-@app.route('/dbinfo/')
-@login_required
-def view_dbinfo():
-    if not app.debug:
-        abort(404)
-
-    get_conn()
-#   return g.db_uri + '<br />' + html(g.metadata)
-#   return render_template('dump_dict.html', obj=g.tables)
-    return render_template('view_dbinfo.html',
-             title = 'Databases info',
-             uri = g.db_uri,
-             dbs = g.metadata.tables.keys(),
-             debug = html(g.metadata),
-           )
-
-
-@app.route('/dbinfo/<table>')
-@login_required
-def view_tableinfo(table=None):
-    if not app.debug:
-        abort(404)
-
-    get_conn()
-    if table in g.metadata.tables.keys():
-        return html(g.metadata.tables.get(table))
-    else:
-        return 'No such table!'
-
-
 @app.route('/db/')
 @login_required
 def view_db():

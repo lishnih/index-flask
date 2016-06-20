@@ -38,7 +38,10 @@ def my_token_loader(token):
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def register():
+def user_register():
+    if not current_user.is_anonymous:
+        return render_template('user/logout.html', username=current_user.username, next="register")
+
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(
@@ -53,14 +56,14 @@ def register():
         flash('Thanks for registering')
 
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('user/register.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 # @app.route('/login/<user>', methods=['GET', 'POST'])
-def login(user=None):
+def user_login(user=None):
     if not current_user.is_anonymous:
-        return render_template('logout.html', username=current_user.username, next="login")
+        return render_template('user/logout.html', username=current_user.username, next="login")
 
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -68,18 +71,17 @@ def login(user=None):
 
         flash('Successfully logged in as {0}'.format(form.user.username))
 
-        next = None
-#       next = request.args.get('next')
-#       if not next_is_valid(next):
-#           return abort(400)
+        next = request.args.get('next')
+        if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
+            return redirect(url_for(next))
 
-        return redirect(next or url_for('index'))
-    return render_template('login.html', form=form)
+        return redirect("/")
+    return render_template('user/login.html', form=form)
 
 
 @app.route("/logout")
 @login_required
-def logout():
+def user_logout():
     logout_user()
 
     next = request.args.get('next')
@@ -91,8 +93,28 @@ def logout():
 
 @app.route("/profile")
 @login_required
-def profile():
-    return html(current_user)
+def user_profile():
+#   return html(current_user)
+
+    return render_template('user/profile.html', cu=current_user)
+
+
+@app.route("/edit", methods=['GET', 'POST'])
+@login_required
+def user_edit():
+    return render_template('user/edit.html', cu=current_user)
+
+
+@app.route("/append_db")
+@login_required
+def user_append_db():
+    return render_template('user/append_db.html', uid=current_user.id)
+
+
+@app.route("/delete_account")
+@login_required
+def user_delete():
+    return render_template('user/delete_account.html', username=current_user.username)
 
 
 # with app.test_client() as tc:
