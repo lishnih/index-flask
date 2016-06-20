@@ -1,3 +1,3 @@
-[submodule "index-flask/static/debug"]
-	path = index-flask/static/debug
+[submodule "index_flask/static/debug"]
+	path = index_flask/static/debug
 	url = git@bitbucket.org:lishnih/jdebug.git
