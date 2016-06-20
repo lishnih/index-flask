@@ -76,5 +76,5 @@ archive.list
 
 
 # index-flask
-index/test/
-index/static/ver.txt
+index-flask/test/
+index-flask/static/ver.txt
