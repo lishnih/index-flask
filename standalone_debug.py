@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 import logging
 
-from index import app
+from index_flask import app
 
 
 if __name__ == '__main__':

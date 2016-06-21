@@ -16,6 +16,14 @@ from . import app
 db = SQLAlchemy(app)
 
 
+def append_user_to_group(group_name, user):
+    group = Group.query.filter_by(name=group_name).first()
+    if not group:
+        group = Group(group_name)
+
+    user.groups.append(group)
+
+
 relationship_user_group = db.Table('rs_user_group',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
     db.Column('_group_id', db.Integer, db.ForeignKey('group.id'), nullable=False),
@@ -107,9 +115,8 @@ class Group(db.Model):              # Rev. 2016-06-20
     name = db.Column(db.String)
     created = db.Column(db.DateTime)
 
-    users = db.relationship('User', backref=__tablename__, lazy='dynamic')
-
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.created = datetime.utcnow()
 
 
@@ -120,6 +127,10 @@ class Database(db.Model):           # Rev. 2016-06-20
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String)
     url = db.Column(db.String)
+
+    def __init__(self, name, user):
+        self.name = name
+        self._user_id = user.id
 
 
 db.create_all()

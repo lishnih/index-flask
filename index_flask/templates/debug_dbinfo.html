@@ -4,7 +4,7 @@
 
 <table border="1">
     <tr>
-        <th>Databases</th>
+        <th>Databases Info</th>
     </tr>
     {%- for key in db_list %}
     <tr>
@@ -26,6 +26,13 @@
 <br />
 
 {%- if db %}
+
+<pre>
+db_uri {{ db_uri }}
+engine {{ engine }}
+metadata {{ metadata }}
+</pre>
+
 <table border="1">
     <tr>
         <th>Tables</th>
@@ -36,6 +43,17 @@
     </tr>
     {%- endfor %}
 </table>
+<br />
+
+<b>Relationships</b>
+<br />
+<dl>
+  {%- for key, value in relationships | dictsort %}
+    <dt>{{ key }}</dt>
+    <dd>{{ value }}</dd>
+  {%- endfor %}
+</dl>
+
 {%- endif %}
 
 {% endblock %}

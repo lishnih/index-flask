@@ -5,10 +5,14 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+import os.path
+
 from sqlalchemy import create_engine, MetaData
 
 
-def initDb(db_uri):
+def initDb(home, dbname):
+    db_uri = "{0}:///{1}/{2}.sqlite".format('sqlite', home, dbname)
+
     engine = create_engine(db_uri)
     metadata = MetaData(engine, reflect=True)
 
@@ -30,4 +34,21 @@ def initDb(db_uri):
                 except ValueError:
                     pass
 
-    return engine, metadata, relationships
+    return db_uri, engine, metadata, tables, relationships
+
+
+def getDbList(home):
+    db_dict = {}
+    try:
+        ldir = os.listdir(home)
+    except OSError:
+        pass
+    else:
+        for name in ldir:
+            fullname = os.path.join(home, name)
+            if os.path.isfile(fullname):
+                filename, ext = os.path.splitext(name)
+                if ext == '.sqlite':
+                    db_dict[filename] = fullname
+
+    return db_dict

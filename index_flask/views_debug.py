@@ -7,46 +7,62 @@ from __future__ import ( division, absolute_import,
 
 import os
 
-from flask import ( g, request, render_template, url_for,
+from flask import ( g, request, render_template, url_for, session,
                     send_from_directory, abort, __version__ )
 
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from .ext.backwardcompat import *
-from .ext.dump_html import html
 from .ext.fileman import list_files
+from .ext.dump_html import html
 
-from . import app, get_conn
+from . import app, user_data
+
+
+@app.route('/current_user')
+@login_required
+def debug_current_user():
+    if not app.debug:
+        abort(404)
+
+    return html(current_user)
+
+
+@app.route('/user_data')
+@login_required
+def debug_global_object():
+    if not app.debug:
+        abort(404)
+
+    return html(user_data.get_data(current_user))
 
 
 @app.route('/dbinfo/')
+@app.route('/dbinfo/<dbname>/')
 @login_required
-def view_dbinfo():
+def debug_dbinfo(dbname=None):
     if not app.debug:
         abort(404)
 
-    get_conn()
-#   return g.db_uri + '<br />' + html(g.metadata)
-#   return render_template('dump_dict.html', obj=g.tables)
-    return render_template('view_dbinfo.html',
-             title = 'Databases info',
-             uri = g.db_uri,
-             dbs = g.metadata.tables.keys(),
-             debug = html(g.metadata),
-           )
-
-
-@app.route('/dbinfo/<table>')
-@login_required
-def view_tableinfo(table=None):
-    if not app.debug:
-        abort(404)
-
-    get_conn()
-    if table in g.metadata.tables.keys():
-        return html(g.metadata.tables.get(table))
+    if dbname:
+        db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     else:
-        return 'No such table!'
+        db_uri = engine = metadata = tables = relationships = None
+
+    print(db_uri, engine, metadata, tables, relationships)
+
+    return render_template('debug_dbinfo.html',
+             title = 'Databases info',
+             db_list = user_data.get_db_list(current_user),
+
+             db = dbname,
+             db_uri = db_uri,
+             engine = engine,
+             metadata = metadata,
+             tables = tables,
+             relationships = relationships,
+             debug = html(metadata),
+           )
 
 
 @app.route('/debug')
@@ -132,14 +148,14 @@ def debug_app():
     return html(app)
 
 
-# @app.route('/session')
-# @login_required
-# def debug_session():
-#     if not app.debug:
-#         abort(404)
-#
-#     d = {key: val for key, val in session.viewitems()}
-#     return html((session, d))
+@app.route('/session')
+@login_required
+def debug_session():
+    if not app.debug:
+        abort(404)
+
+    d = {key: val for key, val in session.viewitems()}
+    return html((session, d))
 
 
 @app.route('/request')
@@ -158,13 +174,3 @@ def debug_g():
         abort(404)
 
     return html(g)
-
-
-@app.route('/rel')
-@login_required
-def debug_rel():
-    if not app.debug:
-        abort(404)
-
-    get_conn()
-    return html(g.relationships)

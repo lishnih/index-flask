@@ -10,6 +10,10 @@
     <a href="/db/">Список баз данных</a>
 </div>
 
+<div class="serial">
+    <a href="/db/{{ db }}">{{ db }}</a>
+</div>
+
 {%- if extratables %}
 <div class="serial">
   {%- for table in extratables %}

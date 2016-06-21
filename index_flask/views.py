@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from flask import ( g, request, jsonify, render_template,
+from flask import ( request, jsonify, render_template, session,
                     redirect, url_for, abort )
 
 from flask_login import login_required, current_user
@@ -15,7 +15,7 @@ from sqlalchemy.sql import select
 from .ext.backwardcompat import *
 from .ext.dump_html import html
 
-from . import app, get_conn
+from . import app, user_data
 
 
 @app.route("/")
@@ -23,34 +23,45 @@ def index():
 #   return app.send_static_file('index.html')
 
     username = None if current_user.is_anonymous else current_user.username
-    return render_template('index.html', username=username)
-
-
-@app.route('/db/')
-@login_required
-def view_db():
-    get_conn()
-    return render_template('view_db.html', 
-             title = 'Databases',
-             dbs = g.metadata.tables.keys(),
-#            debug = html(g),
+    return render_template('index.html',
+             title = 'Index',
+             username = username,
            )
 
 
-@app.route('/db/<table1>/', methods=["GET", "POST"])
-@app.route('/db/<table1>/<table2>/', methods=["GET", "POST"])
-@app.route('/db/<table1>/<table2>/<table3>/', methods=["GET", "POST"])
-@app.route('/db/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
-@app.route('/db/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
+@app.route('/db/')
+@app.route('/db/<dbname>/')
 @login_required
-def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
-    conn = get_conn()
+def view_db(dbname=None):
+    if dbname:
+        db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+    else:
+        tables = None
+
+    return render_template('view_db.html',
+             title = 'Databases',
+             db_list = user_data.get_db_list(current_user),
+
+             db = dbname,
+             tables = tables,
+           )
+
+
+@app.route('/db/<dbname>/<table1>/', methods=["GET", "POST"])
+@app.route('/db/<dbname>/<table1>/<table2>/', methods=["GET", "POST"])
+@app.route('/db/<dbname>/<table1>/<table2>/<table3>/', methods=["GET", "POST"])
+@app.route('/db/<dbname>/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
+@app.route('/db/<dbname>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
+@login_required
+def view_table(dbname, table1=None, table2=None, table3=None, table4=None, table5=None):
+    db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+    conn = engine.connect()
 
     # Обратный порядок - не менять!
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
 
     # Список таблиц
-    mtables = [g.metadata.tables.get(i) for i in tables]
+    mtables = [metadata.tables.get(i) for i in tables]
 
     # Список колонок
     mcolumns = []
@@ -62,7 +73,7 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
 
     # Join для таблиц
     error = None
-    mtable = g.metadata.tables.get(table1)
+    mtable = metadata.tables.get(table1)
 
     l = len(tables) - 1
     for i in range(l):
@@ -107,7 +118,8 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
                )
     else:
         return render_template('view_table.html',
-                 title = 'Database: {0}'.format(table1),
+                 title = 'Database: {0}'.format(dbname),
+                 db = dbname,
                  count = count,
                  offset = offset,
                  limit = limit,
@@ -126,6 +138,7 @@ def view_table(table1=None, table2=None, table3=None, table4=None, table5=None):
 @login_required
 def view_jtable():
     return render_template('view_jtable.html',
+             title = 'View table',
 #            debug = unicode(s),
            )
 
@@ -133,7 +146,7 @@ def view_jtable():
 @app.route('/j3', methods=["GET", "POST"])
 @login_required
 def view_j3():
-    conn = get_conn()
+#   conn = get_conn()
 
     if request.method == 'POST':
         action = request.args.get('action')
@@ -141,7 +154,7 @@ def view_j3():
         table1 = tables[0]
 
         # Список таблиц
-        mtables = [g.metadata.tables.get(i) for i in tables]
+        mtables = [metadata.tables.get(i) for i in tables]
 
         # Список колонок
         mcolumns = []
@@ -153,7 +166,7 @@ def view_j3():
 
         # Join для таблиц
         error = None
-        mtable = g.metadata.tables.get(table1)
+        mtable = metadata.tables.get(table1)
 
         l = len(tables) - 1
         for i in range(l):
