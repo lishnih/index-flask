@@ -90,16 +90,17 @@ def user_register():
     if not current_user.is_anonymous:
         return render_template('user/logout.html',
                  title = 'Logout',
-                 username = current_user.username,
+                 name = current_user.name,
                  next = "user_register",
                )
 
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(
-            email    = form.email.data,
+            email = form.email.data,
             username = form.username.data,
-            company  = form.company.data,
+            name = form.name.data,
+            company = form.company.data,
             password = form.password.data,
         )
         db.session.add(user)
@@ -120,7 +121,7 @@ def user_login(user=None):
     if not current_user.is_anonymous:
         return render_template('user/logout.html',
                  title = 'Logout',
-                 username = current_user.username,
+                 name = current_user.name,
                  next = "user_login",
                )
 
@@ -131,7 +132,7 @@ def user_login(user=None):
         identity_changed.send(current_app._get_current_object(),
                               identity=Identity(form.user.id))
 
-        flash('Successfully logged in as {0}'.format(form.user.username))
+        flash('Successfully logged in as {0}'.format(form.user.name))
 
         next = request.args.get('next')
         if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
@@ -193,23 +194,39 @@ def user_append_db():
            )
 
 
+@app.route("/init_env")
+@login_required
+def user_init_env():
+    current_user.init_env()
+    db.session.commit()
+
+    flash("Task 'Init environment' executed!")
+
+    next = request.args.get('next')
+    if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
+        return redirect(url_for(next))
+
+    return redirect(url_for('user_profile'))
+
+
+@app.route("/send_verification")
+@login_required
+def user_send_verification():
+    current_user.send_verification()
+
+    flash("Task 'Send verification' executed!")
+
+    next = request.args.get('next')
+    if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
+        return redirect(url_for(next))
+
+    return redirect(url_for('user_profile'))
+
+
 @app.route("/delete_account")
 @login_required
 def user_delete():
     return render_template('user/delete_account.html',
              title = 'Delete account',
-             username = current_user.username,
+             name = current_user.name,
            )
-
-
-# with app.test_client() as tc:
-#     # login will set session cookie as well as remember me cookie
-#     # User.get_auth_token will be called because we have defined a token_loader
-#     tc.get('/login')
-#
-#     # clear the session cookie so the next request will use remember me
-#     tc.cookie_jar.clear_session_cookies()
-#
-#     # our token_loader function should be called now as Flask-Login attempts to
-#     # log us in with the remember me cookie
-#     tc.get('/profile')

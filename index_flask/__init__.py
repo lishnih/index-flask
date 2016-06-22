@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify
 from flask_login import login_required
 
 from .ext.backwardcompat import *
-from . import config, user_data
+from . import config
 
 
 app = Flask(__name__, static_url_path='')

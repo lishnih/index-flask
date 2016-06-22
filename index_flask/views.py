@@ -22,10 +22,10 @@ from . import app, user_data
 def index():
 #   return app.send_static_file('index.html')
 
-    username = None if current_user.is_anonymous else current_user.username
+    name = None if current_user.is_anonymous else current_user.name
     return render_template('index.html',
              title = 'Index',
-             username = username,
+             name = name,
            )
 
 

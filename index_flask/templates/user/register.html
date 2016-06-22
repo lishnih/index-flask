@@ -7,11 +7,12 @@
 
 <form method=post action="/register">
   <dl>
-    {{ render_field(form.email) }}
-    {{ render_field(form.username) }}
-    {{ render_field(form.company) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
+    {{ render_field(form.email, size=40) }}
+    {{ render_field(form.username, size=40) }}
+    {{ render_field(form.name, size=40) }}
+    {{ render_field(form.company, size=40) }}
+    {{ render_field(form.password, size=40) }}
+    {{ render_field(form.confirm, size=40) }}
     {{ render_field(form.accept_tos) }}
   </dl>
   <p>

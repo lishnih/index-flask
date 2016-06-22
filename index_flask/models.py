@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import hashlib, random
+import os, hashlib, random
 from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
@@ -30,27 +30,28 @@ relationship_user_group = db.Table('rs_user_group',
     db.PrimaryKeyConstraint('_user_id', '_group_id'))
 
 
-class User(db.Model):               # Rev. 2016-06-20
+class User(db.Model):               # Rev. 2016-06-22
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True)
-    username = db.Column(db.String)
-    company = db.Column(db.String)
-    password = db.Column(db.String)
-    created = db.Column(db.DateTime)
-    token = db.Column(db.String)
-    verified = db.Column(db.String)
-    active = db.Column(db.Boolean, default=True)
-    authenticated = db.Column(db.Boolean, default=True)
+    email = db.Column(db.String, nullable=False, unique=True)
+    username = db.Column(db.String, unique=True)
+    name = db.Column(db.String, nullable=False)
+    company = db.Column(db.String, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    token = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, nullable=False)
+    verified = db.Column(db.String, nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    authenticated = db.Column(db.Boolean, nullable=False, default=True)
 #   db.Index('email', email, unique=True)
 
     home = db.Column(db.String)
 
     ya_account = db.Column(db.String)
-    gd_account = db.Column(db.String)
-
     ya_token = db.Column(db.String)
+
+    gd_account = db.Column(db.String)
     gd_token = db.Column(db.String)
 
     groups = db.relationship('Group', backref=__tablename__, secondary=relationship_user_group)
@@ -58,47 +59,55 @@ class User(db.Model):               # Rev. 2016-06-20
     databases = db.relationship('Database', backref=__tablename__, lazy='dynamic')
 
     @property
-    def is_active(self):
-        return True
-
-    @property
     def is_anonymous(self):
         return False
 
     @property
-    def is_authenticated(self):
-        return True
+    def is_active(self):
+        return self.active
 
-    def __init__(self, email, username, company, password):
+    @property
+    def is_authenticated(self):
+        return self.authenticated
+
+    def __init__(self, email, username, name, company, password):
         self.email = email
         self.username = username
+        self.name = name
         self.company = company
         self.password = self.get_password(password)
-        self.created = datetime.utcnow()
         self.token = self.get_token(email, self.password)
+        self.created = datetime.utcnow()
         self.verified = self.get_verification(email)
+
+        self.init_env()
         self.send_verification()
 
     def __repr__(self):
-        return '<User {0!r}>'.format(self.username)
-
-    def get_auth_token(self):
-        return self.token
+        return '<User {0!r}>'.format(self.name)
 
     def get_id(self):
         return self.email
 
+    def get_auth_token(self):
+        return self.token
+
     def get_password(self, password):
         return hashlib.sha1(password).hexdigest()
 
-    def get_token(self, email, hpassword):
-        randon = random.randint(0, 100000000000000)
-        return hashlib.sha1("{0}_{1}_{2}".format(email, hpassword, randon)).hexdigest()
+    def get_token(self, email, password):
+        rnd = random.randint(0, 100000000000000)
+        return hashlib.sha1("{0}_{1}_{2}".format(email, password, rnd)).hexdigest()
 
     def get_verification(self, email):
-    #   random = datetime.now().strftime("%Y%m%d%H%M%S.%f")
-        randon = random.randint(0, 100000000000000)
-        return hashlib.md5("{0}_{1}".format(email, randon)).hexdigest()
+    #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
+        rnd = random.randint(0, 100000000000000)
+        return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
+
+    def init_env(self):
+        self.home = "C:\\Users\\User\\.config\\index\\{0}".format(self.username)
+        if not os.path.isdir(self.home):
+            os.makedirs(self.home)
 
     def send_verification(self):
         pass
@@ -108,11 +117,11 @@ class User(db.Model):               # Rev. 2016-06-20
 #       return cls.user_database.get(id)
 
 
-class Group(db.Model):              # Rev. 2016-06-20
+class Group(db.Model):              # Rev. 2016-06-22
     __tablename__ = 'group'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False, unique=True)
     created = db.Column(db.DateTime)
 
     def __init__(self, name):
@@ -120,16 +129,17 @@ class Group(db.Model):              # Rev. 2016-06-20
         self.created = datetime.utcnow()
 
 
-class Database(db.Model):           # Rev. 2016-06-20
+class Database(db.Model):           # Rev. 2016-06-22
     __tablename__ = 'database'
 
     id = db.Column(db.Integer, primary_key=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    name = db.Column(db.String)
-    url = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
 
-    def __init__(self, name, user):
+    def __init__(self, name, url, user):
         self.name = name
+        self.url = url
         self._user_id = user.id
 
 
