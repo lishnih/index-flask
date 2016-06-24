@@ -45,19 +45,18 @@ def debug_dbinfo(dbname=None):
         abort(404)
 
     if dbname:
-        db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+        db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     else:
-        db_uri = engine = metadata = tables = relationships = None
-
-    print(db_uri, engine, metadata, tables, relationships)
+        db_uri = engine = session = metadata = tables = relationships = None
 
     return render_template('debug_dbinfo.html',
              title = 'Databases info',
-             db_list = user_data.get_db_list(current_user),
+             dbs_list = user_data.get_dbs_list(current_user),
 
              db = dbname,
              db_uri = db_uri,
              engine = engine,
+             session = session,
              metadata = metadata,
              tables = tables,
              relationships = relationships,

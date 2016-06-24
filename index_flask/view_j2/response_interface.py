@@ -10,7 +10,7 @@ from __future__ import ( division, absolute_import,
 
 def prepare_response(request):
     response = dict(
-        version = 2,
+        version = 2.1,
         _method = request.method,
         _get  = repr(request.args),
         _post = repr(request.form),

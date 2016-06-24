@@ -5,23 +5,45 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from .security_db import user_table_iter
 from .request_interface import *
 from .response_interface import *
 from .query_interface import *
+from ..user_data import *
 
 
-def tables_list_action(userid, request_items, response):
-    tables_list = []
-    for table in user_table_iter(userid):
-        tables_list.append(table)
+def set_default_db_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db')
+    db = set_default_db(user, db)
 
-    response['rows'] = tables_list
+    response['rows'] = [db]
 
 
-def columns_list_action(userid, request_items, response):
+def default_db_action(user, request_items, response):
+    db = get_default_db(user)
+
+    response['rows'] = [db]
+
+
+def dbs_list_action(user, request_items, response):
+    response['rows'] = [i for i in get_dbs_list(user)]
+
+
+def tables_list_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
+
+    response['rows'] = [i for i in get_tables_list(user, db)]
+
+
+def columns_list_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -30,14 +52,18 @@ def columns_list_action(userid, request_items, response):
     if len(tables) > 1:
         fullnames = 1
 
-    columns_list = qi_columns_list(userid, tables, fullnames)
+    columns_list = qi_columns_list(user, db, tables, fullnames)
 
     response['rows'] = columns_list
 
 
-def table_count_action(userid, request_items, response):
+def table_count_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -46,7 +72,8 @@ def table_count_action(userid, request_items, response):
     filter_dict = ri_get_obj(request_items, 'filter_json')
 
     query_params = dict(
-        userid = userid,
+        user = user,
+        db = db,
         tables = tables,
         search = search,
         filter = filter_dict,
@@ -55,14 +82,19 @@ def table_count_action(userid, request_items, response):
     table_info, error = qi_query_count(**query_params)
 
     response.update(table_info)
+    query_params['user'] = user.id
     response['query_params'] = query_params
     if error:
         response['error'] = error
 
 
-def column_func_action(userid, request_items, response):
+def column_func_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -81,7 +113,8 @@ def column_func_action(userid, request_items, response):
     filter_dict = ri_get_obj(request_items, 'filter_json')
 
     query_params = dict(
-        userid  = userid,
+        user = user,
+        db = db,
         tables  = tables,
         column  = column,
         operand = operand,
@@ -92,14 +125,19 @@ def column_func_action(userid, request_items, response):
     table_info, error = qi_query_column(**query_params)
 
     response.update(table_info)
+    query_params['user'] = user.id
     response['query_params'] = query_params
     if error:
         response['error'] = error
 
 
-def column_sum_action(userid, request_items, response):
+def column_sum_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -113,7 +151,8 @@ def column_sum_action(userid, request_items, response):
     filter_dict = ri_get_obj(request_items, 'filter_json')
 
     query_params = dict(
-        userid = userid,
+        user = user,
+        db = db,
         tables = tables,
         column = column,
         search = search,
@@ -123,14 +162,19 @@ def column_sum_action(userid, request_items, response):
     table_info, error = qi_query_sum(**query_params)
 
     response.update(table_info)
+    query_params['user'] = user.id
     response['query_params'] = query_params
     if error:
         response['error'] = error
 
 
-def table_view_action(userid, request_items, response):
+def table_view_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -154,7 +198,8 @@ def table_view_action(userid, request_items, response):
     sorting_dict = ri_get_obj(request_items, 'sorting_json')
 
     query_params = dict(
-        userid  = userid,
+        user = user,
+        db = db,
         tables  = tables,
         search  = search,
         filter  = filter_dict,
@@ -168,6 +213,7 @@ def table_view_action(userid, request_items, response):
     table_info, rows, error = qi_query(**query_params)
 
     response.update(table_info)
+    query_params['user'] = user.id
     response['query_params'] = query_params
 
     if 'sEcho' in response:
@@ -181,9 +227,13 @@ def table_view_action(userid, request_items, response):
         response['error'] = error
 
 
-def column_district_action(userid, request_items, response):
+def column_district_action(user, request_items, response):
+    db = ri_get_str(request_items, 'db') or get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -202,7 +252,8 @@ def column_district_action(userid, request_items, response):
     sorting_dict = ri_get_obj(request_items, 'sorting_json')
 
     query_params = dict(
-        userid  = userid,
+        user = user,
+        db = db,
         tables  = tables,
         search  = search,
         filter  = filter_dict,
@@ -215,6 +266,7 @@ def column_district_action(userid, request_items, response):
     table_info, rows, error = qi_query(**query_params)
 
     response.update(table_info)
+    query_params['user'] = user.id
     response['query_params'] = query_params
 
     if 'sEcho' in response:

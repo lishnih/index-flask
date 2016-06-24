@@ -30,12 +30,12 @@ relationship_user_group = db.Table('rs_user_group',
     db.PrimaryKeyConstraint('_user_id', '_group_id'))
 
 
-class User(db.Model):               # Rev. 2016-06-22
+class User(db.Model):               # Rev. 2016-06-23
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
-    username = db.Column(db.String, unique=True)
+    username = db.Column(db.String, nullable=False, unique=True)
     name = db.Column(db.String, nullable=False)
     company = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -43,7 +43,6 @@ class User(db.Model):               # Rev. 2016-06-22
     created = db.Column(db.DateTime, nullable=False)
     verified = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
-    authenticated = db.Column(db.Boolean, nullable=False, default=True)
 #   db.Index('email', email, unique=True)
 
     home = db.Column(db.String)
@@ -63,12 +62,12 @@ class User(db.Model):               # Rev. 2016-06-22
         return False
 
     @property
-    def is_active(self):
-        return self.active
+    def is_authenticated(self):
+        return True
 
     @property
-    def is_authenticated(self):
-        return self.authenticated
+    def is_active(self):
+        return self.active
 
     def __init__(self, email, username, name, company, password):
         self.email = email
@@ -78,10 +77,9 @@ class User(db.Model):               # Rev. 2016-06-22
         self.password = self.get_password(password)
         self.token = self.get_token(email, self.password)
         self.created = datetime.utcnow()
-        self.verified = self.get_verification(email)
 
         self.init_env()
-        self.send_verification()
+        self.run_verification()
 
     def __repr__(self):
         return '<User {0!r}>'.format(self.name)
@@ -99,18 +97,31 @@ class User(db.Model):               # Rev. 2016-06-22
         rnd = random.randint(0, 100000000000000)
         return hashlib.sha1("{0}_{1}_{2}".format(email, password, rnd)).hexdigest()
 
-    def get_verification(self, email):
-    #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
-        rnd = random.randint(0, 100000000000000)
-        return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
-
     def init_env(self):
         self.home = "C:\\Users\\User\\.config\\index\\{0}".format(self.username)
         if not os.path.isdir(self.home):
             os.makedirs(self.home)
 
+    def run_verification(self):
+        self.verified = self.suit_code(self.email)
+        self.send_verification()
+
     def send_verification(self):
+        # send verified code
         pass
+
+    def suit_code(self, email):
+        double = True
+        while double:
+            verified = self.get_verification(email)
+            double = User.query.filter_by(verified=verified).first()
+
+        return verified
+
+    def get_verification(self, email):
+    #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
+        rnd = random.randint(0, 100000000000000)
+        return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
 
 #   @classmethod
 #   def get(cls, id):

@@ -8,6 +8,7 @@ from __future__ import ( division, absolute_import,
 import os.path
 
 from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 def initDb(home, dbname):
@@ -15,6 +16,9 @@ def initDb(home, dbname):
 
     engine = create_engine(db_uri)
     metadata = MetaData(engine, reflect=True)
+
+    session = scoped_session(sessionmaker())
+    session.configure(bind=engine)
 
     tables = {}
     relationships = dict()
@@ -34,7 +38,7 @@ def initDb(home, dbname):
                 except ValueError:
                     pass
 
-    return db_uri, engine, metadata, tables, relationships
+    return db_uri, engine, session, metadata, tables, relationships
 
 
 def getDbList(home):

@@ -147,6 +147,25 @@ def user_login(user=None):
            )
 
 
+@app.route("/confirm/<code>")
+def user_confirm(code=None):
+    # log request...
+    print(code)
+
+    user = User.query.filter_by(verified=code).first()
+    if user:
+        status = 'verified'
+        user.verified = ''
+        db.session.commit()
+    else:
+        status = 'not verified'
+
+    return render_template('user/confirm.html',
+             title = 'Confirm email',
+             status = status,
+           )
+
+
 @app.route("/logout")
 @login_required
 def user_logout():
@@ -173,6 +192,7 @@ def user_profile():
     return render_template('user/profile.html',
              title = 'Profile',
              cu = current_user,
+             verified = 'not verified' if current_user.verified else 'verified'
            )
 
 

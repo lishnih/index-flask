@@ -33,14 +33,16 @@ def index():
 @app.route('/db/<dbname>/')
 @login_required
 def view_db(dbname=None):
+    dbs_list = user_data.get_dbs_list(current_user)
+
     if dbname:
-        db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+        db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     else:
         tables = None
 
     return render_template('view_db.html',
              title = 'Databases',
-             db_list = user_data.get_db_list(current_user),
+             dbs_list = dbs_list,
 
              db = dbname,
              tables = tables,
@@ -54,7 +56,7 @@ def view_db(dbname=None):
 @app.route('/db/<dbname>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
 @login_required
 def view_table(dbname, table1=None, table2=None, table3=None, table4=None, table5=None):
-    db_uri, engine, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+    db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     conn = engine.connect()
 
     # Обратный порядок - не менять!

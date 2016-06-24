@@ -5,6 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+from flask_login import current_user
+
 from .view_j2_help import *
 from .view_j2_funcs import *
 
@@ -16,7 +18,7 @@ def view_j2(request):
     if not action:
         return response_with_message(response, "Нет запроса!", 'warning')
 
-    logged_in = 'noname'
+    logged_in = current_user
 
 # view_j2_help
 
@@ -28,6 +30,15 @@ def view_j2(request):
 
 
 # view_j2_funcs
+
+    elif action == 'default_db':
+        default_db_action(logged_in, request_items, response)
+
+    elif action == 'set_default_db':
+        set_default_db_action(logged_in, request_items, response)
+
+    elif action == 'dbs_list':
+        dbs_list_action(logged_in, request_items, response)
 
     elif action == 'tables_list':
         tables_list_action(logged_in, request_items, response)

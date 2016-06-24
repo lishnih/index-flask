@@ -5,20 +5,19 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from flask import g
 from sqlalchemy import desc, distinct, func, or_
 
-from .security_db import get_user_table_data
+from ..user_data import get_session, get_table_data
 
 
-def qi_columns_list(userid, tables, fullnames_option = 0):
+def qi_columns_list(user, db, tables, fullnames_option = 0):
     if isinstance(tables, basestring):
         tables = tables,
 
     columns_list = []
 
     for table in tables:
-        mtable = get_user_table_data(userid, table)
+        mtable = get_table_data(user, db, table)
         if mtable is not None:
             for column in mtable.c:
                 cname = "{0}.{1}".format(column.table.name, column.name) \
@@ -29,19 +28,19 @@ def qi_columns_list(userid, tables, fullnames_option = 0):
     return columns_list
 
 
-def qi_columns_dict(userid, tables):
+def qi_columns_dict(user, db, tables):
     if isinstance(tables, basestring):
         tables = tables,
 
     columns_dict = dict()
 
     # Для первой таблицы предусматриваем короткие названия колонок
-#     table = tables[0]
-#     columns_list = qi_columns_list(userid, table)
-#     if columns_list:
-#         mtable = get_user_table_data(userid, table)
-#         for column in columns_list:
-#             columns_dict[column] = mtable.c[column]
+#   table = tables[0]
+#   columns_list = qi_columns_list(user, db, table)
+#   if columns_list:
+#       mtable = get_table_data(user, db, table)
+#       for column in columns_list:
+#           columns_dict[column] = mtable.c[column]
 
     for table in tables:
 
@@ -52,9 +51,9 @@ def qi_columns_dict(userid, tables):
         else:
             table_brief = table
 
-        columns_list = qi_columns_list(userid, table)
+        columns_list = qi_columns_list(user, db, table)
         if columns_list:
-            mtable = get_user_table_data(userid, table)
+            mtable = get_table_data(user, db, table)
             for column in columns_list:
                 full_column = "{0}.{1}".format(table_brief, column)
                 columns_dict[full_column] = mtable.c[column]
@@ -92,22 +91,23 @@ def qi_query_filter(query, filter, columns_dict):
     return query
 
 
-def qi_query_count(userid, tables, search=None, filter={}):
+def qi_query_count(user, db, tables, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
     classes = []
     for table in tables:
-        classes.append(get_user_table_data(userid, table))
+        classes.append(get_table_data(user, db, table))
 
     if None in classes:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    query = g.s.query(*classes)
+    session = get_session(user, db)
+    query = session.query(*classes)
 
     full_rows_count = query.count()
 
-    columns_dict = qi_columns_dict(userid, tables)
+    columns_dict = qi_columns_dict(user, db, tables)
 
     if search:
         search_str = "%{0}%".format(search)
@@ -127,29 +127,30 @@ def qi_query_count(userid, tables, search=None, filter={}):
     ), None
 
 
-def qi_query_column(userid, tables, column, operand, search=None, filter={}):
+def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
     classes = []
     for table in tables:
-        classes.append(get_user_table_data(userid, table))
+        classes.append(get_table_data(user, db, table))
 
     if None in classes:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    query = g.s.query(*classes)
+    session = get_session(user, db)
+    query = session.query(*classes)
 
-    columns_dict = qi_columns_dict(userid, tables)
+    columns_dict = qi_columns_dict(user, db, tables)
     if column not in columns_dict:
         return {}, "Заданной колонки не существует: {0}".format(column)
 
     if   operand == 'sum':
-        query = g.s.query(func.sum(columns_dict[column]).label('sum'))
+        query = session.query(func.sum(columns_dict[column]).label('sum'))
     elif operand == 'max':
-        query = g.s.query(func.max(columns_dict[column]).label('max'))
+        query = session.query(func.max(columns_dict[column]).label('max'))
     elif operand == 'min':
-        query = g.s.query(func.min(columns_dict[column]).label('min'))
+        query = session.query(func.min(columns_dict[column]).label('min'))
     else:
         return {}, "Не задана функция: {0}".format(operand)
 
@@ -169,24 +170,25 @@ def qi_query_column(userid, tables, column, operand, search=None, filter={}):
     ), None
 
 
-def qi_query_sum(userid, tables, column, search=None, filter={}):
+def qi_query_sum(user, db, tables, column, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
     classes = []
     for table in tables:
-        classes.append(get_user_table_data(userid, table))
+        classes.append(get_table_data(user, db, table))
 
     if None in classes:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    query = g.s.query(*classes)
+    session = get_session(user, db)
+    query = session.query(*classes)
 
-    columns_dict = qi_columns_dict(userid, tables)
+    columns_dict = qi_columns_dict(user, db, tables)
     if column not in columns_dict:
         return {}, "Заданной колонки не существует: {0}".format(column)
 
-    query = g.s.query(func.sum(columns_dict[column]).label('sum'))
+    query = session.query(func.sum(columns_dict[column]).label('sum'))
 
     if search:
         search_str = "%{0}%".format(search)
@@ -204,12 +206,12 @@ def qi_query_sum(userid, tables, column, search=None, filter={}):
     ), None
 
 
-def qi_query(userid, tables, search=None, filter={}, sorting=[],
+def qi_query(user, db, tables, search=None, filter={}, sorting=[],
              offset=0, limit=0, columns=None, distinct_column=None):
     if isinstance(tables, basestring):
         tables = tables,
 
-    columns_dict = qi_columns_dict(userid, tables)
+    columns_dict = qi_columns_dict(user, db, tables)
 
     classes = []
 
@@ -221,34 +223,35 @@ def qi_query(userid, tables, search=None, filter={}, sorting=[],
         pre = tables[0].split('.')[0]
         tablename = columns_dict[distinct_column].table.name
         distinct_table = "{0}.{1}".format(pre, tablename)
-#         additional_tables = list(tables)
-#         if distinct_table in additional_tables:
-#             additional_tables.remove(distinct_table)
+#       additional_tables = list(tables)
+#       if distinct_table in additional_tables:
+#           additional_tables.remove(distinct_table)
 
-        # !!! нет проверок
+    # !!! нет проверок
     if columns:
         for column in columns:
             if column != distinct_column:
                 classes.append(columns_dict[column])
 
-#         if not distinct_column:
-#             additional_tables = tables[1:]
+#       if not distinct_column:
+#           additional_tables = tables[1:]
 
-        # !!! нет проверок
+    # !!! нет проверок
     else:
         for table in tables:
-            classes.append(get_user_table_data(userid, table))
+            classes.append(get_table_data(user, db, table))
 
-#         additional_tables = tables[1:]
+#       additional_tables = tables[1:]
 
         if None in classes:
             return {}, [], "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    query = g.s.query(*classes)
+    session = get_session(user, db)
+    query = session.query(*classes)
 
-#     if additional_tables:
-#         for table in additional_tables:
-#             query = query.join(get_user_table_data(userid, table))
+#   if additional_tables:
+#       for table in additional_tables:
+#           query = query.join(get_table_data(user, db, table))
 
     full_rows_count = query.count()
 
@@ -282,11 +285,11 @@ def qi_query(userid, tables, search=None, filter={}, sorting=[],
         th_list.append(unicode(column_description['expr']).replace('.', '<br />'))
 
     td_list = [[i for i in row] for row in rows]
-#     for row in rows:
-#         tr = []
-#         for label in row._labels:
-#             tr.append(row.__getattribute__(label))
-#         td_list.append(tr)
+#   for row in rows:
+#       tr = []
+#       for label in row._labels:
+#           tr.append(row.__getattribute__(label))
+#       td_list.append(tr)
 
     return dict(
         full_rows_count     = full_rows_count,
