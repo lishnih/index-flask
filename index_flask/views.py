@@ -5,6 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+from collections import OrderedDict
+
 from flask import ( request, jsonify, render_template, session,
                     redirect, url_for, abort )
 
@@ -36,7 +38,7 @@ def view_db(dbname=None):
     dbs_list = user_data.get_dbs_list(current_user)
 
     if dbname:
-        db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+        db_uri, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     else:
         tables = None
 
@@ -56,8 +58,7 @@ def view_db(dbname=None):
 @app.route('/db/<dbname>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
 @login_required
 def view_table(dbname, table1=None, table2=None, table3=None, table4=None, table5=None):
-    db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
-    conn = engine.connect()
+    db_uri, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
 
     # Обратный порядок - не менять!
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
@@ -88,7 +89,7 @@ def view_table(dbname, table1=None, table2=None, table3=None, table4=None, table
 
     # Получаем кол-во всех записей в таблице
     s_count = select(mtables, use_labels=True)
-    count = conn.execute(s_count.select_from(mtable).count())
+    count = session.execute(s_count.select_from(mtable).count())
     count = count.first()[0]
 
     # Получаем записи
@@ -101,7 +102,7 @@ def view_table(dbname, table1=None, table2=None, table3=None, table4=None, table
         limit = 100
         s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
 
-    result = conn.execute(s.select_from(mtable))
+    result = session.execute(s.select_from(mtable))
     rows = [row for row in result]
 
     # Необходимые переменные
@@ -148,14 +149,20 @@ def view_jtable():
 @app.route('/j3', methods=["GET", "POST"])
 @login_required
 def view_j3():
-#   conn = get_conn()
-
     if request.method == 'POST':
         action = request.args.get('action')
+        dbname = request.args.get('db')
         tables = request.args.get('t').split(',')
         table1 = tables[0]
 
+        if dbname not in user_data.get_dbs_list(current_user):
+            return jsonify(Result="ERROR", Message="Db don't exists!")
+
+        # Соединение
+        db_uri, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+
         # Список таблиц
+        metadata = user_data.get_metadata(current_user, dbname)
         mtables = [metadata.tables.get(i) for i in tables]
 
         # Список колонок
@@ -181,12 +188,12 @@ def view_j3():
 
         # Получаем кол-во всех записей в таблице
         s_count = select(mtables, use_labels=True)
-        count = conn.execute(s_count.select_from(mtable).count())
+        count = session.execute(s_count.select_from(mtable).count())
         count = count.first()[0]
 
         # Колонки
         names = []
-        fields = {}
+        fields = OrderedDict()
         for name, column in s_count._columns_plus_names:  # s_count!
             columnname = "{0}.{1}".format(column.table.name, column.name)
             names.append(name)
@@ -205,7 +212,7 @@ def view_j3():
             limit = 100
             s = select(mcolumns, offset=offset, limit=limit, use_labels=True)
 
-            result = conn.execute(s.select_from(mtable))
+            result = session.execute(s.select_from(mtable))
 
             rows = []
             for row in result:
@@ -235,11 +242,11 @@ def view_j3():
             }
 
         elif action == 'columns':
-            res = {
-              "Result": "OK",
-              "fields": fields,
+            res = OrderedDict(
+              Result = "OK",
+              fields = fields,
 #             "debug": html(request),
-            }
+            )
 
         elif action == 'extratables':
             extratables = [i.column.table.name for i in s_count.foreign_keys]   # s_count!

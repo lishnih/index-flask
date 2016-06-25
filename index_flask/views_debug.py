@@ -45,9 +45,9 @@ def debug_dbinfo(dbname=None):
         abort(404)
 
     if dbname:
-        db_uri, engine, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+        db_uri, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
     else:
-        db_uri = engine = session = metadata = tables = relationships = None
+        db_uri = session = metadata = tables = relationships = None
 
     return render_template('debug_dbinfo.html',
              title = 'Databases info',
@@ -55,7 +55,6 @@ def debug_dbinfo(dbname=None):
 
              db = dbname,
              db_uri = db_uri,
-             engine = engine,
              session = session,
              metadata = metadata,
              tables = tables,

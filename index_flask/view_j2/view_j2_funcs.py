@@ -49,8 +49,6 @@ def columns_list_action(user, request_items, response):
         return response_with_message(response, "Таблица не задана!", 'error')
 
     fullnames = ri_get_int(request_items, 'fullnames')
-    if len(tables) > 1:
-        fullnames = 1
 
     columns_list = qi_columns_list(user, db, tables, fullnames)
 
