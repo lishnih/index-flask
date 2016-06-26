@@ -44,33 +44,21 @@ def get_db(current_user, dbname):
     user_data = get_data(current_user)
 
     if dbname not in user_data['dbs']:
-        db_uri, session, metadata, tables, relationships = initDb(current_user.home, dbname)
-        user_data[dbname] = (db_uri, session, metadata, tables, relationships)
+        db_uri, session, metadata, relationships = initDb(current_user.home, dbname)
+        user_data[dbname] = (db_uri, session, metadata, relationships)
     else:
-        db_uri, session, metadata, tables, relationships = user_data['dbs'][dbname]
+        db_uri, session, metadata, relationships = user_data['dbs'][dbname]
 
-    return db_uri, session, metadata, tables, relationships
+    return db_uri, session, metadata, relationships
 
 
 def get_session(current_user, dbname):
-    db_uri, session, metadata, tables, relationships = get_db(current_user, dbname)
+    db_uri, session, metadata, relationships = get_db(current_user, dbname)
 
     return session
 
 
-def get_tables_list(current_user, dbname):
-    db_uri, session, metadata, tables, relationships = get_db(current_user, dbname)
-
-    return tables
-
-
 def get_metadata(current_user, dbname):
-    db_uri, session, metadata, tables, relationships = get_db(current_user, dbname)
+    db_uri, session, metadata, relationships = get_db(current_user, dbname)
 
     return metadata
-
-
-def get_table_data(current_user, dbname, table):
-    db_uri, session, metadata, tables, relationships = get_db(current_user, dbname)
-
-    return metadata.tables.get(table)

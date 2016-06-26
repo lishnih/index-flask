@@ -22,6 +22,7 @@ from . import (
     view_j2,      # j2 package
     views,        # Common views
     views_user,   # User views
+    views_db,     # DB views
     views_debug,  # Debug views
 )
 

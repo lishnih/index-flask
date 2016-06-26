@@ -3,7 +3,7 @@
 {% block body %}
 
 <div class="serial">
-  Count: {{ count }}
+  Count: {{ full_rows_count }} > {{ filtered_rows_count }} ({{ rows_count }})
 </div>
 
 <div class="serial">
@@ -14,9 +14,9 @@
     <a href="/db/{{ db }}">{{ db }}</a>
 </div>
 
-{%- if extratables %}
+{%- if primarytables %}
 <div class="serial">
-  {%- for table in extratables %}
+  {%- for table in primarytables %}
     <a href="{{ table }}">+{{ table }}</a>
   {%- endfor %}
 </div>
@@ -28,13 +28,21 @@
 </div>
 {%- endif %}
 
+{%- if followedtables %}
+<div class="serial">
+  {%- for table in followedtables %}
+    <a href="/db/{{ db }}/{{ table }}">>{{ table }}</a>
+  {%- endfor %}
+</div>
+{%- endif %}
+
 <div>&nbsp;</div>
 
 <table border="1">
   {%- if names %}
     <tr>
-      {%- for table, name in names %}
-        <th>{{ table }}<br />{{ name }}</th>
+      {%- for name in names %}
+        <th>{{ name }}</th>
       {%- endfor %}
     </tr>
   {%- endif %}
@@ -47,7 +55,7 @@
     </tr>
   {%- endfor %}
 
-  {%- if count > offset + limit %}
+  {%- if filtered_rows_count > offset + limit %}
     <tr>
         <td class="a extendtable" colspan="{{ colspan }}" data-offset="{{ offset + limit }}">
 Показать ещё {{ limit }} (показано <span id="shown">{{ offset + limit }}</span> записей) | <a href="?all">Показать всё</a>

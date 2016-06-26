@@ -38,7 +38,7 @@ def initDb(home, dbname):
                 except ValueError:
                     pass
 
-    return db_uri, session, metadata, tables, relationships
+    return db_uri, session, metadata, relationships
 
 
 def getDbList(home):

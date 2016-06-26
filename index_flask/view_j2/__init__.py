@@ -5,6 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+import time
+
 from flask_login import current_user
 
 from .view_j2_help import *
@@ -12,6 +14,8 @@ from .view_j2_funcs import *
 
 
 def view_j2(request):
+    t = time.time()
+
     response = prepare_response(request)
 
     action, request_items = get_action(request, response)
@@ -65,4 +69,5 @@ def view_j2(request):
     else:
         return response_with_message(response, "Запрос не опознан!", 'exception')
 
+    response['time'] = time.time() - t
     return response

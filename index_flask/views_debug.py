@@ -38,22 +38,22 @@ def debug_global_object():
 
 
 @app.route('/dbinfo/')
-@app.route('/dbinfo/<dbname>/')
+@app.route('/dbinfo/<db>/')
 @login_required
-def debug_dbinfo(dbname=None):
+def debug_dbinfo(db=None):
     if not app.debug:
         abort(404)
 
-    if dbname:
-        db_uri, session, metadata, tables, relationships = user_data.get_db(current_user, dbname)
+    if db:
+        db_uri, session, metadata, relationships = user_data.get_db(current_user, db)
     else:
-        db_uri = session = metadata = tables = relationships = None
+        db_uri = session = metadata = relationships = None
 
     return render_template('debug_dbinfo.html',
              title = 'Databases info',
              dbs_list = user_data.get_dbs_list(current_user),
 
-             db = dbname,
+             db = db,
              db_uri = db_uri,
              session = session,
              metadata = metadata,

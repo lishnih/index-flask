@@ -41,7 +41,7 @@
             $.ajax({
               type: "POST",
               dataType: "json",
-              url: '/j3?action=extratables&' + query,
+              url: '/j3?action=primarytables&' + query,
 //            data: data,
 //            async: false,
               success: function(data) {
@@ -49,7 +49,7 @@
                   debug(data.debug);
 
                 if (data.Result == "OK")
-                  $('#extratables').html('<a href="' + window.location.href + ',' + data.extratables + '">' + data.extratables + '</a>');
+                  $('#primarytables').html('<a href="' + window.location.href + ',' + data.primarytables + '">' + data.primarytables + '</a>');
               },
               error: function(data, content) {
                 debug(content);
@@ -70,6 +70,7 @@
   </script>
 
   <div id="table1" style="width: 100%;"></div>
-  <div id="extratables"></div>
+  <div id="primarytables"></div>
+  <div id="followedtables"></div>
 
 {% endblock %}

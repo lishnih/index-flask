@@ -42,7 +42,7 @@ jQuery( function($) {
       success: function(data) {
         append_rows(tr, data.rows);
 
-        if ( data.count > data.offset + data.limit ) {
+        if ( data.filtered_rows_count > data.offset + data.limit ) {
           td.data("offset", data.offset + data.limit);
           $("#shown").text(data.offset + data.limit);
         } else {

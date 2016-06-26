@@ -34,7 +34,7 @@ def tables_list_action(user, request_items, response):
     if not db:
         return response_with_message(response, "База данных не задана!", 'error')
 
-    response['rows'] = [i for i in get_tables_list(user, db)]
+    response['rows'] = get_metadata(user, db).tables.keys()
 
 
 def columns_list_action(user, request_items, response):
