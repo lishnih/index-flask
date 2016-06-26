@@ -13,13 +13,14 @@ def actions_list_action(request_items, response):
     response['rows'] = [
         'actions_list',
         'action_params_list',
-        'default_db',
         'set_default_db',
+        'default_db',
         'dbs_list',
         'tables_list',
         'columns_list',
         'table_count',
         'table_view',
+        'column_func',
         'column_sum',
         'column_district',
     ]
@@ -66,6 +67,10 @@ def action_params_list_action(request_items, response):
     elif req_action == 'table_view':
         response['description'] = "Вывод таблицы/нескольких таблиц (связанных между собой)"
         response['rows'] = ['db', 'table', 'tables', 'search', 'offset', 'limit', 'columns', 'filter_json', 'sorting_json']
+
+    elif req_action == 'column_func':
+        response['description'] = "Производит заданное действие над полем в таблице/нескольких таблицах (связанных между собой)"
+        response['rows'] = ['db', 'table', 'tables', 'column', 'func', 'search', 'filter_json']
 
     elif req_action == 'column_sum':
         response['description'] = "Сумма значений поля в таблице/нескольких таблицах (связанных между собой)"

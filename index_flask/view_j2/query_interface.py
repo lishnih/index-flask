@@ -354,8 +354,8 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         result = session.execute(s.count())
         full_rows_count = result.first()[0]
     else:
-        full_rows_count = -1
-
+        query = session.query(*mcolumns)
+        full_rows_count = query.count()
 
     # Поиск по всем полям
     if search:
