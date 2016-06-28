@@ -8,12 +8,7 @@ from __future__ import ( division, absolute_import,
 import os, hashlib, random
 from datetime import datetime
 
-from flask_sqlalchemy import SQLAlchemy
-
-from . import app
-
-
-db = SQLAlchemy(app)
+from . import db
 
 
 def append_user_to_group(group_name, user):

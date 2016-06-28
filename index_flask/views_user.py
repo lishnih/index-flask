@@ -5,84 +5,19 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os, logging
+from flask import session, request, redirect, render_template, flash, abort
 
-from flask import ( current_app, session, request, redirect, url_for,
-                    render_template, flash, abort )
+from flask_login import login_required, login_user, logout_user, current_user
 
-from flask_login import ( LoginManager, login_required,
-                          login_user, logout_user, current_user )
-
-from flask_principal import ( Principal, Permission, RoleNeed, UserNeed,
-                              Identity, AnonymousIdentity, identity_changed,
-                              identity_loaded )
-
-from werkzeug.local import LocalProxy
+from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .views_user_forms import RegistrationForm, LoginForm
 
 from .ext.backwardcompat import *
 from .ext.dump_html import html
 
-from .models import User, db, append_user_to_group
-from . import app, user_data
-
-
-##### login_manager #####
-
-login_manager = LoginManager()
-login_manager.init_app(app)
-# login_manager.login_view = 'login'
-
-
-@login_manager.user_loader
-def load_user(email):
-    logging.debug('Loading user data... ({0})'.format(email))
-    return User.query.filter_by(email=email).first()
-
-
-@login_manager.token_loader
-def my_token_loader(token):
-    return User.query.filter_by(token=token).first()
-
-
-##### identity_loaded #####
-
-principals = Principal(app)
-admin_permission = Permission(RoleNeed('admin'))
-
-
-def _on_principal_init(sender, identity):
-    if identity.id == 1:
-        identity.provides.add(RoleNeed('admin'))
-
-
-identity_loaded.connect(_on_principal_init)
-
-
-# @identity_loaded.connect_via(app)
-# def on_identity_loaded(sender, identity):
-#     identity.user = current_user
-#
-#     if hasattr(current_user, 'id'):
-#         identity.provides.add(UserNeed(current_user.id))
-#
-#     if hasattr(current_user, 'roles'):
-#         for role in current_user.roles:
-#             identity.provides.add(RoleNeed(role.name))
-
-
-##### routes #####
-
-@app.route('/admin')
-# @admin_permission.require()
-def user_admin():
-    if not admin_permission.can():
-        abort(403)
-
-    return render_template('admin/admin.html',
-             title = 'Admin page',
-           )
+from .models import User, db
+from . import app, user_data, get_next
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -91,7 +26,7 @@ def user_register():
         return render_template('user/logout.html',
                  title = 'Logout',
                  name = current_user.name,
-                 next = "user_register",
+                 next = "/register",
                )
 
     form = RegistrationForm(request.form)
@@ -108,7 +43,8 @@ def user_register():
 
         flash('Thanks for registering')
 
-        return redirect(url_for('user_login'))
+        return redirect(get_next('/login'))
+
     return render_template('user/register.html',
              title = 'Registering new user',
              form = form,
@@ -116,30 +52,23 @@ def user_register():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-# @app.route('/login/<user>', methods=['GET', 'POST'])
 def user_login(user=None):
     if not current_user.is_anonymous:
         return render_template('user/logout.html',
                  title = 'Logout',
                  name = current_user.name,
-                 next = "user_login",
+                 next = "/login",
                )
 
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         login_user(form.user, remember=form.remember.data)
 
-        identity_changed.send(current_app._get_current_object(),
-                              identity=Identity(form.user.id))
+        identity_changed.send(app, identity=Identity(form.user.id))
 
         flash('Successfully logged in as {0}'.format(form.user.name))
 
-        next = request.args.get('next')
-        if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
-            return redirect(url_for(next))
-
-#       full_url = url_for("user_init_workspace", next=next)
-        return redirect("/")
+        return redirect(get_next())
 
     return render_template('user/login.html',
              title = 'Login',
@@ -150,7 +79,6 @@ def user_login(user=None):
 @app.route("/confirm/<code>")
 def user_confirm(code=None):
     # log request...
-    print(code)
 
     user = User.query.filter_by(verified=code).first()
     if user:
@@ -174,14 +102,9 @@ def user_logout():
     for key in ('identity.id', 'identity.auth_type'):
         session.pop(key, None)
 
-    identity_changed.send(current_app._get_current_object(),
-                          identity=AnonymousIdentity())
+    identity_changed.send(app, identity=AnonymousIdentity())
 
-    next = request.args.get('next')
-    if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
-        return redirect(url_for(next))
-
-    return redirect("/")
+    return redirect(get_next())
 
 
 @app.route("/profile")
@@ -222,11 +145,7 @@ def user_init_env():
 
     flash("Task 'Init environment' executed!")
 
-    next = request.args.get('next')
-    if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
-        return redirect(url_for(next))
-
-    return redirect(url_for('user_profile'))
+    return redirect(get_next('/profile'))
 
 
 @app.route("/send_verification")
@@ -236,11 +155,7 @@ def user_send_verification():
 
     flash("Task 'Send verification' executed!")
 
-    next = request.args.get('next')
-    if next and next in [rule.endpoint for rule in app.url_map.iter_rules()]:
-        return redirect(url_for(next))
-
-    return redirect(url_for('user_profile'))
+    return redirect(get_next('/profile'))
 
 
 @app.route("/delete_account")

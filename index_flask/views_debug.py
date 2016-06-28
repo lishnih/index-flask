@@ -10,28 +10,26 @@ import os
 from flask import ( g, request, render_template, url_for, session,
                     send_from_directory, abort, __version__ )
 
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 from .ext.backwardcompat import *
 from .ext.fileman import list_files
 from .ext.dump_html import html
 
-from . import app, user_data
+from . import app, debug_permission, user_data
 
 
 @app.route('/current_user')
-@login_required
 def debug_current_user():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(current_user)
 
 
 @app.route('/user_data')
-@login_required
 def debug_global_object():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(user_data.get_data(current_user))
@@ -39,9 +37,8 @@ def debug_global_object():
 
 @app.route('/dbinfo/')
 @app.route('/dbinfo/<db>/')
-@login_required
 def debug_dbinfo(db=None):
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     if db:
@@ -64,9 +61,8 @@ def debug_dbinfo(db=None):
 
 
 @app.route('/debug')
-@login_required
 def debug_debug():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     output = []
@@ -87,9 +83,8 @@ def debug_debug():
 
 @app.route('/test/')
 @app.route('/test/<path:path>')
-@login_required
 def debug_test(path=''):
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     if not path or path[-1] == '/':
@@ -106,50 +101,25 @@ def debug_test(path=''):
 #       return send_from_directory('test', path)
 
 
-# @app.route('/user/')
-# @login_required
-# def debug_user():
-#     user_url = '/{0}/user/'.format(app.template_folder)
-#     dirlist, filelist = list_files(user_url, app.root_path, '/user/')
-#     return render_template('debug_test.html',
-#              title = 'User templates directory',
-#              path = '/user/',
-#              dirlist = dirlist,
-#              filelist = filelist,
-#            )
-#
-#
-# @app.route('/user/<path:path>')
-# @login_required
-# def debug_user_path(path=''):
-#     user_html = 'user/{0}'.format(path)
-#     return render_template(user_html,
-#              title = 'User',
-#            )
-
-
 @app.route('/ver')
-@login_required
 def debug_ver():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return __version__
 
 
 @app.route('/app')
-@login_required
 def debug_app():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(app)
 
 
 @app.route('/session')
-@login_required
 def debug_session():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     d = {key: val for key, val in session.viewitems()}
@@ -157,18 +127,16 @@ def debug_session():
 
 
 @app.route('/request')
-@login_required
 def debug_request():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(request)
 
 
 @app.route('/g')
-@login_required
 def debug_g():
-    if not app.debug:
+    if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(g)

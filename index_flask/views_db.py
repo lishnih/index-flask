@@ -7,12 +7,9 @@ from __future__ import ( division, absolute_import,
 
 from collections import OrderedDict
 
-from flask import ( request, jsonify, render_template, session,
-                    redirect, url_for, abort )
+from flask import request, jsonify, render_template
 
 from flask_login import login_required, current_user
-
-from sqlalchemy.sql import select
 
 from .ext.backwardcompat import *
 from .ext.dump_html import html
@@ -37,7 +34,6 @@ def view_db(db=None):
     return render_template('view_db.html',
              title = 'Databases',
              dbs_list = dbs_list,
-
              db = db,
              tables = tables,
            )
