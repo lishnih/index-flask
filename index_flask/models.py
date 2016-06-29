@@ -123,15 +123,17 @@ class User(db.Model):               # Rev. 2016-06-23
 #       return cls.user_database.get(id)
 
 
-class Group(db.Model):              # Rev. 2016-06-22
+class Group(db.Model):              # Rev. 2016-06-29
     __tablename__ = 'group'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
+    description = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime)
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name, description=''):
+        self.name = name.lower()
+        self.description = description
         self.created = datetime.utcnow()
 
 

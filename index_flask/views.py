@@ -12,7 +12,7 @@ from flask_login import current_user
 from .ext.backwardcompat import *
 from .ext.dump_html import html
 
-from . import app
+from . import app, admin_permission
 
 
 @app.route("/")
@@ -23,4 +23,5 @@ def index():
     return render_template('index.html',
              title = 'Index',
              name = name,
+             admin = admin_permission.can(),
            )

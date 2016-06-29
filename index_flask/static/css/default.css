@@ -6,9 +6,17 @@ input[type="password"] {
   background-color: #aaaaaa;
 }
 
+ul.flashes {
+  background-color: Lightyellow;
+}
+
+li.errors {
+  color: Red;
+}
+
 ul.errors {
   font-weight: bold;
-  color: #ff0000;
+  color: Red;
 }
 
 table {

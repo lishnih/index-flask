@@ -1,11 +1,15 @@
 {% extends "_layout.html" %}
 
-{% from "user/_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block body %}
 <h1>Login</h1>
 
+{%- if next %}
+<form method=post action="/login?next={{ next }}">
+{%- else %}
 <form method=post action="/login">
+{%- endif %}
   <dl>
     {{ render_field(form.email, size=40) }}
     {{ render_field(form.password, size=40) }}

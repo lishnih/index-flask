@@ -1,0 +1,21 @@
+{% extends "_layout.html" %}
+
+{% from "_formhelpers.html" import render_field %}
+
+{% block body %}
+<h1>Append new group</h1>
+
+<form method=post action="?check">
+  <dl>
+    {{ render_field(form.name, size=40) }}
+    {{ render_field(form.description, size=80) }}
+  </dl>
+  <p>
+    <input type=submit value="Append">
+  </p>
+</form>
+
+<ul class="hll">
+<li><a href=".">Home</a></li>
+</ul>
+{% endblock %}

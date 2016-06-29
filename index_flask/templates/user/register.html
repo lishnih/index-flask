@@ -1,11 +1,11 @@
 {% extends "_layout.html" %}
 
-{% from "user/_formhelpers.html" import render_field %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block body %}
 <h1>Register</h1>
 
-<form method=post action="/register">
+<form method=post action="?next={{ next }}">
   <dl>
     {{ render_field(form.email, size=40) }}
     {{ render_field(form.username, size=40) }}

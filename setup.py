@@ -47,8 +47,8 @@ if __name__ == '__main__':
         scripts = [
         ],
         install_requires = [
-            'flask_login',
             'flask_sqlalchemy',
+            'flask_login',
             'flask_principal',
         ],
 

@@ -9,7 +9,7 @@ import os, logging
 
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
-from .models import User
+from .models import User, Group
 
 
 class RegistrationForm(Form):
@@ -76,3 +76,28 @@ class LoginForm(Form):
 
         self.user = user
         return True
+
+
+class AddGroupForm(Form):
+    name = StringField('Name *', [
+        validators.Length(min=3, max=40)
+    ])
+    description = StringField('Description')
+
+    def validate(self):
+        validated = True
+
+        rv = Form.validate(self)
+        if not rv:
+            validated = False
+
+        if not self.name.data.isalnum():
+            self.name.errors.append('All characters in the string must be alphanumeric')
+            validated = False
+
+        group = Group.query.filter_by(name=self.name.data).first()
+        if group:
+            self.name.errors.append('Group already registered')
+            validated = False
+
+        return validated

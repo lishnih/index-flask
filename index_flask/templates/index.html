@@ -10,6 +10,9 @@
       <th style="text-align: right;">
         {%- if name %}
         <a href="/profile">{{ name }}</a>
+            {%- if admin %}
+        :: <a href="/admin/">Manage</a> ::
+            {%- endif %}
         <a href="/logout">[x]</a>
         {%- else %}
         <a id="login" href="/login">Вход</a> ::

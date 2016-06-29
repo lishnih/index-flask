@@ -5,18 +5,18 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from flask import session, request, redirect, render_template, flash, abort
+from flask import session, request, render_template, redirect, flash, abort
 
 from flask_login import login_required, login_user, logout_user, current_user
 
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
-from .views_user_forms import RegistrationForm, LoginForm
-
 from .ext.backwardcompat import *
 from .ext.dump_html import html
 
-from .models import User, db
+from .models import db, User
+from .forms import RegistrationForm, LoginForm
+
 from . import app, user_data, get_next
 
 
@@ -48,6 +48,7 @@ def user_register():
     return render_template('user/register.html',
              title = 'Registering new user',
              form = form,
+             next = request.args.get('next', '/login'),
            )
 
 
@@ -73,6 +74,7 @@ def user_login(user=None):
     return render_template('user/login.html',
              title = 'Login',
              form = form,
+             next = request.args.get('next', '/'),
            )
 
 

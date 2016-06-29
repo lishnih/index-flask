@@ -24,19 +24,21 @@
 </head>
 
 <body>
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
+    {% for category, message in messages %}
+      <li class="flashes {{ category }}">{{ message }}</li>
     {% endfor %}
     </ul>
   {% endif %}
 {% endwith %}
 
+<div id="content">
 {% block body %}
   <p>layout.html</p>
 {% endblock %}
+</div>
 
 {% from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}

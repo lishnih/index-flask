@@ -57,6 +57,11 @@ jQuery( function($) {
   } );
 
 
+  $("li.flashes").click( function(event) {
+    $(this).remove();
+  } );
+
+
   /*** FUNCTIONS ***/
 
 
