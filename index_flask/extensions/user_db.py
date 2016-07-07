@@ -5,11 +5,22 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from .core.db import initDb, getDbList
+from flask import render_template
 
+from flask_login import login_required, current_user
+
+from ..core.backwardcompat import *
+from ..core.dump_html import html
+from ..core.db import initDb, getDbList
+from .. import app
+
+
+##### Storage #####
 
 global_users_data = {}
 
+
+##### Interface #####
 
 def get_data(current_user):
     if current_user.is_anonymous:
@@ -73,3 +84,33 @@ def get_metadata(current_user, dbname):
     db_uri, session, metadata, relationships = get_db(current_user, dbname)
 
     return metadata
+
+
+##### Routes #####
+
+@app.route('/user_dbinfo/')
+@app.route('/user_dbinfo/<db>/')
+@login_required
+def ext_user_dbinfo(db=None):
+    if db:
+        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
+    else:
+        db_uri = session = metadata = relationships = None
+
+    return render_template('debug_dbinfo.html',
+             title = 'Databases info',
+             dbs_list = get_dbs_list(current_user),
+
+             db = db,
+             db_uri = db_uri,
+             session = session,
+             metadata = metadata,
+             relationships = relationships,
+             debug = html(metadata),
+           )
+
+
+@app.route('/user_db/')
+@login_required
+def ext_user_db():
+    return html(get_data(current_user))

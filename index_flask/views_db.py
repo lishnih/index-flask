@@ -14,8 +14,9 @@ from flask_login import login_required, current_user
 from .core.backwardcompat import *
 from .core.dump_html import html
 from .view_j2.query_interface import qi_query
+from .extensions import user_db
 
-from . import app, user_db
+from . import app
 
 
 @app.route('/db/')

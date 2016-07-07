@@ -16,7 +16,7 @@ from .core.backwardcompat import *
 from .core.fileman import list_files
 from .core.dump_html import html
 
-from . import app, debug_permission, user_db, get_next
+from . import app, debug_permission, get_next
 
 
 @app.route('/debug/')
@@ -76,45 +76,12 @@ def debug_current_user():
     return html(current_user)
 
 
-@app.route('/debug/dbinfo/')
-@app.route('/debug/dbinfo/<db>/')
-def debug_dbinfo(db=None):
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    if db:
-        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
-    else:
-        db_uri = session = metadata = relationships = None
-
-    return render_template('debug_dbinfo.html',
-             title = 'Databases info',
-             dbs_list = user_db.get_dbs_list(current_user),
-
-             db = db,
-             db_uri = db_uri,
-             session = session,
-             metadata = metadata,
-             tables = tables,
-             relationships = relationships,
-             debug = html(metadata),
-           )
-
-
 @app.route('/debug/g')
 def debug_g():
     if not app.debug or not debug_permission.can():
         abort(404)
 
     return html(g)
-
-
-@app.route('/debug/user_db')
-def debug_user_db():
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    return html(user_db.get_data(current_user))
 
 
 @app.route('/debug/request')

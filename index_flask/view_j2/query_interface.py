@@ -10,7 +10,7 @@ from collections import OrderedDict
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
-from .. import user_db
+from ..extensions import user_db
 
 
 def qi_columns_list(user, db, tables, fullnames_option = 1):

@@ -84,6 +84,7 @@ from . import (
 
 ##### Import extensions #####
 
-# from .extensions import (
-#     user_dict,
-# )
+from .extensions import (
+    user_db,
+    user_dict,
+)

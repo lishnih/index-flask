@@ -11,14 +11,6 @@ from datetime import datetime
 from . import db
 
 
-def append_user_to_group(group_name, user):
-    group = Group.query.filter_by(name=group_name).first()
-    if not group:
-        group = Group(group_name)
-
-    user.groups.append(group)
-
-
 relationship_user_group = db.Table('rs_user_group',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
     db.Column('_group_id', db.Integer, db.ForeignKey('group.id'), nullable=False),

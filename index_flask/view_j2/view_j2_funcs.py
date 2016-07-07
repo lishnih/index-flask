@@ -8,7 +8,7 @@ from __future__ import ( division, absolute_import,
 from .request_interface import *
 from .response_interface import *
 from .query_interface import *
-from ..user_db import *
+from ..extensions.user_db import *
 
 
 def set_default_db_action(user, request_items, response):
