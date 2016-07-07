@@ -7,12 +7,14 @@
         <th>Url</th>
         <th>Function</th>
         <th>Methods</th>
+        <th>Lead script</th>
     </tr>
-  {%- for endpoint, methods, url in urls %}
+  {%- for endpoint, methods, url, loc in urls %}
     <tr>
         <td><a href="{{ url }}">{{ url }}</a></td>
         <td>{{ endpoint }}</td>
         <td>{{ methods }}</td>
+        <td>{{ loc }}</td>
     </tr>
   {%- endfor %}
 </table>

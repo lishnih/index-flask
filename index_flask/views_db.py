@@ -26,12 +26,12 @@ def view_db(db=None):
     dbs_list = user_db.get_dbs_list(current_user)
 
     if db:
-        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
+        db_uri, session, metadata = user_db.get_db(current_user, db)
         tables = metadata.tables.keys()
     else:
         tables = None
 
-    return render_template('view_db.html',
+    return render_template('db/index.html',
              title = 'Databases',
              dbs_list = dbs_list,
              db = db,
@@ -89,7 +89,7 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
                  rows = rows,
                )
     else:
-        return render_template('view_table.html',
+        return render_template('db/table.html',
                  title = 'Database: {0}'.format(db),
                  db = db,
                  full_rows_count = table_info.get('full_rows_count', 0),
@@ -112,7 +112,7 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
 @app.route('/jtable')
 @login_required
 def view_db_jtable():
-    return render_template('view_jtable.html',
+    return render_template('db/jtable.html',
              title = 'View table',
 #            debug = unicode(s),
            )

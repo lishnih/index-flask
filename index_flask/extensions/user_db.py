@@ -66,22 +66,22 @@ def get_db(current_user, dbname):
         return None, None, None, None
 
     if dbname not in user_db.get('dbs', {}):
-        db_uri, session, metadata, relationships = initDb(current_user.home, dbname)
-        user_db[dbname] = (db_uri, session, metadata, relationships)
+        db_uri, session, metadata = initDb(current_user.home, dbname)
+        user_db[dbname] = (db_uri, session, metadata)
     else:
-        db_uri, session, metadata, relationships = user_db['dbs'][dbname]
+        db_uri, session, metadata = user_db['dbs'][dbname]
 
-    return db_uri, session, metadata, relationships
+    return db_uri, session, metadata
 
 
 def get_session(current_user, dbname):
-    db_uri, session, metadata, relationships = get_db(current_user, dbname)
+    db_uri, session, metadata = get_db(current_user, dbname)
 
     return session
 
 
 def get_metadata(current_user, dbname):
-    db_uri, session, metadata, relationships = get_db(current_user, dbname)
+    db_uri, session, metadata = get_db(current_user, dbname)
 
     return metadata
 
@@ -93,11 +93,11 @@ def get_metadata(current_user, dbname):
 @login_required
 def ext_user_dbinfo(db=None):
     if db:
-        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
+        db_uri, session, metadata = user_db.get_db(current_user, db)
     else:
-        db_uri = session = metadata = relationships = None
+        db_uri = session = metadata = None
 
-    return render_template('debug_dbinfo.html',
+    return render_template('ext_user_db/info.html',
              title = 'Databases info',
              dbs_list = get_dbs_list(current_user),
 
@@ -105,7 +105,6 @@ def ext_user_dbinfo(db=None):
              db_uri = db_uri,
              session = session,
              metadata = metadata,
-             relationships = relationships,
              debug = html(metadata),
            )
 

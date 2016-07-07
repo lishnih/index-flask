@@ -24,7 +24,7 @@ def admin():
     if not admin_permission.can():
         abort(403)
 
-    return render_template('admin/admin.html',
+    return render_template('admin/index.html',
              title = 'Admin page',
            )
 

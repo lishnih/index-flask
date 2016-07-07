@@ -264,7 +264,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     distinct_columns = [i for i in distinct_columns if i]
 
 
-    db_uri, session, metadata, relationships = user_db.get_db(user, db)
+    db_uri, session, metadata = user_db.get_db(user, db)
     if not session:
         return {}, [], "Нет такой БД: {0}".format(db)
 
@@ -320,18 +320,9 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
             if j.column.table == mtables[i]:
                 mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
                 break
+
         else:
-            first, second = tables[i], tables[i+1]
-            rel = relationships.get(first, {}).get(second)
-
-            if rel:
-                their, own = rel
-                own = columns_dict["{0}.{1}".format(second, own)]
-                their = columns_dict["{0}.{1}".format(first, their)]
-                mtable1 = mtable1.join(mtables[i+1], own==their)
-
-            else:
-                return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
+            return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
 
 
     # Дополнительные таблицы
@@ -340,14 +331,16 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         for j in mtables[i].foreign_keys:
             primarytables.append(j.column.table.name)
 
-    for i in relationships:
-        if table1 in relationships[i]:
-            primarytables.append(i)
-
     primarytables = [i for i in set(primarytables) if i not in tables]
 
-    table = relationships.get(tables[-1], {})
-    followedtables = table.keys() if table else []
+
+    followedtables = []
+    for i in metadata.tables:
+        mtable = metadata.tables.get(i)
+        for j in mtable.foreign_keys:
+            if table1 == j.column.table.name:
+                followedtables.append(i)
+
     followedtables = [i for i in set(followedtables) if i not in tables]
 
 

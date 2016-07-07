@@ -33,27 +33,6 @@ engine {{ engine }}
 metadata {{ metadata }}
 </pre>
 
-<table border="1">
-    <tr>
-        <th>Tables</th>
-    </tr>
-    {%- for key in tables %}
-    <tr>
-        <td><a href="{{ key }}">{{ key }}</a></td>
-    </tr>
-    {%- endfor %}
-</table>
-<br />
-
-<b>Relationships</b>
-<br />
-<dl>
-  {%- for key, value in relationships | dictsort %}
-    <dt>{{ key }}</dt>
-    <dd>{{ value }}</dd>
-  {%- endfor %}
-</dl>
-
 {%- endif %}
 
 {% endblock %}

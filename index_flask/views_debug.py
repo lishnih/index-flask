@@ -32,9 +32,11 @@ def debug():
 
         methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
-        output.append([rule.endpoint, methods, url])
+        f = app.view_functions.get(rule.endpoint)
+        loc = f.func_code.co_filename if f else None
+        output.append([rule.endpoint, methods, url, loc])
 
-    return render_template('debug_debug.html',
+    return render_template('debug/index.html',
              title = 'Url mapping',
              urls = sorted(output),
            )
@@ -49,7 +51,7 @@ def debug_test(path=''):
     if not path or path[-1] == '/':
         test_url = '/test/{0}'.format(path)
         dirlist, filelist = list_files(test_url, app.root_path)
-        return render_template('debug_test.html',
+        return render_template('debug/test.html',
                  title = 'Testing directory',
                  path = test_url,
                  dirlist = dirlist,

@@ -20,25 +20,7 @@ def initDb(home, dbname):
     session = scoped_session(sessionmaker())
     session.configure(bind=engine)
 
-    tables = {}
-    relationships = dict()
-
-    for table in sorted(metadata.tables.keys()):
-        table = metadata.tables.get(table)
-        tables[table.name] = []
-        for column in table.c:
-            tables[table.name].append(column.name)
-
-            if column.name[0:1] == '_':
-                try:
-                    x, first_table, unique_key = column.name.split('_', 2)
-                    if first_table not in relationships:
-                        relationships[first_table] = dict()
-                    relationships[first_table][table.name] = [unique_key, column.name]
-                except ValueError:
-                    pass
-
-    return db_uri, session, metadata, relationships
+    return db_uri, session, metadata
 
 
 def getDbList(home):
