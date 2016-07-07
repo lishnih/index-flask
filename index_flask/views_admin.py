@@ -5,14 +5,14 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from flask import request, render_template, redirect, flash, abort
+from flask import request, render_template, redirect, jsonify, flash, abort
 
 from flask_login import current_user
 
-from .ext.backwardcompat import *
-from .ext.dump_html import html
+from .core.backwardcompat import *
+from .core.dump_html import html
 
-from .models import db, User, Group, Database, append_user_to_group
+from .models import db, User, Group
 from .forms import RegistrationForm, AddGroupForm
 
 from . import app, admin_permission, get_next
@@ -20,7 +20,7 @@ from . import app, admin_permission, get_next
 
 @app.route('/admin/')
 # @admin_permission.require(403)
-def admin_index():
+def admin():
     if not admin_permission.can():
         abort(403)
 
@@ -117,9 +117,33 @@ def admin_group(name):
            )
 
 
-@app.route('/admin/users_groups')
+@app.route('/admin/users_groups', methods=['GET', 'POST'])
 @admin_permission.require(403)
 def admin_users_groups():
+    if request.method == 'POST':
+        id = request.form.get('id')
+        group = request.form.get('group')
+        status = request.form.get('status')
+
+        user = User.query.filter_by(id=id).first()
+        group = Group.query.filter_by(name=group).first()
+
+        if status == 'true':
+            if group in user.groups:
+                return jsonify(result='rejected', message='The user is already in the group.')
+
+            user.groups.append(group)
+
+        else:
+            if group not in user.groups:
+                return jsonify(result='rejected', message='The user is not in the group.')
+
+            user.groups.remove(group)
+
+        db.session.commit()
+
+        return jsonify(result='accepted', message='Ok', status=status)
+
     users = User.query.all()
     groups = Group.query.all()
 
@@ -132,7 +156,8 @@ def admin_users_groups():
         row = [user.id, user.email]
 
         for group in groups:
-            row.append('+' if group in user.groups else '-')
+            checkbox = '<input class="user_group" type="checkbox" data-id="{0}" data-group="{1}" {2}>'
+            row.append(checkbox.format(user.id, group.name, 'checked' if group in user.groups else ''))
 
         rows.append(row)
 

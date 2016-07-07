@@ -50,8 +50,8 @@ jQuery( function($) {
           td.data("offset", -1);
         }
       },
-      error: function(data, content) {
-        debug(content);
+      error: function(xhr, error, thrown) {
+        debug(thrown);
       },
     });
   } );

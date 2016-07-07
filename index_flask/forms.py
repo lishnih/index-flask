@@ -5,8 +5,6 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os, logging
-
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
 from .models import User, Group
@@ -24,7 +22,7 @@ class RegistrationForm(Form):
     ])
     company = StringField('Company')
     password = PasswordField('New Password *', [
-        validators.DataRequired(),
+        validators.Length(min=6),
         validators.EqualTo('confirm', message='Passwords must match')
     ])
     confirm = PasswordField('Repeat Password *')

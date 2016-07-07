@@ -9,8 +9,8 @@ from flask import render_template
 
 from flask_login import current_user
 
-from .ext.backwardcompat import *
-from .ext.dump_html import html
+from .core.backwardcompat import *
+from .core.dump_html import html
 
 from . import app, admin_permission
 
@@ -20,8 +20,9 @@ def index():
 #   return app.send_static_file('index.html')
 
     name = None if current_user.is_anonymous else current_user.name
+    admin = admin_permission.can()
     return render_template('index.html',
              title = 'Index',
              name = name,
-             admin = admin_permission.can(),
+             admin = admin,
            )

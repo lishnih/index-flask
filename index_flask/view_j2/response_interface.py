@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-# from ..ext.dump_html import html
+# from ..core.dump_html import html
 
 
 def prepare_response(request):

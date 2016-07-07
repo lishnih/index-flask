@@ -24,7 +24,7 @@ except IOError:
     README = CHANGES = ''
 
 
-from index_flask.ext.info import __pkgname__, __description__, __version__
+from index_flask.core.info import __pkgname__, __description__, __version__
 
 
 if __name__ == '__main__':

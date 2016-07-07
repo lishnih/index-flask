@@ -11,13 +11,12 @@ from flask_login import login_required, login_user, logout_user, current_user
 
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
-from .ext.backwardcompat import *
-from .ext.dump_html import html
-
+from .core.backwardcompat import *
+from .core.dump_html import html
 from .models import db, User
 from .forms import RegistrationForm, LoginForm
 
-from . import app, user_data, get_next
+from . import app, get_next
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -117,6 +116,8 @@ def user_profile():
     return render_template('user/profile.html',
              title = 'Profile',
              cu = current_user,
+             groups = current_user.groups,
+             databases = current_user.databases,
              verified = 'not verified' if current_user.verified else 'verified'
            )
 

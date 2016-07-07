@@ -12,56 +12,15 @@ from flask import ( g, request, render_template, url_for, session,
 
 from flask_login import current_user
 
-from .ext.backwardcompat import *
-from .ext.fileman import list_files
-from .ext.dump_html import html
+from .core.backwardcompat import *
+from .core.fileman import list_files
+from .core.dump_html import html
 
-from . import app, debug_permission, user_data
-
-
-@app.route('/current_user')
-def debug_current_user():
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    return html(current_user)
+from . import app, debug_permission, user_db, get_next
 
 
-@app.route('/user_data')
-def debug_global_object():
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    return html(user_data.get_data(current_user))
-
-
-@app.route('/dbinfo/')
-@app.route('/dbinfo/<db>/')
-def debug_dbinfo(db=None):
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    if db:
-        db_uri, session, metadata, relationships = user_data.get_db(current_user, db)
-    else:
-        db_uri = session = metadata = relationships = None
-
-    return render_template('debug_dbinfo.html',
-             title = 'Databases info',
-             dbs_list = user_data.get_dbs_list(current_user),
-
-             db = db,
-             db_uri = db_uri,
-             session = session,
-             metadata = metadata,
-             tables = tables,
-             relationships = relationships,
-             debug = html(metadata),
-           )
-
-
-@app.route('/debug')
-def debug_debug():
+@app.route('/debug/')
+def debug():
     if not app.debug or not debug_permission.can():
         abort(404)
 
@@ -101,15 +60,7 @@ def debug_test(path=''):
 #       return send_from_directory('test', path)
 
 
-@app.route('/ver')
-def debug_ver():
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    return __version__
-
-
-@app.route('/app')
+@app.route('/debug/app')
 def debug_app():
     if not app.debug or not debug_permission.can():
         abort(404)
@@ -117,7 +68,64 @@ def debug_app():
     return html(app)
 
 
-@app.route('/session')
+@app.route('/debug/current_user')
+def debug_current_user():
+    if not app.debug or not debug_permission.can():
+        abort(404)
+
+    return html(current_user)
+
+
+@app.route('/debug/dbinfo/')
+@app.route('/debug/dbinfo/<db>/')
+def debug_dbinfo(db=None):
+    if not app.debug or not debug_permission.can():
+        abort(404)
+
+    if db:
+        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
+    else:
+        db_uri = session = metadata = relationships = None
+
+    return render_template('debug_dbinfo.html',
+             title = 'Databases info',
+             dbs_list = user_db.get_dbs_list(current_user),
+
+             db = db,
+             db_uri = db_uri,
+             session = session,
+             metadata = metadata,
+             tables = tables,
+             relationships = relationships,
+             debug = html(metadata),
+           )
+
+
+@app.route('/debug/g')
+def debug_g():
+    if not app.debug or not debug_permission.can():
+        abort(404)
+
+    return html(g)
+
+
+@app.route('/debug/user_db')
+def debug_user_db():
+    if not app.debug or not debug_permission.can():
+        abort(404)
+
+    return html(user_db.get_data(current_user))
+
+
+@app.route('/debug/request')
+def debug_request():
+    if not app.debug or not debug_permission.can():
+        abort(404)
+
+    return html(request)
+
+
+@app.route('/debug/session')
 def debug_session():
     if not app.debug or not debug_permission.can():
         abort(404)
@@ -126,17 +134,9 @@ def debug_session():
     return html((session, d))
 
 
-@app.route('/request')
-def debug_request():
+@app.route('/debug/ver')
+def debug_ver():
     if not app.debug or not debug_permission.can():
         abort(404)
 
-    return html(request)
-
-
-@app.route('/g')
-def debug_g():
-    if not app.debug or not debug_permission.can():
-        abort(404)
-
-    return html(g)
+    return __version__

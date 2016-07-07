@@ -10,14 +10,14 @@ from collections import OrderedDict
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
-from .. import user_data
+from .. import user_db
 
 
 def qi_columns_list(user, db, tables, fullnames_option = 1):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_data.get_metadata(user, db)
+    metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
@@ -37,7 +37,7 @@ def qi_columns_dict(user, db, tables, fullnames_option = 1):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_data.get_metadata(user, db)
+    metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
@@ -117,13 +117,13 @@ def qi_query_count(user, db, tables, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_data.get_metadata(user, db)
+    metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    session = user_data.get_session(user, db)
+    session = user_db.get_session(user, db)
 
 
 
@@ -165,13 +165,13 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_data.get_metadata(user, db)
+    metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    session = user_data.get_session(user, db)
+    session = user_db.get_session(user, db)
     query = session.query(*mtables)
 
     columns_dict = qi_columns_dict(user, db, tables)
@@ -210,13 +210,13 @@ def qi_query_sum(user, db, tables, column, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_data.get_metadata(user, db)
+    metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    session = user_data.get_session(user, db)
+    session = user_db.get_session(user, db)
     query = session.query(*mtables)
 
     columns_dict = qi_columns_dict(user, db, tables)
@@ -248,23 +248,25 @@ def qi_query_sum(user, db, tables, column, search=None, filter={}):
 
 
 def qi_query(user, db, tables, search=None, filter={}, sorting=[],
-             offset=0, limit=0, columns=[], distinct_column=[], plain=1):
+             offset=0, limit=0, columns=[], distinct_columns=[], plain=1):
     if isinstance(tables, basestring):
         tables = tables,
     if isinstance(sorting, basestring):
         sorting = sorting,
     if isinstance(columns, basestring):
         columns = columns,
-    if isinstance(distinct_column, basestring):
-        distinct_column = distinct_column,
+    if isinstance(distinct_columns, basestring):
+        distinct_columns = distinct_columns,
 
     tables = [i for i in tables if i]
     sorting = [i for i in sorting if i]
     columns = [i for i in columns if i]
-    distinct_column = [i for i in distinct_column if i]
+    distinct_columns = [i for i in distinct_columns if i]
 
 
-    db_uri, session, metadata, relationships = user_data.get_db(user, db)
+    db_uri, session, metadata, relationships = user_db.get_db(user, db)
+    if not session:
+        return {}, [], "Нет такой БД: {0}".format(db)
 
 
     # Список таблиц
@@ -288,13 +290,16 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     # Формируем список колонок для вывода
     mcolumns = []
 
-    if distinct_column:
-        for column in distinct_column:
+    if distinct_columns:
+        for column in distinct_columns:
             if column not in names:
                 column = "{0}.{1}".format(table1, column)
 
             if column in names:
-                mcolumns.append(distinct(columns_dict[column]))
+                if mcolumns:
+                    mcolumns.append(columns_dict[column])
+                else:
+                    mcolumns.append(distinct(columns_dict[column]))
 
     elif columns:
         for column in columns:
@@ -350,7 +355,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
 
     # Получаем кол-во всех записей
-    if not distinct_column:   # !!!
+    if not distinct_columns:   # !!!
         result = session.execute(s.count())
         full_rows_count = result.first()[0]
     else:
@@ -378,7 +383,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
 
     # Получаем кол-во записей после фильтрации
-    if not distinct_column:   # !!!
+    if not distinct_columns:   # !!!
         result = session.execute(s.count())
         filtered_rows_count = result.first()[0]
     else:
@@ -412,7 +417,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
 
     # Получаем кол-во записей в выборке
-    if not distinct_column:   # !!!
+    if not distinct_columns:   # !!!
         result = session.execute(s.count())
         rows_count = result.first()[0]
     else:
@@ -420,7 +425,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
 
     # Получаем записи и поля
-    if distinct_column:     # !!!
+    if distinct_columns:     # !!!
         names = [repr(column) for name, column in s._columns_plus_names]
     else:
         names = ["{0}.{1}".format(column.table.name, column.name) for name, column in s._columns_plus_names]

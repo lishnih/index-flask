@@ -11,22 +11,21 @@ from flask import request, jsonify, render_template
 
 from flask_login import login_required, current_user
 
-from .ext.backwardcompat import *
-from .ext.dump_html import html
-
+from .core.backwardcompat import *
+from .core.dump_html import html
 from .view_j2.query_interface import qi_query
 
-from . import app, user_data
+from . import app, user_db
 
 
 @app.route('/db/')
 @app.route('/db/<db>/')
 @login_required
 def view_db(db=None):
-    dbs_list = user_data.get_dbs_list(current_user)
+    dbs_list = user_db.get_dbs_list(current_user)
 
     if db:
-        db_uri, session, metadata, relationships = user_data.get_db(current_user, db)
+        db_uri, session, metadata, relationships = user_db.get_db(current_user, db)
         tables = metadata.tables.keys()
     else:
         tables = None
@@ -45,7 +44,7 @@ def view_db(db=None):
 @app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
 @app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
 @login_required
-def view_table(db, table1=None, table2=None, table3=None, table4=None, table5=None):
+def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5=None):
     # Обратный порядок - не менять!
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
 
@@ -66,7 +65,7 @@ def view_table(db, table1=None, table2=None, table3=None, table4=None, table5=No
         offset  = offset,
         limit   = limit,
         columns = [],
-        distinct_column = [],
+        distinct_columns = [],
         plain = 1,
     )
 
@@ -111,7 +110,7 @@ def view_table(db, table1=None, table2=None, table3=None, table4=None, table5=No
 
 @app.route('/jtable')
 @login_required
-def view_jtable():
+def view_db_jtable():
     return render_template('view_jtable.html',
              title = 'View table',
 #            debug = unicode(s),
@@ -120,14 +119,14 @@ def view_jtable():
 
 @app.route('/j3', methods=["GET", "POST"])
 @login_required
-def view_j3():
+def view_db_j3():
     if request.method == 'POST':
         action = request.args.get('action')
         db = request.args.get('db')
         tables = request.args.get('t').split('|')
         table1 = tables[0]
 
-        if db not in user_data.get_dbs_list(current_user):
+        if db not in user_db.get_dbs_list(current_user):
             return jsonify(Result="ERROR", Message="Db don't exists!")
 
         offset = int(request.form.get('offset', 0))
@@ -147,7 +146,7 @@ def view_j3():
             offset  = offset,
             limit   = limit,
             columns = [],
-            distinct_column = [],
+            distinct_columns = [],
             plain = 0,
         )
 

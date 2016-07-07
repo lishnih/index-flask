@@ -8,7 +8,7 @@ from __future__ import ( division, absolute_import,
 from .request_interface import *
 from .response_interface import *
 from .query_interface import *
-from ..user_data import *
+from ..user_db import *
 
 
 def set_default_db_action(user, request_items, response):
@@ -104,7 +104,8 @@ def table_view_action(user, request_items, response):
     plain  = ri_get_int(request_items, 'plain', 1)    # Тип возвращаемых данных (записей)
 
     columns_tuple = ri_get_tuple(request_items, 'columns')
-    distinct_column = ri_get_str(request_items, 'distinct_column')
+    distinct_columns = ri_get_str(request_items, 'distinct_column')
+    distinct_columns = ri_get_str(request_items, 'distinct_columns')
 
     # Если заданы короткие имена колонок - добавляем к ним название первой таблицы
     table = tables[0]
@@ -126,7 +127,7 @@ def table_view_action(user, request_items, response):
         offset  = offset,
         limit   = limit,
         columns = columns,
-        distinct_column = distinct_column,
+        distinct_columns = distinct_columns,
         plain = plain,
     )
 
@@ -260,7 +261,7 @@ def column_district_action(user, request_items, response):
         sorting = sorting_dict,
         offset  = offset,
         limit   = limit,
-        distinct_column = column,
+        distinct_columns = column,
     )
 
     table_info, rows, error = qi_query(**query_params)

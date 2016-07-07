@@ -14,10 +14,18 @@
 <br />
 
 
+<b>Groups:</b>
+<table>
+{%- for group in groups %}
+  <tr><td>{{ group.name }}</td></tr>
+{%- endfor %}
+</table>
+<br />
+
 <b>Databases:</b>
 <table>
-{%- for db in cu.databases %}
-  <tr><td><b>>{{ db }}</b></td><td>View</td><td>Edit</td><td>Delete</td></tr>
+{%- for db in databases %}
+  <tr><td><b>{{ db }}</b></td><td>View</td><td>Edit</td><td>Delete</td></tr>
 {%- endfor %}
 </table>
 <a href="/append_db">Append database</a><br />
