@@ -1,0 +1,24 @@
+{% extends "_layout.html" %}
+
+{% from "_formhelpers.html" import render_field %}
+
+{% block body %}
+
+{%- if p_admin %}
+<h1>Append new app</h1>
+
+<form method=post action="?check">
+  <dl>
+    {{ render_field(form.name, size=40) }}
+    {{ render_field(form.description, size=80) }}
+  </dl>
+  <p>
+    <input type=submit value="Append">
+  </p>
+</form>
+{%- endif %}
+
+<ul class="hll">
+<li><a href=".">Home</a></li>
+</ul>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "_layout.html" %}
+
+{% from "_formhelpers.html" import render_field %}
+
+{% block body %}
+
+<h1>Options</h1>
+
+{%- if not attached %}
+<p>
+Приложение не подключено.<br />
+Нажмите на ссылку, чтобы подключить приложение.<br />
+Приложение получит доступ к Вашим данным.<br />
+<a href="?attach">Подключить</a><br />
+</p>
+{%- endif %}
+
+<ul class="hll">
+<li><a href=".">Home</a></li>
+</ul>
+{% endblock %}

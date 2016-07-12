@@ -15,7 +15,7 @@ from .. import app
 
 ##### Model #####
 
-class Dict(db.Model):               # Rev. 2016-07-02
+class Dict(db.Model):         # Rev. 2016-07-02
     __tablename__ = 'dict'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -26,7 +26,7 @@ class Dict(db.Model):               # Rev. 2016-07-02
     def __init__(self, name, d):
         self.name = name
         self.obj = d
-#         self._user_id = user.id
+#       self._user_id = user.id
 
 User.ext_dicts = db.relationship('Dict', backref='user', lazy='dynamic')
 

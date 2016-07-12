@@ -9,9 +9,10 @@ from flask import Flask, request
 
 from flask_sqlalchemy import SQLAlchemy
 
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 
-from flask_principal import Principal, Permission, RoleNeed, identity_loaded
+from flask_principal import ( Principal, Permission, RoleNeed, UserNeed,
+                              identity_loaded )
 
 from .core.backwardcompat import *
 from . import config
@@ -52,13 +53,16 @@ principals = Principal(app)
 admin_permission = Permission(RoleNeed('admin'))
 debug_permission = Permission(RoleNeed('debug'))
 
-def _on_principal_init(sender, identity):
-    user = User.query.filter_by(id=identity.id).first()
-    if user:
-        for i in user.groups:
-            identity.provides.add(RoleNeed(i.name))
+@identity_loaded.connect_via(app)
+def on_identity_loaded(sender, identity):
+    if identity.id:
+        if hasattr(current_user, 'id'):
+            identity.provides.add(UserNeed(current_user.id))
 
-identity_loaded.connect(_on_principal_init)
+        user = User.query.filter_by(id=identity.id).first()
+        if user:
+            for i in user.groups:
+                identity.provides.add(RoleNeed(i.name))
 
 
 ##### get_next function #####
@@ -72,19 +76,15 @@ def get_next(default='/'):
 ##### Import routes #####
 
 from . import (
-    views,        # Common views
+    views_index,  # Common views
     views_admin,  # Admin views
     views_user,   # User views
-    views_db,     # DB views
-    views_j2,     # j2 views
-#   views_st,     # ST views
-    views_debug,  # Debug views
 )
 
 
-##### Import extensions #####
+##### Import extensions and views #####
 
-from .extensions import (
-    user_db,
-    user_dict,
-)
+from .load_modules import load_modules, require_ext
+
+load_modules('extensions')
+load_modules('views')

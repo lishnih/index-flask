@@ -8,37 +8,56 @@ from __future__ import ( division, absolute_import,
 from .request_interface import *
 from .response_interface import *
 from .query_interface import *
-from ..extensions.user_db import *
 
 
 def set_default_db_action(user, request_items, response):
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
     db = ri_get_str(request_items, 'db')
-    db = set_default_db(user, db)
+    db = user_db.set_default_db(user, db)
 
     response['rows'] = [db]
 
 
 def default_db_action(user, request_items, response):
-    db = get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = user_db.get_default_db(user)
 
     response['rows'] = [db]
 
 
 def dbs_list_action(user, request_items, response):
-    response['rows'] = [i for i in get_dbs_list(user)]
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    response['rows'] = [i for i in user_db.get_dbs_list(user)]
 
 
 def tables_list_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
 
     if not db:
         return response_with_message(response, "База данных не задана!", 'error')
 
-    response['rows'] = get_metadata(user, db).tables.keys()
+    response['rows'] = user_db.get_metadata(user, db).tables.keys()
 
 
 def columns_list_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 
@@ -56,7 +75,11 @@ def columns_list_action(user, request_items, response):
 
 
 def table_count_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 
@@ -87,7 +110,11 @@ def table_count_action(user, request_items, response):
 
 
 def table_view_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 
@@ -149,7 +176,11 @@ def table_view_action(user, request_items, response):
 
 
 def column_func_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 
@@ -192,7 +223,11 @@ def column_func_action(user, request_items, response):
 
 
 def column_sum_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 
@@ -229,7 +264,11 @@ def column_sum_action(user, request_items, response):
 
 
 def column_district_action(user, request_items, response):
-    db = ri_get_str(request_items, 'db') or get_default_db(user)
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
     tables = ri_get_str(request_items, 'table'),
     tables = ri_get_tuple(request_items, 'tables', tables)
 

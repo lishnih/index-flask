@@ -17,7 +17,7 @@ jQuery( function($) {
     var data = {
       "id": id,
       "group": group,
-      "status": input.prop('checked'),
+      "checked": input.prop('checked'),
     };
 
     $.ajax({

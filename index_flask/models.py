@@ -14,10 +14,11 @@ from . import db
 relationship_user_group = db.Table('rs_user_group',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
     db.Column('_group_id', db.Integer, db.ForeignKey('group.id'), nullable=False),
+    db.Column('is_admin', db.Boolean, nullable=False, default=False),
     db.PrimaryKeyConstraint('_user_id', '_group_id'))
 
 
-class User(db.Model):               # Rev. 2016-06-23
+class User(db.Model):         # Rev. 2016-06-23
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -115,7 +116,7 @@ class User(db.Model):               # Rev. 2016-06-23
 #       return cls.user_database.get(id)
 
 
-class Group(db.Model):              # Rev. 2016-06-29
+class Group(db.Model):        # Rev. 2016-06-29
     __tablename__ = 'group'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -129,18 +130,41 @@ class Group(db.Model):              # Rev. 2016-06-29
         self.created = datetime.utcnow()
 
 
-class Database(db.Model):           # Rev. 2016-06-22
+class Database(db.Model):     # Rev. 2016-07-12
     __tablename__ = 'database'
 
     id = db.Column(db.Integer, primary_key=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    _group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
     name = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, name, url, user):
+        self._user_id = user.id
         self.name = name
         self.url = url
-        self._user_id = user.id
+        self.created = datetime.utcnow()
+
+
+class Module(db.Model):       # Rev. 2016-07-12
+    __tablename__ = 'module'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    folder = db.Column(db.String, nullable=False)
+    active = db.Column(db.Boolean, nullable=False, default=True)
+    created = db.Column(db.DateTime, nullable=False)
+    loaded = db.Column(db.DateTime, nullable=False)
+    error = db.Column(db.String, nullable=False, default='')
+
+    db.Index('ext', name, folder, unique=True)
+
+    def __init__(self, name, folder='extensions'):
+        self.name = name
+        self.folder = folder
+        self.created = datetime.utcnow()
+        self.loaded = datetime(2000, 1, 1)
 
 
 db.create_all()

@@ -10,12 +10,16 @@ from collections import OrderedDict
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
-from ..extensions import user_db
+from .. import require_ext
 
 
 def qi_columns_list(user, db, tables, fullnames_option = 1):
     if isinstance(tables, basestring):
         tables = tables,
+
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
 
     metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
@@ -117,14 +121,11 @@ def qi_query_count(user, db, tables, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_db.get_metadata(user, db)
+    db_uri, session, metadata = user_db.get_db(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
-
-    session = user_db.get_session(user, db)
-
 
 
     query = session.query(*mtables)
@@ -165,13 +166,12 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_db.get_metadata(user, db)
+    db_uri, session, metadata = user_db.get_db(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    session = user_db.get_session(user, db)
     query = session.query(*mtables)
 
     columns_dict = qi_columns_dict(user, db, tables)
@@ -210,13 +210,12 @@ def qi_query_sum(user, db, tables, column, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
-    metadata = user_db.get_metadata(user, db)
+    db_uri, session, metadata = user_db.get_db(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-    session = user_db.get_session(user, db)
     query = session.query(*mtables)
 
     columns_dict = qi_columns_dict(user, db, tables)
@@ -263,6 +262,19 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     columns = [i for i in columns if i]
     distinct_columns = [i for i in distinct_columns if i]
 
+
+    links = {}
+    for i in range(len(tables)):
+        table = tables[i]
+        if ':' in table:
+            table, link = table.split(':')
+            tables[i] = table
+            links[link] = table
+
+
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
 
     db_uri, session, metadata = user_db.get_db(user, db)
     if not session:
@@ -316,13 +328,28 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
     # Join для таблиц
     for i in range(len(tables) - 1):
-        for j in mtables[i + 1].foreign_keys:
-            if j.column.table == mtables[i]:
-                mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
-                break
+        first, second = tables[i], tables[i+1]
+        if links.get(first) == second:
+            for j in mtables[i].foreign_keys:
+                if j.column.table == mtables[i+1]:
+                    # j.parent - ссылка на другую таблицу
+                    # j.column - первичный ключ
+                    mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
+                    break
+
+            else:
+                return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
 
         else:
-            return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
+            for j in mtables[i + 1].foreign_keys:
+                if j.column.table == mtables[i]:
+                    # j.parent - ссылка на другую таблицу
+                    # j.column - первичный ключ
+                    mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
+                    break
+
+            else:
+                return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
 
 
     # Дополнительные таблицы

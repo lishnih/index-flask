@@ -7,22 +7,23 @@ from __future__ import ( division, absolute_import,
 
 from collections import OrderedDict
 
-from flask import request, jsonify, render_template
+from flask import request, render_template, jsonify
 
 from flask_login import login_required, current_user
 
-from .core.backwardcompat import *
-from .core.dump_html import html
-from .view_j2.query_interface import qi_query
-from .extensions import user_db
+from ..core.backwardcompat import *
+from ..core.dump_html import html
+from ..view_j2.query_interface import qi_query
 
-from . import app
+from .. import app, require_ext
 
 
 @app.route('/db/')
 @app.route('/db/<db>/')
 @login_required
 def view_db(db=None):
+    user_db = require_ext('user_db', 'html')
+
     dbs_list = user_db.get_dbs_list(current_user)
 
     if db:
@@ -121,6 +122,13 @@ def view_db_jtable():
 @app.route('/j3', methods=["GET", "POST"])
 @login_required
 def view_db_j3():
+    user_db = require_ext('user_db', 'json')
+
+    res = {
+      "Result": "ERROR",
+      "Message": "Action unknown!",
+    }
+
     if request.method == 'POST':
         action = request.args.get('action')
         db = request.args.get('db')
@@ -212,5 +220,4 @@ def view_db_j3():
               "Message": "Action unknown!",
             }
 
-        return jsonify(**res)
-    return "no output"
+    return jsonify(**res)
