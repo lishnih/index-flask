@@ -5,8 +5,11 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import re
+import re, hashlib, random
 from datetime import datetime
+
+from sqlalchemy import and_
+from sqlalchemy.sql import select
 
 from flask import request, render_template, redirect, url_for, flash
 
@@ -28,7 +31,7 @@ relationship_user_app = db.Table('rs_user_app',
     db.Column('token', db.String, nullable=False, default=''),
     db.Column('sticked', db.Boolean, nullable=False, default=True),
     db.Column('options', db.PickleType, nullable=False, default={}),
-    db.Column('created', db.DateTime),    # !!!
+    db.Column('attached', db.DateTime),
     db.PrimaryKeyConstraint('_user_id', '_app_id'))
 
 
@@ -79,6 +82,36 @@ class AddAppForm(Form):
 
 ##### Interface #####
 
+def init_rs_user_app(current_user, app):
+    s = relationship_user_app.update(values=dict(
+          attached = datetime.utcnow(),
+          token = suit_code(current_user.id, app.id),
+        )).where(
+          and_(relationship_user_app.c._user_id == current_user.id,
+          relationship_user_app.c._app_id == app.id)
+        )
+    res = db.session.execute(s)
+    db.session.commit()
+
+def get_token(user, app):
+#   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
+    rnd = random.randint(0, 100000000000000)
+    return hashlib.md5("{0}_{1}_{2}".format(rnd, user, app)).hexdigest()
+
+def suit_code(user, app):
+    double = True
+    while double:
+        token = get_token(user, app)
+#         double = RS_App.query.filter_by(token=token).first()
+
+        s = select('*').select_from(relationship_user_app).\
+              where(relationship_user_app.c.token==token)
+        res = db.session.execute(s)
+        double = res.first()
+
+    return token
+
+
 def get(app):
     if current_user.is_anonymous:
         return {}
@@ -112,24 +145,43 @@ def view_app(id):
         if 'attach' in request.args:
             current_user.ext_apps.append(app)
             db.session.commit()
+
+            init_rs_user_app(current_user, app)
             return redirect(url_for('view_app', id=id))
 
     else:
         flash('App is not created yet!')
 
         p_admin = admin_permission.can()
-        return render_template('ext_user_app/add_app.html',
-             title = '',
-             p_admin = p_admin,
-             form = form,
-#            debug = html(table_info),
+        return render_template('extensions/user_app/add_app.html',
+                 title = '',
+                 p_admin = p_admin,
+                 form = form,
+#                debug = html(table_info),
+               )
+
+    s = select('*').select_from(relationship_user_app).where(
+          and_(relationship_user_app.c._user_id == current_user.id,
+          relationship_user_app.c._app_id == app.id)
         )
 
-    attached = app in current_user.ext_apps
-    k
+    res = db.session.execute(s)
+    user_app = res.first()
+    if user_app:
+        user_app = dict(user_app.items())
 
-    return render_template('ext_user_app/index.html',
-               title = 'Options',
-               attached = attached,
-#              debug = html(table_info),
+        options = user_app.pop('options')
+    else:
+        options = {}
+
+    names = [i.name for i in App.__table__.c]
+    row = [app.__dict__.get(i) for i in names]
+    app = dict((zip(names, row)))
+
+    return render_template('extensions/user_app/index.html',
+             title = 'Options',
+             app = app,
+             user_app = user_app,
+             options = options,
+#            debug = html(table_info),
            )

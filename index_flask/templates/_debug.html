@@ -14,3 +14,66 @@
 </div>
 {%- endif %}
 {% endmacro %}
+
+
+{% macro dump_dict(obj) %}
+<dl>
+  {%- for key, value in obj | dictsort %}
+    <dt>{{ key }}</dt>
+    <dd>{{ value }}</dd>
+  {%- endfor %}
+</dl>
+{% endmacro %}
+
+
+{% macro dump_list(obj) %}
+<ul>
+  {%- for value in obj %}
+    <li>{{ value }}</li>
+  {%- endfor %}
+</ul>
+{% endmacro %}
+
+
+{% macro dump_table(names, rows) %}
+<table border="1">
+  {%- if names %}
+    <tr>
+      {%- for name in names %}
+        <th>{{ name }}</th>
+      {%- endfor %}
+    </tr>
+  {%- endif %}
+
+  {%- for row in rows %}
+    <tr>
+      {%- for col in row %}
+        <td>{{ col }}</td>
+      {%- endfor %}
+    </tr>
+  {%- endfor %}
+</table>
+{% endmacro %}
+
+
+{% macro dump_table_unsafe(names, rows) %}
+<table border="1">
+  {%- if names %}
+    <tr>
+      {%- for name in names %}
+        <th>{{ name }}</th>
+      {%- endfor %}
+    </tr>
+  {%- endif %}
+
+  {%- for row in rows %}
+    <tr>
+      {%- autoescape false %}
+      {%- for col in row %}
+        <td>{{ col }}</td>
+      {%- endfor %}
+      {%- endautoescape %}
+    </tr>
+  {%- endfor %}
+</table>
+{% endmacro %}

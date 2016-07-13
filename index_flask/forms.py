@@ -61,7 +61,7 @@ class LoginForm(Form):
             return False
 
         user = User.query.filter_by(email=self.email.data).first()
-        if user is None:
+        if not user:
             self.email.errors.append('Invalid email or password')
             self.password.errors.append('Invalid email or password')
             return False

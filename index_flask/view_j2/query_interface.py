@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from collections import OrderedDict
+# from collections import OrderedDict
 
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
@@ -456,7 +456,8 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     if plain:
         rows = [[j for j in i] for i in result.fetchall()]
     else:
-        rows = [OrderedDict((zip(names, i))) for i in result.fetchall()]
+        rows = [dict(i.items()) for i in result.fetchall()]
+#       rows = [OrderedDict(i.items()) for i in result.fetchall()]
 
 
     return dict(

@@ -1,0 +1,22 @@
+<!doctype html>
+<title>Table</title>
+
+<table border="1">
+  {%- if names %}
+    <tr>
+      {%- for name in names %}
+        <th>{{ name }}</th>
+      {%- endfor %}
+    </tr>
+  {%- endif %}
+
+  {%- for row in rows %}
+    <tr>
+      {%- autoescape false %}
+      {%- for col in row %}
+        <td>{{ col }}</td>
+      {%- endfor %}
+      {%- endautoescape %}
+    </tr>
+  {%- endfor %}
+</table>

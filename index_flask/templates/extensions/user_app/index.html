@@ -1,12 +1,17 @@
 {% extends "_layout.html" %}
 
 {% from "_formhelpers.html" import render_field %}
+{% from "_debug.html" import dump_dict %}
 
 {% block body %}
 
-<h1>Options</h1>
+<h1>App</h1>
+{{ dump_dict(app) }}
 
-{%- if not attached %}
+<h1>Options</h1>
+{%- if user_app %}
+{{ dump_dict(user_app) }}
+{%- else %}
 <p>
 Приложение не подключено.<br />
 Нажмите на ссылку, чтобы подключить приложение.<br />

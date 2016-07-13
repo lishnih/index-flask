@@ -5,8 +5,6 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from flask import render_template, jsonify
-
 from flask_login import login_required, current_user
 
 from ..core.backwardcompat import *

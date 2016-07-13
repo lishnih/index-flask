@@ -14,7 +14,7 @@ from . import db
 relationship_user_group = db.Table('rs_user_group',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
     db.Column('_group_id', db.Integer, db.ForeignKey('group.id'), nullable=False),
-    db.Column('is_admin', db.Boolean, nullable=False, default=False),
+#   db.Column('is_admin', db.Boolean, nullable=False, default=False),
     db.PrimaryKeyConstraint('_user_id', '_group_id'))
 
 
@@ -110,10 +110,6 @@ class User(db.Model):         # Rev. 2016-06-23
     #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
         rnd = random.randint(0, 100000000000000)
         return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
-
-#   @classmethod
-#   def get(cls, id):
-#       return cls.user_database.get(id)
 
 
 class Group(db.Model):        # Rev. 2016-06-29

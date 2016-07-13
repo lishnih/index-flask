@@ -6,25 +6,8 @@
 
 {% block body %}
 
-<table border="1">
-  {%- if names %}
-    <tr>
-      {%- for name in names %}
-        <th>{{ name }}</th>
-      {%- endfor %}
-    </tr>
-  {%- endif %}
-
-  {%- for row in rows %}
-    <tr>
-      {%- autoescape false %}
-      {%- for col in row %}
-        <td>{{ col }}</td>
-      {%- endfor %}
-      {%- endautoescape %}
-    </tr>
-  {%- endfor %}
-</table>
+{% from "_debug.html" import dump_table_unsafe %}
+{{ dump_table_unsafe(names, rows) }}
 
 <ul class="hll">
 <li><a href=".">Home</a></li>

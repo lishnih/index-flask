@@ -32,7 +32,7 @@ def view_db(db=None):
     else:
         tables = None
 
-    return render_template('db/index.html',
+    return render_template('views/views_db/index.html',
              title = 'Databases',
              dbs_list = dbs_list,
              db = db,
@@ -90,7 +90,7 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
                  rows = rows,
                )
     else:
-        return render_template('db/table.html',
+        return render_template('views/views_db/table.html',
                  title = 'Database: {0}'.format(db),
                  db = db,
                  full_rows_count = table_info.get('full_rows_count', 0),
@@ -113,7 +113,7 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
 @app.route('/jtable')
 @login_required
 def view_db_jtable():
-    return render_template('db/jtable.html',
+    return render_template('views/views_db/jtable.html',
              title = 'View table',
 #            debug = unicode(s),
            )
