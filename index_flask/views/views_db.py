@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 from collections import OrderedDict
 
-from flask import request, render_template, jsonify
+from flask import request, render_template, jsonify, flash
 
 from flask_login import login_required, current_user
 
@@ -90,6 +90,8 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
                  rows = rows,
                )
     else:
+        if error:
+            flash(error, 'error')
         return render_template('views/views_db/table.html',
                  title = 'Database: {0}'.format(db),
                  db = db,
@@ -105,7 +107,6 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
                  primarytables = table_info.get('primarytables', []),
                  followedtables = table_info.get('followedtables', []),
                  lasttable = lasttable,
-                 error = error,
 #                debug = unicode(s),
                )
 

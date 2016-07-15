@@ -1,16 +1,10 @@
 {% macro debug_footer() %}
 {%- if debug %}
-  {%- autoescape false %}
 <hr />
 <div>
+  {%- autoescape false %}
   {{ debug }}
-</div>
   {%- endautoescape %}
-{%- endif %}
-
-{%- if error %}
-<div>
-  Error: {{ error }}
 </div>
 {%- endif %}
 {% endmacro %}
@@ -19,8 +13,8 @@
 {% macro dump_dict(obj) %}
 <dl>
   {%- for key, value in obj | dictsort %}
-    <dt>{{ key }}</dt>
-    <dd>{{ value }}</dd>
+  <dt>{{ key }}</dt>
+  <dd>{{ value }}</dd>
   {%- endfor %}
 </dl>
 {% endmacro %}
@@ -29,51 +23,67 @@
 {% macro dump_list(obj) %}
 <ul>
   {%- for value in obj %}
-    <li>{{ value }}</li>
+  <li>{{ value }}</li>
   {%- endfor %}
 </ul>
 {% endmacro %}
 
 
 {% macro dump_table(names, rows) %}
+<div class="table">
 <table border="1">
-  {%- if names %}
+  <thead>
+    {%- if names %}
     <tr>
       {%- for name in names %}
-        <th>{{ name }}</th>
+      <th>{{ name }}</th>
       {%- endfor %}
     </tr>
-  {%- endif %}
+    {%- endif %}
+  </thead>
 
-  {%- for row in rows %}
+  <tbody>
+    {%- if rows %}
+    {%- for row in rows %}
     <tr>
       {%- for col in row %}
-        <td>{{ col }}</td>
+      <td>{{ col }}</td>
       {%- endfor %}
     </tr>
-  {%- endfor %}
+    {%- endfor %}
+    {%- endif %}
+  </tbody>
 </table>
+</div>
 {% endmacro %}
 
 
 {% macro dump_table_unsafe(names, rows) %}
+<div class="table">
 <table border="1">
-  {%- if names %}
+  <thead>
+    {%- if names %}
     <tr>
       {%- for name in names %}
-        <th>{{ name }}</th>
+      <th>{{ name }}</th>
       {%- endfor %}
     </tr>
-  {%- endif %}
+    {%- endif %}
+  </thead>
 
-  {%- for row in rows %}
+  <tbody>
+    {%- if rows %}
+    {%- for row in rows %}
     <tr>
       {%- autoescape false %}
       {%- for col in row %}
-        <td>{{ col }}</td>
+      <td>{{ col }}</td>
       {%- endfor %}
       {%- endautoescape %}
     </tr>
-  {%- endfor %}
+    {%- endfor %}
+    {%- endif %}
+  </tbody>
 </table>
+</div>
 {% endmacro %}

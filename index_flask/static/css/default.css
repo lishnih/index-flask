@@ -1,5 +1,9 @@
-body, input[type="text"], textarea {
+body {
   background-color: #d0d0ff;
+}
+
+textarea, select, input[type="text"] {
+  background-color: #e0e0ff;
 }
 
 input[type="password"] {
@@ -54,7 +58,7 @@ span.a {
 }
 
 .no-border {
-  padding: 0em 0em 0em 0em;
+  padding: 0em;
 }
 
 .unselectable {
@@ -69,6 +73,22 @@ span.a {
 div {
   box-sizing: border-box;
   padding: .3em .7em;
+}
+
+div.table {
+  padding: 0em;
+}
+
+div.table table {
+  display: table;
+}
+
+div.table tr:hover {
+  background-color: Azure;
+}
+
+div.table td:hover {
+  color: blue;
 }
 
 div.menu {

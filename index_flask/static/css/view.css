@@ -1,9 +1,1 @@
 @import url("default.css");
-
-TR:hover {
-  background-color: Azure;
-}
-
-TD:hover {
-  color: blue;
-}

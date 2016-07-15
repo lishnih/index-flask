@@ -1,0 +1,50 @@
+{% macro render_tr(field) %}
+  <tr>
+    <td>{{ field.label }}</td>
+    <td>{{ field(**kwargs)|safe }}</td>
+  </tr>
+  {% if field.errors %}
+  <tr>
+    <td colspan=2>
+      <ul class=errors>
+        {% for error in field.errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </td>
+  </tr>
+  {% endif %}
+{% endmacro %}
+
+{% macro render_tr_filter(field1, field2, field3) %}
+  <tr>
+    <td>{{ field1(**kwargs)|safe }}</td>
+    <td>{{ field2(**kwargs)|safe }}</td>
+    <td>{{ field3(**kwargs)|safe }}</td>
+  </tr>
+{% endmacro %}
+
+{% macro render_tr_sorting(field1, field2) %}
+  <tr>
+    <td>{{ field1(**kwargs)|safe }}</td>
+    <td>{{ field2(**kwargs)|safe }}</td>
+  </tr>
+{% endmacro %}
+
+{% macro render_navigator(page, pages, filtered) %}
+  <span class="a navigator frew"><<</span> |
+  <span class="a navigator rew"><</span>
+  <select class="page" name="page">
+    {%- if page %}
+    {%- for i in range(pages) %}
+    {%- if i+1 == page %}
+    <option selected value="{{ i+1 }}">{{ i+1 }} / {{ pages }}</option>
+    {%- else %}
+    <option value="{{ i+1 }}">{{ i+1 }} / {{ pages }}</option>
+    {%- endif %}
+    {%- endfor %}
+    {%- endif %}
+  </select>
+  <span class="a navigator fwd">></span> |
+  <span class="a navigator ffwd" data-filtered="{{ filtered }}">>></span>
+{% endmacro %}
