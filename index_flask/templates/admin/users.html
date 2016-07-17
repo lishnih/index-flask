@@ -6,6 +6,9 @@
 
 {% block body %}
 
+{% if total %}
+<i>Всего: {{ total }}</i><br />
+{% endif %}
 {% from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, rows) }}
 

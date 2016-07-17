@@ -51,7 +51,7 @@
 </form>
 </div>
 
-<i>Выведено {{ showed }} из {{ filtered }} (всего {{ all }})</i>
+<i>Выведено {{ showed }} из {{ filtered }} (всего {{ total }})</i>
 
 {% from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, rows) }}

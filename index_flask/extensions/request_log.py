@@ -216,7 +216,7 @@ def request_log():
             order.append(sort_column)
 
     s = RequestRecord.query
-    all = s.count()
+    total = s.count()
     s = s.filter(*criterion)
     filtered = s.count()
     s = s.order_by(*order).offset(form.offset.data).limit(form.limit.data)
@@ -225,8 +225,9 @@ def request_log():
     records = s.all()
 #   names = [i.name for i in RequestRecord.__table__.c]
     names.insert(0, '#')
-    rows = [[seq+1 if i == '#' else record.__dict__.get(i) for i in names] for seq, record in enumerate(records)]
+    rows = [[seq if i == '#' else record.__dict__.get(i) for i in names] for seq, record in enumerate(records, 1)]
 #   rows_dict = [dict((zip(names, [record.__dict__.get(i) for i in names]))) for record in records]
+#   rows_seq_dict = [seq, dict((zip(names, [record.__dict__.get(i) for i in names]))) for seq, record in enumerate(records, 1)]
 
     pages = int(math.ceil(filtered / form.limit.data)) if form.limit.data else 0
     page = int(math.floor(form.offset.data / form.limit.data)) + 1 if form.limit.data else 0
@@ -236,7 +237,7 @@ def request_log():
              form = form,
              names = names,
              rows = rows,
-             all = all,
+             total = total,
              filtered = filtered,
              showed = showed,
              page = page,

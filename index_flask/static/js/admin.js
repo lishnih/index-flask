@@ -6,34 +6,47 @@ jQuery( function($) {
 
   /*** EVENTS ***/
 
-  /* Extend table */
+  /* Action handler */
 
-  $("input.user_group").click( function(event) {
-    input = $(this);
+  $("span.for_action").click( function(event) {
+    span = $(this);
+    span1 = span[0];
 
-    var id = input.data("id");
-    var group = input.data("group");
+    data = get_data(span1);
 
-    var data = {
-      "id": id,
-      "group": group,
-      "checked": input.prop('checked'),
-    };
-
-    $.ajax({
-      type: "POST",
-      dataType: "json",
-      url: this.baseURI,
-      data: data,
-      async: false,
-      success: function(data) {
+    $.post(this.baseURI, data, function(data) {
         debug(data);
-      },
-      error: function(xhr, error, thrown) {
-        debug(thrown);
-      },
-    });
+    } );
   } );
+
+
+  /* Action handler for inputs */
+
+  $("input.for_action").click( function(event) {
+    input = $(this);
+    input1 = input[0];
+
+    data = get_data(input1);
+    data["checked"] = input.prop('checked')
+
+    $.post(this.baseURI, data, function(data) {
+        debug(data);
+    } );
+  } );
+
+
+  /*** FUNCTIONS ***/
+
+  function get_data(cls) {
+    data = {}
+    for (name in cls.attributes) {
+      obj = cls.attributes[name];
+      if ( typeof obj == "object" && obj.name.indexOf("data-") === 0 )
+          data[obj.name.slice(5)] = obj.value
+    } // for
+
+    return data;
+  } // get_data
 
 
 } );

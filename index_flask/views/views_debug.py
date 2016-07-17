@@ -27,9 +27,9 @@ def debug():
     output = []
     for rule in app.url_map.iter_rules():
         options = {}
-        for i, arg in enumerate(rule.arguments):
+        for seq, arg in enumerate(rule.arguments, 1):
 #           options[arg] = "<{0}>".format(arg)
-            options[arg] = i
+            options[arg] = seq
 
         methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
