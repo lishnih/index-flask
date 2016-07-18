@@ -5,18 +5,23 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+import os
+
 from flask import request, render_template, jsonify, redirect, flash, abort
 
 from flask_login import login_required
+from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
 from .core.dump_html import html
-from .core.html_helpers import parse_input, parse_span
-
+from .core.html_helpers import parse_input, parse_span, dye_red, dye_green
 from .models import db, User, Group, Module
 from .forms import RegistrationForm, AddGroupForm
 
-from . import app, admin_permission, get_next
+from . import app, get_next
+
+
+admin_permission = Permission(RoleNeed('admin'))
 
 
 @app.route('/admin/')
@@ -130,6 +135,8 @@ def admin_group(name):
 def admin_users_groups():
     if request.method == 'POST':
         action = request.form.get('action')
+        result = 'omitted'
+        message = ''
 
         if action == 'toggle_record':
             id = request.form.get('id')
@@ -142,20 +149,19 @@ def admin_users_groups():
                 if user and group:
                     if checked:
                         if group in user.groups:
-                            return jsonify(result='rejected', message='The user is already in the group.')
+                            return jsonify(action=action, result='rejected', message='The user is already in the group.')
 
                         user.groups.append(group)
+                        result = 'accepted'
 
                     else:
                         if group not in user.groups:
-                            return jsonify(result='rejected', message='The user is not in the group.')
+                            return jsonify(action=action, result='rejected', message='The user is not in the group.')
 
                         user.groups.remove(group)
+                        result = 'accepted'
 
-        if action:
-            db.session.commit()
-
-        return jsonify(result='accepted', message=action)
+        return jsonify(action=action, result=result, message=message)
 
     users = User.query.all()
     groups = Group.query.all()
@@ -173,8 +179,6 @@ def admin_users_groups():
                 id = user.id,
                 group = group.name,
             ))
-
-
 
         rows.append(row)
 
@@ -291,12 +295,18 @@ def admin_modules():
             else:
                 row.append(module.__dict__.get(i))
 
+        # Delete
         row.append(parse_span('', '[ x ]', 'delete_record',
             id = module.id,
         ))
+        # On the disk
+        fl = os.path.isfile(os.path.join(app.root_path, module.folder, "{0}.py".format(module.name)))
+        row.append(dye_green('Yes') if fl else dye_red('No'))
+
         rows.append(row)
 
     names.append('Delete')
+    names.append('On the disk')
 
     return render_template('admin/modules.html',
              title = 'App modules',

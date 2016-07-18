@@ -8,7 +8,6 @@ from __future__ import ( division, absolute_import,
 from flask import session, request, render_template, redirect, flash, abort
 
 from flask_login import login_required, login_user, logout_user, current_user
-
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .core.backwardcompat import *

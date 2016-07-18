@@ -11,17 +11,21 @@ from flask import ( g, request, render_template, url_for, session,
                     send_from_directory, abort, __version__ )
 
 from flask_login import current_user
+from flask_principal import Permission, RoleNeed
 
 from ..core.backwardcompat import *
 from ..core.fileman import list_files
 from ..core.dump_html import html
 
-from .. import app, debug_permission, get_next
+from .. import app, get_next
+
+
+debug_permission = Permission(RoleNeed('debug'))
 
 
 @app.route('/debug/')
 def debug():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     output = []
@@ -46,7 +50,7 @@ def debug():
 @app.route('/test/')
 @app.route('/test/<path:path>')
 def debug_test(path=''):
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     if not path or path[-1] == '/':
@@ -65,7 +69,7 @@ def debug_test(path=''):
 
 @app.route('/debug/app')
 def debug_app():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     return html(app)
@@ -73,7 +77,7 @@ def debug_app():
 
 @app.route('/debug/current_user')
 def debug_current_user():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     return html(current_user)
@@ -81,7 +85,7 @@ def debug_current_user():
 
 @app.route('/debug/g')
 def debug_g():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     return html(g)
@@ -89,7 +93,7 @@ def debug_g():
 
 @app.route('/debug/request')
 def debug_request():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     return html(request)
@@ -97,7 +101,7 @@ def debug_request():
 
 @app.route('/debug/session')
 def debug_session():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     d = {key: val for key, val in session.viewitems()}
@@ -106,7 +110,7 @@ def debug_session():
 
 @app.route('/debug/ver')
 def debug_ver():
-    if not app.debug or not debug_permission.can():
+    if not debug_permission.can():
         abort(404)
 
     return __version__

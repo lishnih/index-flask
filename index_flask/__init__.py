@@ -8,11 +8,8 @@ from __future__ import ( division, absolute_import,
 from flask import Flask, request
 
 from flask_sqlalchemy import SQLAlchemy
-
 from flask_login import LoginManager, current_user
-
-from flask_principal import ( Principal, Permission, RoleNeed, UserNeed,
-                              identity_loaded )
+from flask_principal import Principal, RoleNeed, UserNeed, identity_loaded
 
 from .core.backwardcompat import *
 from . import config
@@ -50,8 +47,6 @@ def my_token_loader(token):
 ##### principals #####
 
 principals = Principal(app)
-admin_permission = Permission(RoleNeed('admin'))
-debug_permission = Permission(RoleNeed('debug'))
 
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):

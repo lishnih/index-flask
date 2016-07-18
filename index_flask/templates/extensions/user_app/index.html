@@ -11,6 +11,7 @@
 <h1>Options</h1>
 {%- if user_app %}
 {{ dump_dict(user_app) }}
+<a href="?update">Получить (обновить) токен</a><br />
 {%- else %}
 <p>
 Приложение не подключено.<br />
@@ -19,6 +20,7 @@
 <a href="?attach">Подключить</a><br />
 </p>
 {%- endif %}
+<br />
 
 <ul class="hll">
 <li><a href=".">Home</a></li>

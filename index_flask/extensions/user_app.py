@@ -8,19 +8,23 @@ from __future__ import ( division, absolute_import,
 import re, hashlib, random
 from datetime import datetime
 
-from sqlalchemy import and_
-from sqlalchemy.sql import select
-
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, jsonify, redirect, url_for, flash
 
 from flask_login import login_required, current_user
+from flask_principal import Permission, RoleNeed
 
+from sqlalchemy import and_
+from sqlalchemy.sql import select
 from wtforms import Form, BooleanField, StringField, validators
 
 from ..core.backwardcompat import *
 from ..core.dump_html import html
+from ..core.html_helpers import parse_input
 from ..models import db, User
-from .. import app, require_ext, admin_permission
+from .. import app, require_ext
+
+
+admin_permission = Permission(RoleNeed('admin'))
 
 
 ##### Model #####
@@ -82,12 +86,22 @@ class AddAppForm(Form):
 
 ##### Interface #####
 
-def init_rs_user_app(current_user, app):
+def init_rs_user_app(user, app):
     s = relationship_user_app.update(values=dict(
           attached = datetime.utcnow(),
-          token = suit_code(current_user.id, app.id),
+          token = suit_code(user.id, app.id),
         )).where(
-          and_(relationship_user_app.c._user_id == current_user.id,
+          and_(relationship_user_app.c._user_id == user.id,
+          relationship_user_app.c._app_id == app.id)
+        )
+    res = db.session.execute(s)
+    db.session.commit()
+
+def update_token(user, app):
+    s = relationship_user_app.update(values=dict(
+          token = suit_code(user.id, app.id),
+        )).where(
+          and_(relationship_user_app.c._user_id == user.id,
           relationship_user_app.c._app_id == app.id)
         )
     res = db.session.execute(s)
@@ -102,7 +116,7 @@ def suit_code(user, app):
     double = True
     while double:
         token = get_token(user, app)
-#         double = RS_App.query.filter_by(token=token).first()
+#       double = RS_App.query.filter_by(token=token).first()
 
         s = select('*').select_from(relationship_user_app).\
               where(relationship_user_app.c.token==token)
@@ -112,23 +126,22 @@ def suit_code(user, app):
     return token
 
 
-def get(app):
-    if current_user.is_anonymous:
-        return {}
-
-    app = App.query.filter_by(name=group).first()
-
-    if checked:
-        if group in user.groups:
-            return jsonify(result='rejected', message='The user is already in the group.')
-    k
+def get_user(app_id, token):
+    s = select([relationship_user_app.c._user_id,
+               relationship_user_app.c._app_id]).select_from(relationship_user_app).\
+          where(relationship_user_app.c.token==token)
+    res = db.session.execute(s)
+    _user_id, _app_id = res.first()
+    if app_id == _app_id:
+        user = User.query.filter_by(id=_user_id).first()
+        return user
 
 
 ##### Routes #####
 
 @app.route('/app<int:id>', methods=['GET', 'POST'])
 @login_required
-def view_app(id):
+def ext_user_app(id):
     form = AddAppForm(request.form)
     if request.method == 'POST' and form.validate():
         app = App(
@@ -147,7 +160,11 @@ def view_app(id):
             db.session.commit()
 
             init_rs_user_app(current_user, app)
-            return redirect(url_for('view_app', id=id))
+            return redirect(url_for('ext_user_app', id=id))
+
+        elif 'update' in request.args:
+            update_token(current_user, app)
+            return redirect(url_for('ext_user_app', id=id))
 
     else:
         flash('App is not created yet!')
@@ -184,4 +201,64 @@ def view_app(id):
              user_app = user_app,
              options = options,
 #            debug = html(table_info),
+           )
+
+
+@app.route('/admin/users_apps', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(403)
+def ext_user_app_users():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        result = 'omitted'
+        message = ''
+
+        if action == 'toggle_record':
+            id = request.form.get('id')
+            app_id = request.form.get('app_id')
+            checked = request.form.get('checked')
+            checked = True if checked == 'true' else False
+            if id:
+                user = User.query.filter_by(id=id).first()
+                app = App.query.filter_by(id=app_id).first()
+                if user and app:
+                    if checked:
+                        if app in user.ext_apps:
+                            return jsonify(action=action, result='rejected', message='The app is already attached.')
+
+                        user.ext_apps.append(app)
+                        result = 'accepted'
+
+                    else:
+                        if app not in user.ext_apps:
+                            return jsonify(action=action, result='rejected', message='The app is not attached.')
+
+                        user.ext_apps.remove(app)
+                        result = 'accepted'
+
+        return jsonify(action=action, result=result, message=message)
+
+    users = User.query.all()
+    apps = App.query.all()
+
+    names = ['#', 'id', 'email']
+    for app in apps:
+        names.append(app.id)
+
+    rows = []
+    for seq, user in enumerate(users, 1):
+        row = ['<i>{0}</i>'.format(seq), user.id, user.email]
+
+        for app in apps:
+            row.append(parse_input('', app in user.ext_apps, 'toggle_record',
+                id = user.id,
+                app_id = app.id,
+            ))
+
+        rows.append(row)
+
+    return render_template('admin/users.html',
+             title = 'User apps',
+             names = names,
+             rows = rows,
            )

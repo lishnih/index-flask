@@ -31,3 +31,17 @@ def parse_span(sid, text, action, **kargs):
     sid = ' id="{0}"'.format(sid) if sid else ''
 
     return '<span{0}{1}{2}>{3}</span>'.format(cls, sid, data, text)
+
+
+def dye(text, color, background=None):
+    background = ' background-color: {0}'.format(background) if background else ''
+    return '<span style="color: {0};{1}"><b>{2}</b></span>'.format(color, background, text)
+
+def dye_red(text, background=None):
+    return dye(text, 'Red', background)
+
+def dye_blue(text, background=None):
+    return dye(text, 'Blue', background)
+
+def dye_green(text, background=None):
+    return dye(text, 'Green', background)

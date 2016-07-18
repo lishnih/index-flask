@@ -7,12 +7,12 @@ from __future__ import ( division, absolute_import,
 
 import time, math
 
-from sqlalchemy import desc, distinct, func, and_, or_, not_
-from wtforms import Form, StringField, IntegerField, SelectField, validators
-
-from flask import g, request, render_template, redirect, url_for, flash
+from flask import g, request, render_template, redirect, flash
 from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
+
+from sqlalchemy import desc, distinct, func, and_, or_, not_
+from wtforms import Form, StringField, IntegerField, SelectField, validators
 
 from ..core.backwardcompat import *
 from ..core.dump_html import html
@@ -174,7 +174,7 @@ def get_order(model, column, cond):
 @app.route('/request_log', methods=['GET', 'POST'])
 @login_required
 @statistics_permission.require(403)
-def request_log():
+def ext_request_log():
     names = [i.name for i in RequestRecord.__table__.c]
 
     form = TableCondForm(request.form, names)

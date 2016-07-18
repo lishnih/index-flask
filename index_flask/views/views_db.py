@@ -21,7 +21,7 @@ from .. import app, require_ext
 @app.route('/db/')
 @app.route('/db/<db>/')
 @login_required
-def view_db(db=None):
+def views_db(db=None):
     user_db = require_ext('user_db', 'html')
 
     dbs_list = user_db.get_dbs_list(current_user)
@@ -46,7 +46,7 @@ def view_db(db=None):
 @app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
 @app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
 @login_required
-def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5=None):
+def views_db_table(db, table1=None, table2=None, table3=None, table4=None, table5=None):
     # Обратный порядок - не менять!
     tables = [i for i in [table5, table4, table3, table2, table1] if i]
 
@@ -113,7 +113,7 @@ def view_db_table(db, table1=None, table2=None, table3=None, table4=None, table5
 
 @app.route('/jtable')
 @login_required
-def view_db_jtable():
+def views_db_jtable():
     return render_template('views/views_db/jtable.html',
              title = 'View table',
 #            debug = unicode(s),
@@ -122,7 +122,7 @@ def view_db_jtable():
 
 @app.route('/j3', methods=["GET", "POST"])
 @login_required
-def view_db_j3():
+def views_db_j3():
     user_db = require_ext('user_db', 'json')
 
     res = {
