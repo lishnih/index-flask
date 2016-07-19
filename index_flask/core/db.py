@@ -12,15 +12,19 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 def initDb(home, dbname):
-    db_uri = "{0}:///{1}/{2}.sqlite".format('sqlite', home, dbname)
+    fname = os.path.join(home, "{0}.sqlite".format(dbname))
+    if os.path.isfile(fname):
+        db_uri = "{0}:///{1}".format('sqlite', fname)
 
-    engine = create_engine(db_uri)
-    metadata = MetaData(engine, reflect=True)
+        engine = create_engine(db_uri)
+        metadata = MetaData(engine, reflect=True)
 
-    session = scoped_session(sessionmaker())
-    session.configure(bind=engine)
+        session = scoped_session(sessionmaker())
+        session.configure(bind=engine)
 
-    return db_uri, session, metadata
+        return db_uri, session, metadata
+
+    return None, None, None
 
 
 def getDbList(home):

@@ -122,6 +122,9 @@ def qi_query_count(user, db, tables, search=None, filter={}):
         tables = tables,
 
     db_uri, session, metadata = user_db.get_db(user, db)
+    if not db_uri:
+        return {}, "БД не существует: {0}".format(db)
+
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
@@ -167,6 +170,9 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
         tables = tables,
 
     db_uri, session, metadata = user_db.get_db(user, db)
+    if not db_uri:
+        return {}, "БД не существует: {0}".format(db)
+
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
@@ -211,6 +217,9 @@ def qi_query_sum(user, db, tables, column, search=None, filter={}):
         tables = tables,
 
     db_uri, session, metadata = user_db.get_db(user, db)
+    if not db_uri:
+        return {}, "БД не существует: {0}".format(db)
+
     mtables = [metadata.tables.get(i) for i in tables]
 
     if None in mtables:
@@ -277,7 +286,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         return None
 
     db_uri, session, metadata = user_db.get_db(user, db)
-    if not session:
+    if not db_uri:
         return {}, [], "Нет такой БД: {0}".format(db)
 
 

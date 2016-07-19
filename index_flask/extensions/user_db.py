@@ -65,7 +65,10 @@ def get_db(user, dbname):
 
     if dbname not in user_db.get('dbs', {}):
         db_uri, session, metadata = initDb(user.home, dbname)
-        user_db[dbname] = (db_uri, session, metadata)
+        if not db_uri:
+            return None, None, None
+
+        user_db['dbs'][dbname] = (db_uri, session, metadata)
     else:
         db_uri, session, metadata = user_db['dbs'][dbname]
 

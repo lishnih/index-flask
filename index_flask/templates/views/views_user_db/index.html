@@ -1,0 +1,15 @@
+{% extends "_layout.html" %}
+
+{% block body %}
+
+{% if total %}
+<i>Всего: {{ total }}</i><br />
+{% endif %}
+{% from "_debug.html" import dump_table_unsafe %}
+{{ dump_table_unsafe(names, dbs_list) }}
+
+{%- if db %}
+{{ dump_table_unsafe(table_names, tables) }}
+{%- endif %}
+
+{% endblock %}
