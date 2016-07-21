@@ -12,7 +12,6 @@ from flask import jsonify
 
 from .core.backwardcompat import *
 from .models import db, Module
-
 from . import app
 
 

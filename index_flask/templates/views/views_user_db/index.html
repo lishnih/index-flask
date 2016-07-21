@@ -5,11 +5,17 @@
 {% if total %}
 <i>Всего: {{ total }}</i><br />
 {% endif %}
+
 {% from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, dbs_list) }}
 
-{%- if db %}
-{{ dump_table_unsafe(table_names, tables) }}
+{%- if group %}
+  {%- for label, names, table in group %}
+  {%- autoescape false %}
+  <i><b>{{ label }}</b></i>
+  {%- endautoescape %}
+  {{ dump_table_unsafe(names, table) }}
+  {%- endfor %}
 {%- endif %}
 
 {% endblock %}

@@ -42,3 +42,16 @@ def getDbList(home):
                     db_dict[filename] = fullname
 
     return db_dict
+
+
+def get_primary_tables(metadata, tablename):
+    mtable = metadata.tables.get(tablename)
+    for key in mtable.foreign_keys:
+        yield key.column.table.name
+
+
+def get_relative_tables(metadata, tablename):
+    for (table, column), fk_list in metadata._fk_memos.items():
+        if table == tablename:
+            for i in fk_list:
+                yield i.parent.table.name

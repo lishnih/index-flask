@@ -1,28 +1,5 @@
 <!doctype html>
-<title>Table</title>
+<title>Dump</title>
 
-<div class="table">
-<table border="1">
-  <thead>
-    {%- if names %}
-    <tr>
-      {%- for name in names %}
-      <th>{{ name }}</th>
-      {%- endfor %}
-    </tr>
-    {%- endif %}
-  </thead>
-
-  <tbody>
-    {%- if rows %}
-    {%- for row in rows %}
-    <tr>
-      {%- for col in row %}
-      <td>{{ col }}</td>
-      {%- endfor %}
-    </tr>
-    {%- endfor %}
-    {%- endif %}
-  </tbody>
-</table>
-</div>
+{% from "_debug.html" import dump_table %}
+{{ dump_table(names, rows) }}

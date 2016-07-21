@@ -14,7 +14,13 @@
 <dl>
   {%- for key, value in obj | dictsort %}
   <dt>{{ key }}</dt>
-  <dd>{{ value }}</dd>
+  <dd style="border: .1em dotted blue;">
+  {%- if value is mapping %}
+    {{ dump_dict(value) }}
+  {%- else %}
+    {{ value }}
+  {%- endif %}
+  </dd>
   {%- endfor %}
 </dl>
 {% endmacro %}

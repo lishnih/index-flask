@@ -129,10 +129,10 @@ def admin_group(name):
            )
 
 
-@app.route('/admin/users_groups', methods=['GET', 'POST'])
+@app.route('/admin/user_groups', methods=['GET', 'POST'])
 @login_required
 @admin_permission.require(403)
-def admin_users_groups():
+def admin_user_groups():
     if request.method == 'POST':
         action = request.form.get('action')
         result = 'omitted'
@@ -278,7 +278,7 @@ def admin_modules():
     s = Module.query
     total = s.count()
 
-    modules = s.all()
+    modules = s.order_by('folder', 'name').all()
     names = [i.name for i in Module.__table__.c]
     names.insert(0, '#')
 #   rows = [[seq if i == '#' else module.__dict__.get(i) for i in names] for seq, module in enumerate(modules, 1)]

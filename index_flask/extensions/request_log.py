@@ -37,6 +37,7 @@ class RequestRecord(db.Model):  # Rev. 2016-07-13
     user = db.Column(db.Integer, nullable=False)
     start = db.Column(db.Integer, nullable=False)
     duration = db.Column(db.Integer, nullable=False, default=0)
+    status = db.Column(db.Integer)
 
     def __init__(self):
         self.remote_addr = request.remote_addr
@@ -117,6 +118,7 @@ def before_request():
 def after_request(response):
     if 'record' in g:
         g.record.duration = time.time() - g.record.start
+        g.record.status = response.status_code
         db.session.commit()
     return response
 

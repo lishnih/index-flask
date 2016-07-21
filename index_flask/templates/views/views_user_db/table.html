@@ -14,9 +14,9 @@
     <a href="/db/{{ db }}">{{ db }}</a>
 </div>
 
-{%- if primarytables %}
+{%- if primary_tables %}
 <div class="serial">
-  {%- for table in primarytables %}
+  {%- for table in primary_tables %}
     <a href="{{ table }}">+{{ table }}</a>
   {%- endfor %}
 </div>
@@ -28,9 +28,9 @@
 </div>
 {%- endif %}
 
-{%- if followedtables %}
+{%- if relative_tables %}
 <div class="serial">
-  {%- for table in followedtables %}
+  {%- for table in relative_tables %}
     <a href="/db/{{ db }}/{{ table }}">>{{ table }}</a>
   {%- endfor %}
 </div>

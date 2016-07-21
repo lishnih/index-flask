@@ -1,8 +1,5 @@
 <!doctype html>
 <title>Dump</title>
 
-<ul>
-  {%- for value in obj %}
-    <li>{{ value }}</li>
-  {%- endfor %}
-</ul>
+{% from "_debug.html" import dump_list %}
+{{ dump_list(obj) }}

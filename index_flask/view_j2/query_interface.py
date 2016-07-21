@@ -10,6 +10,7 @@ from __future__ import ( division, absolute_import,
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
+from ..core.db import get_primary_tables, get_relative_tables
 from .. import require_ext
 
 
@@ -362,22 +363,16 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
 
     # Дополнительные таблицы
-    primarytables = []
+    primary_tables = []
     for i in range(len(tables)):
         for j in mtables[i].foreign_keys:
-            primarytables.append(j.column.table.name)
+            primary_tables.append(j.column.table.name)
 
-    primarytables = [i for i in set(primarytables) if i not in tables]
+    primary_tables = [i for i in set(primary_tables) if i not in tables]
 
 
-    followedtables = []
-    for i in metadata.tables:
-        mtable = metadata.tables.get(i)
-        for j in mtable.foreign_keys:
-            if table1 == j.column.table.name:
-                followedtables.append(i)
-
-    followedtables = [i for i in set(followedtables) if i not in tables]
+    relative_tables = get_relative_tables(metadata, table1)
+    relative_tables = [i for i in set(relative_tables) if i not in tables]
 
 
     s = select(mcolumns, use_labels=True).select_from(mtable1)
@@ -474,7 +469,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         filtered_rows_count = filtered_rows_count,
         rows_count = rows_count,
         columns = names,
-        primarytables = primarytables,
-        followedtables = followedtables,
+        primary_tables = primary_tables,
+        relative_tables = relative_tables,
         query = unicode(s),
     ), rows, None

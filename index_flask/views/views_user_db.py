@@ -28,31 +28,74 @@ def views_db(db=None):
 
     dbs_list = user_db.get_dbs_list(current_user)
 
-    names = ['Db/View', 'Info']
+    names = ['Db/View', 'Info', 'Session', 'Metadata']
     dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
-                '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
                ] for key, val in dbs_list.items()]
 
+    group = []
     if db:
         db_uri, session, metadata = user_db.get_db(current_user, db)
         if not db_uri:
-            return "БД не существует: {0}".format(db)
+            group = [(db, None, [["БД не существует: {0}".format(db)]])]
 
-        table_names = ['View']
-        tables = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table1=table), table),
-                 ] for table in metadata.tables.keys()]
+        else:
+            table_names = ['View']
+            tables = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table1=table), table),
+                     ] for table in metadata.tables.keys()]
 
-    else:
-        table_names = tables = None
+            group.append((db, table_names, tables))
 
     return render_template('views/views_user_db/index.html',
              title = 'Databases',
              names = names,
              dbs_list = dbs_list,
-             db = db,
-             table_names = table_names,
-             tables = tables,
+             group = group,
            )
+
+
+@app.route('/db/session/<db>/')
+@login_required
+def views_db_session(db):
+    user_db = require_ext('user_db', 'html')
+
+    dbs_list = user_db.get_dbs_list(current_user)
+
+    names = ['Db/View', 'Info', 'Session', 'Metadata']
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
+               ] for key, val in dbs_list.items()]
+
+    group = []
+    if db:
+        db_uri, session, metadata = user_db.get_db(current_user, db)
+
+    return html(session)
+
+
+@app.route('/db/metadata/<db>/')
+@login_required
+def views_db_metadata(db):
+    user_db = require_ext('user_db', 'html')
+
+    dbs_list = user_db.get_dbs_list(current_user)
+
+    names = ['Db/View', 'Info', 'Session', 'Metadata']
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
+               ] for key, val in dbs_list.items()]
+
+    group = []
+    if db:
+        db_uri, session, metadata = user_db.get_db(current_user, db)
+
+    return html(metadata)
 
 
 @app.route('/db/info/<db>')
@@ -62,31 +105,37 @@ def views_db_info(db):
 
     dbs_list = user_db.get_dbs_list(current_user)
 
-    names = ['Db/View', 'Info']
+    names = ['Db/View', 'Info', 'Session', 'Metadata']
     dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
                  '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
                ] for key, val in dbs_list.items()]
 
-    db_uri, session, metadata = user_db.get_db(current_user, db)
-    if not db_uri:
-        return "БД не существует: {0}".format(db)
+    group = []
+    if db:
+        db_uri, session, metadata = user_db.get_db(current_user, db)
+        if not db_uri:
+            group = [(db, None, [["БД не существует: {0}".format(db)]])]
 
-    table_names = ['Table', 'Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement', 'unique', 'default', 'foreign_keys', 'onupdate']
-    tables = []
-    for key, mtable in metadata.tables.items():
-        for c in mtable.c:
-            tables.append(['<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=key), key),
-                           '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=db, table=key, column=c.name), c.name),
-                           '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=db, table=key, column=c.name), c.type),
-                           c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
+        else:
+            group = [(db, None, None)]
+            table_names = ['Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement', 'unique', 'default', 'foreign_keys', 'onupdate']
+            for table, mtable in metadata.tables.items():
+                tables = []
+                for c in mtable.c:
+                    tables.append(['<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=db, table=table, column=c.name), c.name),
+                                   '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=db, table=table, column=c.name), c.type),
+                                   c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
+
+                table = '<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=table), table)
+                group.append((table, table_names, tables))
 
     return render_template('views/views_user_db/index.html',
              title = 'Database Info',
              names = names,
              dbs_list = dbs_list,
-             db = db,
-             table_names = table_names,
-             tables = tables,
+             group = group,
            )
 
 
@@ -135,9 +184,10 @@ def views_db_table_column_distinct(db, table, column):
 
     s = select([mtable.c.get(column).distinct()]).select_from(mtable)
     res = session.execute(s)
-    row = [i[0] for i in res.fetchall()]
+    rows = [i[0] for i in res.fetchall()]
+    total = len(rows)
 
-    return html(row)
+    return html([total, rows])
 
 
 @app.route('/db/<db>/<table1>/', methods=["GET", "POST"])
@@ -204,8 +254,8 @@ def views_db_table(db, table1=None, table2=None, table3=None, table4=None, table
                  names = names,
                  rows = rows,
                  tables = tables,
-                 primarytables = table_info.get('primarytables', []),
-                 followedtables = table_info.get('followedtables', []),
+                 primary_tables = table_info.get('primary_tables', []),
+                 relative_tables = table_info.get('relative_tables', []),
                  lasttable = lasttable,
 #                debug = unicode(s),
                )

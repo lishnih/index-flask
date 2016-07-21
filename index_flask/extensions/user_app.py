@@ -47,7 +47,8 @@ class App(db.Model):          # Rev. 2016-07-12
     description = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime)
 
-    def __init__(self, name, description=''):
+    def __init__(self, id, name, description=''):
+        self.id = id
         self.name = name.lower()
         self.description = description
         self.created = datetime.utcnow()
@@ -131,10 +132,12 @@ def get_user(app_id, token):
                relationship_user_app.c._app_id]).select_from(relationship_user_app).\
           where(relationship_user_app.c.token==token)
     res = db.session.execute(s)
-    _user_id, _app_id = res.first()
-    if app_id == _app_id:
-        user = User.query.filter_by(id=_user_id).first()
-        return user
+    row = res.first()
+    if row:
+        _user_id, _app_id = row
+        if app_id == _app_id:
+            user = User.query.filter_by(id=_user_id).first()
+            return user
 
 
 ##### Routes #####
@@ -145,6 +148,7 @@ def ext_user_app(id):
     form = AddAppForm(request.form)
     if request.method == 'POST' and form.validate():
         app = App(
+            id = id,
             name = form.name.data,
             description = form.description.data,
         )
@@ -204,7 +208,39 @@ def ext_user_app(id):
            )
 
 
-@app.route('/admin/users_apps', methods=['GET', 'POST'])
+@app.route('/admin/apps')
+@login_required
+@admin_permission.require(403)
+def ext_user_app_apps():
+    s = App.query
+    total = s.count()
+
+    apps = s.all()
+    names = [i.name for i in App.__table__.c]
+    names.insert(0, '#')
+#   rows = [[seq if i == '#' else app.__dict__.get(i) for i in names] for seq, app in enumerate(apps, 1)]
+    rows = []
+    for seq, app in enumerate(apps, 1):
+        row = []
+        for i in names:
+            if i == '#':
+                row.append('<i>{0}</i>'.format(seq))
+            elif i == 'name':
+                row.append('<a href="/app{0}">{1}</a>'.format(app.id, app.name))
+            else:
+                row.append(app.__dict__.get(i))
+
+        rows.append(row)
+
+    return render_template('admin/users.html',
+             title = 'Apps',
+             names = names,
+             rows = rows,
+             total = total,
+           )
+
+
+@app.route('/admin/user_apps', methods=['GET', 'POST'])
 @login_required
 @admin_permission.require(403)
 def ext_user_app_users():
