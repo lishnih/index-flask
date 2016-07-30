@@ -104,6 +104,40 @@ class TableCondForm(Form):
 
         return True
 
+    def get_criterion(self):
+        criterion = []
+        if self.column1.data:
+            clause = get_clause(RequestRecord, self.column1.data, [self.condition1.data, self.value1.data])
+            if clause is not None:
+                criterion.append(clause)
+        if self.column2.data:
+            clause = get_clause(RequestRecord, self.column2.data, [self.condition2.data, self.value2.data])
+            if clause is not None:
+                criterion.append(clause)
+        if self.column3.data:
+            clause = get_clause(RequestRecord, self.column3.data, [self.condition3.data, self.value3.data])
+            if clause is not None:
+                criterion.append(clause)
+
+        return criterion
+
+    def get_order(self):
+        order = []
+        if self.sorting1.data:
+            sort_column = get_order(RequestRecord, self.sorting1.data, self.sort_dir1.data)
+            if sort_column is not None:
+                order.append(sort_column)
+        if self.sorting2.data:
+            sort_column = get_order(RequestRecord, self.sorting2.data, self.sort_dir2.data)
+            if sort_column is not None:
+                order.append(sort_column)
+        if self.sorting3.data:
+            sort_column = get_order(RequestRecord, self.sorting3.data, self.sort_dir3.data)
+            if sort_column is not None:
+                order.append(sort_column)
+
+        return order
+
 
 ##### Interface #####
 
@@ -189,33 +223,8 @@ def ext_request_log():
     if request.method == 'POST':
         form.validate()
 
-    criterion = []
-    order = []
-    if form.column1.data:
-        clause = get_clause(RequestRecord, form.column1.data, [form.condition1.data, form.value1.data])
-        if clause is not None:
-            criterion.append(clause)
-    if form.column2.data:
-        clause = get_clause(RequestRecord, form.column2.data, [form.condition2.data, form.value2.data])
-        if clause is not None:
-            criterion.append(clause)
-    if form.column3.data:
-        clause = get_clause(RequestRecord, form.column3.data, [form.condition3.data, form.value3.data])
-        if clause is not None:
-            criterion.append(clause)
-
-    if form.sorting1.data:
-        sort_column = get_order(RequestRecord, form.sorting1.data, form.sort_dir1.data)
-        if sort_column is not None:
-            order.append(sort_column)
-    if form.sorting2.data:
-        sort_column = get_order(RequestRecord, form.sorting2.data, form.sort_dir2.data)
-        if sort_column is not None:
-            order.append(sort_column)
-    if form.sorting3.data:
-        sort_column = get_order(RequestRecord, form.sorting3.data, form.sort_dir3.data)
-        if sort_column is not None:
-            order.append(sort_column)
+    criterion = form.get_criterion()
+    order = form.get_order()
 
     s = RequestRecord.query
     total = s.count()
@@ -225,11 +234,8 @@ def ext_request_log():
     showed = s.count()
 
     records = s.all()
-#   names = [i.name for i in RequestRecord.__table__.c]
     names.insert(0, '#')
     rows = [[seq if i == '#' else record.__dict__.get(i) for i in names] for seq, record in enumerate(records, 1)]
-#   rows_dict = [dict((zip(names, [record.__dict__.get(i) for i in names]))) for record in records]
-#   rows_seq_dict = [seq, dict((zip(names, [record.__dict__.get(i) for i in names]))) for seq, record in enumerate(records, 1)]
 
     pages = int(math.ceil(filtered / form.limit.data)) if form.limit.data else 0
     page = int(math.floor(form.offset.data / form.limit.data)) + 1 if form.limit.data else 0

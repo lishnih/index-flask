@@ -60,6 +60,9 @@
     {%- endif %}
   </tbody>
 </table>
+{%- if not rows %}
+<i>Нет данных</i>
+{%- endif %}
 </div>
 {% endmacro %}
 
@@ -91,5 +94,8 @@
     {%- endif %}
   </tbody>
 </table>
+{%- if not rows %}
+<i>Нет данных</i>
+{%- endif %}
 </div>
 {% endmacro %}

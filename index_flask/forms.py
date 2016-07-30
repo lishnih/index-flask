@@ -7,6 +7,7 @@ from __future__ import ( division, absolute_import,
 
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
+from .core.backwardcompat import *
 from .models import User, Group
 
 

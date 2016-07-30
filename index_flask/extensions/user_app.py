@@ -32,11 +32,38 @@ admin_permission = Permission(RoleNeed('admin'))
 relationship_user_app = db.Table('rs_user_app',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
     db.Column('_app_id', db.Integer, db.ForeignKey('app.id'), nullable=False),
-    db.Column('token', db.String, nullable=False, default=''),
-    db.Column('sticked', db.Boolean, nullable=False, default=True),
-    db.Column('options', db.PickleType, nullable=False, default={}),
-    db.Column('attached', db.DateTime),
-    db.PrimaryKeyConstraint('_user_id', '_app_id'))
+#   db.PrimaryKeyConstraint('_user_id', '_app_id'),
+)
+
+
+class RS_App(db.Model):       # Rev. 2016-07-23
+    __tablename__ = 'rs_user_app'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    _user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    _app_id = db.Column(db.Integer, db.ForeignKey('app.id'), nullable=False)
+    token = db.Column(db.String, nullable=False, default='')
+    sticked = db.Column(db.Boolean, nullable=False, default=True)
+    options = db.Column(db.PickleType, nullable=False, default={})
+    attached = db.Column(db.DateTime)
+
+    def __init__(self):
+        self.attached = datetime.utcnow()
+        self.token = self.suit_code(self._user_id, self._app_id)
+
+    def get_token(self, user, app):
+    #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
+        rnd = random.randint(0, 100000000000000)
+        return hashlib.md5("{0}_{1}_{2}".format(rnd, user, app)).hexdigest()
+
+    def suit_code(self, user, app):
+        double = True
+        while double:
+            token = self.get_token(user, app)
+            double = RS_App.query.filter_by(token=token).first()
+
+        return token
 
 
 class App(db.Model):          # Rev. 2016-07-12
@@ -53,7 +80,8 @@ class App(db.Model):          # Rev. 2016-07-12
         self.description = description
         self.created = datetime.utcnow()
 
-User.ext_apps = db.relationship('App', backref='user', secondary=relationship_user_app)
+User.ext_apps = db.relationship('App', secondary=relationship_user_app,
+                backref=db.backref('user', lazy='dynamic'))
 
 db.create_all()
 

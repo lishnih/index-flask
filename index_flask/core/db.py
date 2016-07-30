@@ -5,10 +5,11 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os.path
+import os, math
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.sql import select
 
 
 def initDb(home, dbname):
@@ -55,3 +56,29 @@ def get_relative_tables(metadata, tablename):
         if table == tablename:
             for i in fk_list:
                 yield i.parent.table.name
+
+
+def get_base(session, mtable, offset, limit, criterion=None, order=None):
+    s = select('*').select_from(mtable)
+    s_count = select([func.count('*')]).select_from(mtable)
+    total, = session.execute(s_count).first()
+    if criterion:
+        s = s.where(*criterion)
+        s_count = s_count.where(*criterion)
+        filtered, = session.execute(s_count).first()
+    else:
+        filtered = total
+    if order:
+        s = s.order_by(*order)
+    s = s.offset(offset).limit(limit)
+    showed, = session.execute(s.count()).first()
+
+    res = session.execute(s)
+    names = [i.name for i in mtable.c]
+    rows = [i for i in res.fetchall()]
+
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
+    if page > pages: page = 0
+
+    return names, rows, total, filtered, showed, page, pages, s

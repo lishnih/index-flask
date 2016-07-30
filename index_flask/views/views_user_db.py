@@ -119,7 +119,7 @@ def views_db_info(db):
             group = [(db, None, [["БД не существует: {0}".format(db)]])]
 
         else:
-            group = [(db, None, None)]
+            group = [(db, None, [[]])]
             table_names = ['Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement', 'unique', 'default', 'foreign_keys', 'onupdate']
             for table, mtable in metadata.tables.items():
                 tables = []
@@ -257,5 +257,5 @@ def views_db_table(db, table1=None, table2=None, table3=None, table4=None, table
                  primary_tables = table_info.get('primary_tables', []),
                  relative_tables = table_info.get('relative_tables', []),
                  lasttable = lasttable,
-#                debug = unicode(s),
+                 debug = table_info.get('query'),
                )

@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os
+import os, traceback
 from datetime import datetime
 
 from flask import jsonify
@@ -37,9 +37,10 @@ def load_modules(folder):
                     module.loaded = datetime.utcnow()
                     module.error = ''
                 except Exception, e:
+                    tb_msg = traceback.format_exc()
                     message = "Error: ".format(e.message)
-                    print(e, '>', folder, ext_name, base, basedir)
-                    module.error = message
+                    module.error = tb_msg
+                    print(tb_msg)
 
                 db.session.commit()
 
