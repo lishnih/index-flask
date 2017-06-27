@@ -58,13 +58,13 @@ def get_default_db(user):
     return user_db.get('default_db')
 
 
-def get_db(user, dbname):
+def get_db(user, dbname, create=False):
     user_db = get_data(user)
     if not user_db:
         return None, None, None
 
     if dbname not in user_db.get('dbs', {}):
-        db_uri, session, metadata = initDb(user.home, dbname)
+        db_uri, session, metadata = initDb(user.home, dbname, create)
         if not db_uri:
             return None, None, None
 
