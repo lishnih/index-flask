@@ -125,7 +125,7 @@ def views_db_info(db):
                 tables = []
                 for c in mtable.c:
                     tables.append(['<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=db, table=table, column=c.name), c.name),
-                                   '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=db, table=table, column=c.name), c.type),
+                                   '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=db, table=table, column=c.name), repr(c.type)),
                                    c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
 
                 table = '<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=table), table)

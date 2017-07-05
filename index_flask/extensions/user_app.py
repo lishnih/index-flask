@@ -15,7 +15,7 @@ from flask_principal import Permission, RoleNeed
 
 from sqlalchemy import and_
 from sqlalchemy.sql import select
-from wtforms import Form, BooleanField, StringField, validators
+from wtforms import Form, StringField, BooleanField, validators
 
 from ..core.backwardcompat import *
 from ..core.dump_html import html

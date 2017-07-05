@@ -86,8 +86,10 @@ class User(db.Model):         # Rev. 2016-06-23
         return hashlib.sha1("{0}_{1}_{2}".format(email, password, rnd)).hexdigest()
 
     def init_env(self):
-        self.home = "C:\\Users\\User\\.config\\index\\{0}".format(self.username)
+        home = os.path.expanduser("~")
+        self.home = "{0}\\.config\\index\\{1}".format(home, self.username)
         if not os.path.isdir(self.home):
+            print(self.home)
             os.makedirs(self.home)
 
     def run_verification(self):
@@ -161,6 +163,39 @@ class Module(db.Model):       # Rev. 2016-07-12
         self.folder = folder
         self.created = datetime.utcnow()
         self.loaded = datetime(2000, 1, 1)
+
+
+class Register(db.Model):     # Rev. 2017-04-30
+    __tablename__ = 'register'
+
+    id = db.Column(db.Integer, primary_key=True)
+    _user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    _group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
+    section = db.Column(db.String)
+    dir = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.Text, nullable=False)
+
+    def __init__(self, section, name, value, user=None, group=None):
+        self._user_id = user.id
+        self._group_id = group.id
+        self.section = section
+        self.name = name
+        self.value = value
+
+
+class Favorite(db.Model):     # Rev. 2017-05-06
+    __tablename__ = 'favorite'
+
+    id = db.Column(db.Integer, primary_key=True)
+    _user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.String)
+    url = db.Column(db.String)
+
+    def __init__(self, title, url, user=None):
+        self._user_id = user.id
+        self.title = title
+        self.url = url
 
 
 db.create_all()

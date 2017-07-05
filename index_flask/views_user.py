@@ -5,12 +5,15 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+import os
+
 from flask import session, request, render_template, redirect, flash, abort
 
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .core.backwardcompat import *
+from .core.db import getDbList
 from .core.dump_html import html
 from .models import db, User
 from .forms import RegistrationForm, LoginForm
@@ -133,9 +136,11 @@ def user_edit():
 @app.route("/append_db")
 @login_required
 def user_append_db():
-    return render_template('user/append_db.html',
-             title = 'Append database',
-             uid = current_user.id,
+    dbpath = os.path.expanduser("~/.config/index/{0}".format(current_user.username))
+    dbs_list = getDbList(current_user.home)
+
+    return render_template('dump_dict.html',
+             obj = dbs_list,
            )
 
 

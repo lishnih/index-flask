@@ -65,6 +65,17 @@ def view_j2(request):
     elif action == 'column_district':
         column_district_action(logged_in, request_items, response)
 
+    elif action == 'search':
+        search_action(logged_in, request_items, response)
+
+    elif action == 'query':
+        query_action(logged_in, request_items, response)
+
+    elif action == 'favorite_page_add':
+        favorite_page_add_action(logged_in, request_items, response)
+
+    elif action == 'get_favorites':
+        get_favorites_action(logged_in, request_items, response)
 
     else:
         return response_with_message(response, "Запрос не опознан!", 'exception')

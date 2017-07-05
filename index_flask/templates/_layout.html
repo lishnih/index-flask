@@ -1,26 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="python web application" />
+  <meta name="description" content="flask web application" />
+  <link href="favicon.ico" type="image/ico" rel="shortcut icon" />
 
   <title>{{ title }}</title>
 
-  <script src="/jquery-ui/external/jquery/jquery.js"></script>
+  <link href="/external/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+  <script src="/external/jquery-ui/external/jquery/jquery.js"></script>
+  <script src="/external/jquery-ui/jquery-ui.min.js"></script>
 
-  <link href="/jquery-ui/jquery-ui.css" rel="stylesheet" />
-  <script src="/jquery-ui/jquery-ui.min.js"></script>
+  <link href="/external/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="/external/bootstrap/js/bootstrap.min.js"></script>
 
-  <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-  <script src="/bootstrap/js/bootstrap.min.js"></script>
+  <link href="/external/jquery.tablesorter/default.css" rel="stylesheet" />
+  <script src="/external/jquery.tablesorter/jquery.tablesorter.min.js"></script>
+
+  <link href="/external/highlight/highlight.css" rel="stylesheet" />
+  <script src="/external/highlight/highlight.js"></script>
+
+  <script src="/external/string.format-1.0.packed.js"></script>
+  <script src="/external/jquery.json-2.3.min.js"></script>
 
   <link href="/debug/default.css" rel="stylesheet" />
   <script src="/debug/debug.js"></script>
   <script src="/debug/jquery-debug.js"></script>
 
-  <link href="/css/view.css" rel="stylesheet" />
+  <link href="/css/default.css" rel="stylesheet" />
   <script src="/js/view.js"></script>
+
+  <script src="/j2/j2.js"></script>
 
   {%- block head %}
   {% endblock %}

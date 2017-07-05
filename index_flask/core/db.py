@@ -12,9 +12,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import select
 
 
-def initDb(home, dbname):
+def initDb(home, dbname, create=False):
     fname = os.path.join(home, "{0}.sqlite".format(dbname))
-    if os.path.isfile(fname):
+    if os.path.isfile(fname) or create:
         db_uri = "{0}:///{1}".format('sqlite', fname)
 
         engine = create_engine(db_uri)
@@ -58,7 +58,7 @@ def get_relative_tables(metadata, tablename):
                 yield i.parent.table.name
 
 
-def get_base(session, mtable, offset, limit, criterion=None, order=None):
+def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=None):
     s = select('*').select_from(mtable)
     s_count = select([func.count('*')]).select_from(mtable)
     total, = session.execute(s_count).first()
@@ -70,12 +70,16 @@ def get_base(session, mtable, offset, limit, criterion=None, order=None):
         filtered = total
     if order:
         s = s.order_by(*order)
-    s = s.offset(offset).limit(limit)
-    showed, = session.execute(s.count()).first()
+    s = s.offset(offset)
+    if limit:
+        s = s.limit(limit)
+#   showed, = session.execute(s.count()).first()
 
     res = session.execute(s)
-    names = [i.name for i in mtable.c]
+    names = res.keys()
+#   rows = [[j for j in i] for i in res.fetchall()]
     rows = [i for i in res.fetchall()]
+    showed = len(rows)
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0

@@ -140,7 +140,7 @@ def qi_query_count(user, db, tables, search=None, filter={}):
     s_count = select(mtables, use_labels=True)
     mtable = mtables[0]
     full_rows_count = session.execute(s_count.select_from(mtable).count())
-    full_rows_count = full_rows_count.first()[0]
+    full_rows_count, = full_rows_count.first()
 
 
 
@@ -381,7 +381,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     # Получаем кол-во всех записей
     if not distinct_columns:   # !!!
         result = session.execute(s.count())
-        full_rows_count = result.first()[0]
+        full_rows_count, = result.first()
     else:
         query = session.query(*mcolumns)
         full_rows_count = query.count()
@@ -409,7 +409,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     # Получаем кол-во записей после фильтрации
     if not distinct_columns:   # !!!
         result = session.execute(s.count())
-        filtered_rows_count = result.first()[0]
+        filtered_rows_count, = result.first()
     else:
         filtered_rows_count = -1
 
@@ -443,7 +443,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     # Получаем кол-во записей в выборке
     if not distinct_columns:   # !!!
         result = session.execute(s.count())
-        rows_count = result.first()[0]
+        rows_count, = result.first()
     else:
         rows_count = -1
 

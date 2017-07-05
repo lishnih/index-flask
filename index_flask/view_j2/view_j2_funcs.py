@@ -9,6 +9,8 @@ from .request_interface import *
 from .response_interface import *
 from .query_interface import *
 
+from ..models import db, Register, Favorite
+
 
 def set_default_db_action(user, request_items, response):
     user_db = require_ext('user_db')
@@ -47,7 +49,8 @@ def tables_list_action(user, request_items, response):
     db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response, '/user_db_set_default_db/')
 
     response['rows'] = user_db.get_metadata(user, db).tables.keys()
 
@@ -62,7 +65,8 @@ def columns_list_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -84,7 +88,8 @@ def table_count_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -119,7 +124,8 @@ def table_view_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -185,7 +191,8 @@ def column_func_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -232,7 +239,8 @@ def column_sum_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -273,7 +281,8 @@ def column_district_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-        return response_with_message(response, "База данных не задана!", 'error')
+#         return response_with_message(response, "База данных не задана!", 'error')
+        return response_redirect(response)
 
     if not tables[0]:
         return response_with_message(response, "Таблица не задана!", 'error')
@@ -318,3 +327,130 @@ def column_district_action(user, request_items, response):
 
     if error:
         response['error'] = error
+
+
+def collect_columns(mtable, root=None):
+    if root is None:
+        root = mtable
+    mcolumns = []
+    mcolumns2 = []
+    foreign_key = False
+    for c in mtable.columns:
+        if c.foreign_keys and not foreign_key:
+            foreign_key = True
+            first, = c.foreign_keys
+            root = root.join(first.column.table, first.parent==first.column)
+            mcolumns2, root = collect_columns(first.column.table, root)
+        elif c.name != 'id':
+            mcolumns.append(c)
+
+    if mcolumns2:
+        mcolumns = mcolumns2 + mcolumns
+
+    return mcolumns, root
+
+
+def search_action(user, request_items, response):
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    search = ri_get_str(request_items, 'search')
+    dbs_list = user_db.get_dbs_list(user)
+
+    rows = []
+    drows = {}
+    for db in dbs_list.keys():
+        drow = {}
+        db_uri, session, metadata = user_db.get_db(user, db)
+        for mtable in metadata.sorted_tables:
+            tablename = unicode(mtable.name)
+
+            record = Register.query.filter_by(
+              _user_id = user.id,
+              section = 'search_sql_query',
+              dir = '*',                      # !!!
+              name = tablename,
+            ).first()
+            if record:
+                sql = record.value.format(tablename, search)
+                res = session.execute(sql)
+                names = res.keys()
+                rows1 = [[j for j in i] for i in res.fetchall()]
+                if rows1:
+                    drow[tablename] = {
+                        'names': names,
+                        'rows': rows1,
+                        'query': sql,
+                    }
+            else:
+                mcolumns, mtable = collect_columns(mtable)
+                or_st = []
+                for c in mcolumns:
+                    or_st.append(c.like("%{0}%".format(search)))
+
+                s = select(mcolumns).select_from(mtable).where(or_(*or_st))
+                res = session.execute(s)
+                names = res.keys()
+                rows1 = [[j for j in i] for i in res.fetchall()]
+                if rows1:
+                    drow[tablename] = {
+                        'names': names,
+                        'rows': rows1,
+                        'query': str(s),
+                    }
+
+        if drow:
+            rows.append(db)
+            drow['__tables__'] = drow.keys()
+            drows[db] = drow
+
+
+    response['rows'] = rows
+    response['drows'] = drows
+
+
+def query_action(user, request_items, response):
+    user_db = require_ext('user_db')
+    if not user_db:
+        return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
+
+    db = ri_get_str(request_items, 'db') or user_db.get_default_db(user)
+    query = ri_get_str(request_items, 'query')
+
+    if not db:
+        return response_with_message(response, "База данных не задана!", 'error')
+
+    db_uri, session, metadata = user_db.get_db(user, db)
+    res = session.execute(query)
+
+    response['names'] = res.keys()
+    response['rows'] = [[j for j in i] for i in res.fetchall()]
+
+
+def favorite_page_add_action(user, request_items, response):
+    title = ri_get_str(request_items, 'title')
+    url = ri_get_str(request_items, 'url')
+
+    favorite = Favorite.query.filter_by(title=title, url=url, _user_id=user.id).first()
+    if favorite:
+        response['message'] = "Уже добавлено ранее!"
+
+    else:
+        favorite = Favorite(
+            title = title,
+            url = url,
+            user = user,
+        )
+        db.session.add(favorite)
+        db.session.commit()
+
+        response['message'] = "Успешно добавлено!"
+
+
+def get_favorites_action(user, request_items, response):
+    favorites = Favorite.query.filter_by(_user_id=user.id).all()
+    rows = []
+    for f in favorites:
+        rows.append({a: b for a, b in f.__dict__.items() if a[0] !="_"})
+    response['rows'] = rows

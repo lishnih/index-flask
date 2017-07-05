@@ -35,3 +35,10 @@ def response_with_message(response, msg, msg_type='info'):
         response[msg_type] = msg
 
     return response
+
+
+def response_redirect(response, url=None):
+    response['action'] = 'redirect'
+    response['url'] = url
+
+    return response

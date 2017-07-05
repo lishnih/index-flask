@@ -13,8 +13,8 @@ def actions_list_action(request_items, response):
     response['rows'] = [
         'actions_list',
         'action_params_list',
-        'set_default_db',
         'default_db',
+        'set_default_db',
         'dbs_list',
         'tables_list',
         'columns_list',
@@ -23,6 +23,9 @@ def actions_list_action(request_items, response):
         'column_func',
         'column_sum',
         'column_district',
+        'search',
+        'query',
+        'favorite_page_add',
     ]
 
 
@@ -40,13 +43,13 @@ def action_params_list_action(request_items, response):
         response['description'] = "Перечень параметров команды"
         response['rows'] = ['req_action']
 
-    elif req_action == 'set_default_db':
-        response['description'] = "Установить БД по умолчанию"
-        response['rows'] = ['db']
-
     elif req_action == 'default_db':
         response['description'] = "Получить БД по умолчанию"
         response['rows'] = []
+
+    elif req_action == 'set_default_db':
+        response['description'] = "Установить БД по умолчанию"
+        response['rows'] = ['db']
 
     elif req_action == 'dbs_list':
         response['description'] = "Список доступных БД"
@@ -79,6 +82,18 @@ def action_params_list_action(request_items, response):
     elif req_action == 'column_district':
         response['description'] = "Вывод значений заданной колонки таблицы"
         response['rows'] = ['db', 'table', 'tables', 'column', 'search', 'offset', 'limit', 'filter_json', 'sorting_json']
+
+    elif req_action == 'search':
+        response['description'] = "Поиск во всех таблицах"
+        response['rows'] = ['search']
+
+    elif req_action == 'query':
+        response['description'] = "Выполнение запроса"
+        response['rows'] = ['db', 'query']
+
+    elif req_action == 'favorite_page_add':
+        response['description'] = "Добавление страницы в избранное"
+        response['rows'] = ['title', 'url']
 
     else:
         return response_with_message(response, "Неизвестная команда!", 'error')

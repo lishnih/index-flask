@@ -5,12 +5,14 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+from flask import request, redirect
+
 from flask_login import login_required, current_user
 
 from ..core.backwardcompat import *
 from ..core.dump_html import html
 from ..core.db import initDb, getDbList
-from .. import app
+from .. import app, get_next
 
 
 ##### Storage #####
@@ -58,13 +60,13 @@ def get_default_db(user):
     return user_db.get('default_db')
 
 
-def get_db(user, dbname):
+def get_db(user, dbname, create=False):
     user_db = get_data(user)
     if not user_db:
         return None, None, None
 
     if dbname not in user_db.get('dbs', {}):
-        db_uri, session, metadata = initDb(user.home, dbname)
+        db_uri, session, metadata = initDb(user.home, dbname, create)
         if not db_uri:
             return None, None, None
 
@@ -93,3 +95,12 @@ def get_metadata(user, dbname):
 @login_required
 def ext_user_db():
     return html(get_data(current_user))
+
+
+@app.route('/user_db_set_default_db/')
+@login_required
+def ext_user_db_set_default_db():
+    default_db = request.args.get('default_db')
+    set_default_db(current_user, default_db)
+
+    return redirect(get_next())
