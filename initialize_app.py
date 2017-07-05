@@ -10,7 +10,6 @@ from index_flask.models import db, User, Group
 
 def init_admin():
     user_id = 1
-    group_name = 'admin'
 
     user = User.query.filter_by(id=user_id).first()
     if not user:
@@ -23,6 +22,21 @@ def init_admin():
         )
         db.session.add(user)
 
+    group_name = 'admin'
+    group = Group.query.filter_by(name=group_name).first()
+    if not group:
+        group = Group(group_name)
+
+    user.groups.append(group)
+
+    group_name = 'debug'
+    group = Group.query.filter_by(name=group_name).first()
+    if not group:
+        group = Group(group_name)
+
+    user.groups.append(group)
+
+    group_name = 'statistics'
     group = Group.query.filter_by(name=group_name).first()
     if not group:
         group = Group(group_name)
