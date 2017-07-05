@@ -4,15 +4,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="python web application" />
+  <meta name="description" content="flask web application" />
+  <link href="favicon.ico" type="image/ico" rel="shortcut icon" />
 
   <title>{{ title }}</title>
 
-  <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="/external/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 
-  <link href="/css/view.css" rel="stylesheet" />
+  <link href="/css/default.css" rel="stylesheet" />
 </head>
 
 <body>
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <ul class=flashes>
@@ -28,7 +32,11 @@
 {% endblock %}
 </div>
 
+{% from "_common.html" import text_copyright %}
+{{ text_copyright() }}
+
 {% from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}
+
 </body>
 </html>

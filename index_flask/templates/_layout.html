@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -39,6 +40,7 @@
 </head>
 
 <body>
+
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <ul class=flashes>
@@ -54,7 +56,11 @@
 {% endblock %}
 </div>
 
+{% from "_common.html" import text_copyright %}
+{{ text_copyright() }}
+
 {% from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}
+
 </body>
 </html>

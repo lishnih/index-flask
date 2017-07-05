@@ -3,3 +3,6 @@
 
 {% from "_debug.html" import dump_dict %}
 {{ dump_dict(obj) }}
+
+{% from "_debug.html" import debug_footer with context %}
+{{ debug_footer() }}

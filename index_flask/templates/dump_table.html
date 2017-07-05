@@ -3,3 +3,6 @@
 
 {% from "_debug.html" import dump_table %}
 {{ dump_table(names, rows) }}
+
+{% from "_debug.html" import debug_footer with context %}
+{{ debug_footer() }}

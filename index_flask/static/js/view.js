@@ -32,7 +32,7 @@ jQuery( function($) {
     var filtered = parseInt(Ffwd.data('filtered'));
     var max = to_int(filtered/limit) * limit;
 
-    if (span.hasClass('frew'))
+    if (span.hasClass('frw'))
         Offset.attr('value', 0);
     else if (span.hasClass('rew')) {
         offset -= limit;
