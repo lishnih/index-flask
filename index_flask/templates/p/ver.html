@@ -1,0 +1,56 @@
+{% extends "_p.html" %}
+
+{%- block head %}
+
+  <script>
+
+    $(document).ready( function() {
+
+        $("#jquery").text($.fn.jquery);
+
+        $("#jqueryui").text($.ui.version);
+
+        //$("#bootstrap").text($.fn.jquery);
+
+        //$("#jtable").text($.fn.jquery);
+
+    } );
+
+  </script>
+
+{%- endblock %}
+
+{%- block pbody %}
+
+  <table border="1">
+    <tr>
+      <th>
+        Package
+      </th>
+      <th>
+        Version
+      </th>
+    </tr>
+
+    <tr>
+      <td>jQuery</td>
+      <td id="jquery"></td>
+    </tr>
+
+    <tr>
+      <td>jQueryUI</td>
+      <td id="jqueryui"></td>
+    </tr>
+
+    <tr>
+      <td>Bootstrap</td>
+      <td id="bootstrap"></td>
+    </tr>
+
+    <tr>
+      <td>jTable</td>
+      <td id="jtable"></td>
+    </tr>
+  </table>
+
+{%- endblock %}

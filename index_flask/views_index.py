@@ -24,8 +24,18 @@ statistics_permission = Permission(RoleNeed('statistics'))
 @app.route("/")
 def index():
 #   return app.send_static_file('index.html')
-    return render_template('index.html',
+    return render_template('p/index.html',
              title = 'Index',
+             name = None if current_user.is_anonymous else current_user.name,
+             p_admin = admin_permission.can(),
+             p_debug = debug_permission.can(),
+             p_statistics = statistics_permission.can(),
+           )
+
+
+@app.route("/p/<page>")
+def p(page):
+    return render_template('p/{0}.html'.format(page),
              name = None if current_user.is_anonymous else current_user.name,
              p_admin = admin_permission.can(),
              p_debug = debug_permission.can(),
