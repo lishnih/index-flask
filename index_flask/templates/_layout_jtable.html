@@ -6,9 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="keywords" content="python web application" />
   <meta name="description" content="flask web application" />
-  <link href="favicon.ico" type="image/ico" rel="shortcut icon" />
+  <link href="/favicon.ico" type="image/ico" rel="shortcut icon" />
 
+  {%- if title %}
   <title>{{ title }}</title>
+  {%- else %}
+  {%- block title %}
+  {%- endblock %}
+  {%- endif %}
 
   <link href="/external/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
   <script src="/external/jquery-ui/external/jquery/jquery.js"></script>
@@ -36,7 +41,7 @@
   <script src="/j2/j2.js"></script>
 
   {%- block head %}
-  {% endblock %}
+  {%- endblock %}
 
   <script type="text/javascript">
 
@@ -56,25 +61,25 @@
 
 <body>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
+{%- with messages = get_flashed_messages(with_categories=true) %}
+  {%- if messages %}
     <ul class=flashes>
-    {% for category, message in messages %}
+    {%- for category, message in messages %}
       <li class="flashes {{ category }}">{{ message }}</li>
-    {% endfor %}
+    {%- endfor %}
     </ul>
-  {% endif %}
-{% endwith %}
+  {%- endif %}
+{%- endwith %}
 
 <div id="content">
-{% block body %}
-{% endblock %}
+{%- block body %}
+{%- endblock %}
 </div>
 
-{% from "_common.html" import text_copyright %}
+{%- from "_common.html" import text_copyright %}
 {{ text_copyright() }}
 
-{% from "_debug.html" import debug_footer with context %}
+{%- from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}
 
 </body>

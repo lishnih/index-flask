@@ -3,35 +3,35 @@
 {% block body %}
 
 <div class="serial">
-  Count: {{ full_rows_count }} > {{ filtered_rows_count }} ({{ rows_count }})
+  Count: {{ full_rows_count }} > {{ filtered_rows_count }} ({{ rows_count }}) ::&nbsp;
 </div>
 
 <div class="serial">
-    <a href="/db/">Список баз данных</a>
+  <a href="/db/">Список баз данных</a> ::&nbsp;
 </div>
 
 <div class="serial">
-    <a href="/db/{{ db }}">{{ db }}</a>
+  <a href="/db/{{ db }}">{{ db }}</a> ::&nbsp;
 </div>
 
 {%- if primary_tables %}
 <div class="serial">
   {%- for table in primary_tables %}
-    <a href="{{ table }}">+{{ table }}</a>
+    <a href="{{ table }}">+{{ table }}</a> ::&nbsp;
   {%- endfor %}
 </div>
 {%- endif %}
 
 {%- if lasttable %}
 <div class="serial">
-    <a href="..">-{{ lasttable }}</a>
+    <a href="..">-{{ lasttable }}</a> ::&nbsp;
 </div>
 {%- endif %}
 
 {%- if relative_tables %}
 <div class="serial">
   {%- for table in relative_tables %}
-    <a href="/db/{{ db }}/{{ table }}">>{{ table }}</a>
+    <a href="/db/{{ db }}/{{ table }}">>{{ table }}</a> ::&nbsp;
   {%- endfor %}
 </div>
 {%- endif %}

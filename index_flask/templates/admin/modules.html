@@ -1,15 +1,15 @@
 {% extends "_layout.html" %}
 
-{% block head %}
+{%- block head %}
   <script src="/js/admin.js"></script>
-{% endblock %}
+{%- endblock %}
 
-{% block body %}
+{%- block body %}
 
-{% if total %}
+{%- if total %}
 <i>Всего: {{ total }}</i><br />
-{% endif %}
-{% from "_debug.html" import dump_table_unsafe %}
+{%- endif %}
+{%- from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, rows) }}
 
 <ul class="hll">
@@ -18,4 +18,4 @@
 <li><a href="add_group">Add group</a></li>
 </ul>
 
-{% endblock %}
+{%- endblock %}

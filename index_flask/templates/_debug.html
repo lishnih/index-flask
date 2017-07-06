@@ -7,7 +7,7 @@
   {%- endautoescape %}
 </div>
 {%- endif %}
-{% endmacro %}
+{%- endmacro %}
 
 
 {% macro dump_dict(obj) %}
@@ -23,7 +23,7 @@
   </dd>
   {%- endfor %}
 </dl>
-{% endmacro %}
+{%- endmacro %}
 
 
 {% macro dump_list(obj) %}
@@ -32,7 +32,7 @@
   <li>{{ value }}</li>
   {%- endfor %}
 </ul>
-{% endmacro %}
+{%- endmacro %}
 
 
 {% macro dump_table(names, rows) %}
@@ -64,7 +64,7 @@
 <i>Нет данных</i>
 {%- endif %}
 </div>
-{% endmacro %}
+{%- endmacro %}
 
 
 {% macro dump_table_unsafe(names, rows) %}
@@ -98,4 +98,4 @@
 <i>Нет данных</i>
 {%- endif %}
 </div>
-{% endmacro %}
+{%- endmacro %}

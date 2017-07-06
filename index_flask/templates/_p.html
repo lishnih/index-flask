@@ -1,0 +1,46 @@
+{% extends "_layout.html" %}
+
+{%- block body %}
+
+  <table width="100%" border="1">
+    <tr>
+      <th width="200">
+        <a href="https://github.com/lishnih/index/">NDT Index</a>
+      </th>
+      <th style="text-align: right;">
+      {%- if name %}
+        <a href="/profile">{{ name }}</a>
+        {%- if p_admin %}
+        :: <a href="/admin/">Manage</a>
+        {%- endif %}
+        {%- if p_debug %}
+        :: <a href="/debug/">Debug</a>
+        {%- endif %}
+        {%- if p_statistics %}
+        :: <a href="/request_log">Statistics</a>
+        {%- endif %}
+        <a href="/logout">[x]</a>
+      {%- else %}
+        <a id="/login" href="/login">Вход</a> ::
+        <a id="/register" href="/register">Регистрация</a>
+      {%- endif %}
+      </th>
+    </tr>
+
+    <tr>
+      <td>
+        <ul>
+          <li><a href="/db/">Просмотр</a></li>
+          <li><a href="/p/about">О проекте</a></li>
+        </ul>
+      </td>
+      <td>
+        <div>
+{%- block pbody %}
+{%- endblock %}
+        </div>
+      </td>
+    </tr>
+  </table>
+
+{%- endblock %}

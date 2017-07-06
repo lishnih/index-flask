@@ -1,8 +1,8 @@
 <!doctype html>
 <title>Dump</title>
 
-{% from "_debug.html" import dump_list %}
+{%- from "_debug.html" import dump_list %}
 {{ dump_list(obj) }}
 
-{% from "_debug.html" import debug_footer with context %}
+{%- from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}

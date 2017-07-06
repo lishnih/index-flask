@@ -3,18 +3,18 @@
     <td>{{ field.label }}</td>
     <td>{{ field(**kwargs)|safe }}</td>
   </tr>
-  {% if field.errors %}
+  {%- if field.errors %}
   <tr>
     <td colspan=2>
       <ul class=errors>
-        {% for error in field.errors %}
+        {%- for error in field.errors %}
         <li>{{ error }}</li>
-        {% endfor %}
+        {%- endfor %}
       </ul>
     </td>
   </tr>
-  {% endif %}
-{% endmacro %}
+  {%- endif %}
+{%- endmacro %}
 
 {% macro render_tr_filter(field1, field2, field3) %}
   <tr>
@@ -22,14 +22,14 @@
     <td>{{ field2(**kwargs)|safe }}</td>
     <td>{{ field3(**kwargs)|safe }}</td>
   </tr>
-{% endmacro %}
+{%- endmacro %}
 
 {% macro render_tr_sorting(field1, field2) %}
   <tr>
     <td>{{ field1(**kwargs)|safe }}</td>
     <td>{{ field2(**kwargs)|safe }}</td>
   </tr>
-{% endmacro %}
+{%- endmacro %}
 
 {% macro render_navigator(page, pages, filtered) %}
   <span class="a navigator frw"><<</span> |
@@ -47,4 +47,4 @@
   </select>
   <span class="a navigator fwd">></span> |
   <span class="a navigator ffwd" data-filtered="{{ filtered }}">>></span>
-{% endmacro %}
+{%- endmacro %}
