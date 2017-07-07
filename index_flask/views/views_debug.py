@@ -43,7 +43,8 @@ def debug():
 
     return render_template('views/views_debug/index.html',
              title = 'Url mapping',
-             urls = sorted(output),
+#            urls = sorted(output),
+             urls = sorted(output, key=lambda url: url[2])
            )
 
 

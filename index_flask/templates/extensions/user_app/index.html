@@ -1,9 +1,9 @@
 {% extends "_layout.html" %}
 
-{% from "_formhelpers.html" import render_field %}
-{% from "_debug.html" import dump_dict %}
+{%- from "_formhelpers.html" import render_field %}
+{%- from "_debug.html" import dump_dict %}
 
-{% block body %}
+{%- block body %}
 
 <h1>App</h1>
 {{ dump_dict(app) }}
@@ -25,4 +25,4 @@
 <ul class="hll">
 <li><a href=".">Home</a></li>
 </ul>
-{% endblock %}
+{%- endblock %}

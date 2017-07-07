@@ -1,12 +1,12 @@
 {% extends "_layout.html" %}
 
-{% block body %}
+{%- block body %}
 
-{% if total %}
+{%- if total %}
 <i>Всего: {{ total }}</i><br />
-{% endif %}
+{%- endif %}
 
-{% from "_debug.html" import dump_table_unsafe %}
+{%- from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, dbs_list) }}
 
 {%- if group %}
@@ -18,4 +18,4 @@
   {%- endfor %}
 {%- endif %}
 
-{% endblock %}
+{%- endblock %}
