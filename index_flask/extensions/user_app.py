@@ -21,6 +21,7 @@ from ..core.backwardcompat import *
 from ..core.dump_html import html
 from ..core.html_helpers import parse_input
 from ..models import db, User
+
 from .. import app, require_ext
 
 

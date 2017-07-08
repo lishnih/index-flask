@@ -360,7 +360,7 @@ def search_action(user, request_items, response):
 
     rows = []
     drows = {}
-    for db in dbs_list.keys():
+    for db in dbs_list:
         drow = {}
         db_uri, session, metadata = user_db.get_db(user, db)
         for mtable in metadata.sorted_tables:

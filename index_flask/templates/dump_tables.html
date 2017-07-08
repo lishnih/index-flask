@@ -1,0 +1,19 @@
+{% extends "_layout_nojs.html" %}
+
+{%- block title %}
+  <title>Tables dumping</title>
+{%- endblock %}
+
+{%- block body %}
+
+{%- from "_debug.html" import dump_table %}
+{%- for names, rows, description in obj %}
+
+  <i style="background-color: yellow">{{ description }}</i>
+  <br />
+  {{ dump_table(names, rows) }}
+  <hr />
+
+{%- endfor %}
+
+{%- endblock %}

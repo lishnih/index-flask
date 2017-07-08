@@ -139,7 +139,7 @@ def user_append_db():
     dbpath = os.path.expanduser("~/.config/index/{0}".format(current_user.username))
     dbs_list = getDbList(current_user.home)
 
-    return render_template('dump_dict.html',
+    return render_template('dump_list.html',
              obj = dbs_list,
            )
 

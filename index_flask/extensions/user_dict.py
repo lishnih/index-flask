@@ -10,6 +10,7 @@ from flask_login import login_required, current_user
 from ..core.backwardcompat import *
 from ..core.dump_html import html
 from ..models import db, User
+
 from .. import app
 
 

@@ -225,23 +225,24 @@ def ext_request_log():
 
     criterion = form.get_criterion()
     order = form.get_order()
+    offset = form.offset.data
+    limit = form.limit.data
 
     s = RequestRecord.query
     total = s.count()
     s = s.filter(*criterion)
     filtered = s.count()
-    s = s.order_by(*order).offset(form.offset.data).limit(form.limit.data)
+    s = s.order_by(*order).offset(offset).limit(limit)
     showed = s.count()
 
     records = s.all()
-    names.insert(0, '#')
-    rows = [[seq if i == '#' else record.__dict__.get(i) for i in names] for seq, record in enumerate(records, 1)]
+    rows = [[record.__dict__.get(i) for i in names] for record in records]
 
-    pages = int(math.ceil(filtered / form.limit.data)) if form.limit.data else 0
-    page = int(math.floor(form.offset.data / form.limit.data)) + 1 if form.limit.data else 0
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
     if page > pages: page = 0
 
-    return render_template('extensions/request_log/index.html',
+    return render_template('table.html',
              form = form,
              names = names,
              rows = rows,

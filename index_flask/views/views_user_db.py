@@ -14,36 +14,35 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import select
 
 from ..core.backwardcompat import *
+from ..core.db import getDbList, initDb, get_relative_tables, get_rows_base
 from ..core.dump_html import html
-from ..view_j2.query_interface import qi_query
 
-from .. import app, require_ext
+from .. import app
 
 
 @app.route('/db/')
 @app.route('/db/<db>/')
 @login_required
 def views_db(db=None):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
+    dbs_list = getDbList(current_user.home)
 
     names = ['Db/View', 'Info', 'Session', 'Metadata']
-    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
-               ] for key, val in dbs_list.items()]
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=dbname), dbname),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=dbname), '>'),
+               ] for dbname in dbs_list]
 
     group = []
     if db:
-        db_uri, session, metadata = user_db.get_db(current_user, db)
+        db_uri, session, metadata = initDb(current_user.home, db)
         if not db_uri:
-            group = [(db, None, [["БД не существует: {0}".format(db)]])]
+            flash("Базы данных не существует: {0}".format(db), 'error')
+            return render_template('p/empty.html')
 
         else:
             table_names = ['View']
-            tables = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table1=table), table),
+            tables = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table=table), table),
                      ] for table in metadata.tables.keys()]
 
             group.append((db, table_names, tables))
@@ -59,20 +58,18 @@ def views_db(db=None):
 @app.route('/db/session/<db>/')
 @login_required
 def views_db_session(db):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
+    dbs_list = getDbList(current_user.home)
 
     names = ['Db/View', 'Info', 'Session', 'Metadata']
-    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
-               ] for key, val in dbs_list.items()]
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=dbname), dbname),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=dbname), '>'),
+               ] for dbname in dbs_list]
 
     group = []
     if db:
-        db_uri, session, metadata = user_db.get_db(current_user, db)
+        db_uri, session, metadata = initDb(current_user.home, db)
 
     return html(session)
 
@@ -80,20 +77,18 @@ def views_db_session(db):
 @app.route('/db/metadata/<db>/')
 @login_required
 def views_db_metadata(db):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
+    dbs_list = getDbList(current_user.home)
 
     names = ['Db/View', 'Info', 'Session', 'Metadata']
-    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
-               ] for key, val in dbs_list.items()]
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=dbname), dbname),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=dbname), '>'),
+               ] for dbname in dbs_list]
 
     group = []
     if db:
-        db_uri, session, metadata = user_db.get_db(current_user, db)
+        db_uri, session, metadata = initDb(current_user.home, db)
 
     return html(metadata)
 
@@ -101,22 +96,21 @@ def views_db_metadata(db):
 @app.route('/db/info/<db>')
 @login_required
 def views_db_info(db):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
+    dbs_list = getDbList(current_user.home)
 
     names = ['Db/View', 'Info', 'Session', 'Metadata']
-    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=key), key),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=key), val),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=key), '>'),
-                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=key), '>'),
-               ] for key, val in dbs_list.items()]
+    dbs_list = [['<a href="{0}">{1}</a>'.format(url_for('views_db', db=dbname), dbname),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_info', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_session', db=dbname), '>'),
+                 '<a href="{0}">{1}</a>'.format(url_for('views_db_metadata', db=dbname), '>'),
+               ] for dbname in dbs_list]
 
     group = []
     if db:
-        db_uri, session, metadata = user_db.get_db(current_user, db)
+        db_uri, session, metadata = initDb(current_user.home, db)
         if not db_uri:
-            group = [(db, None, [["БД не существует: {0}".format(db)]])]
+            flash("Базы данных не существует: {0}".format(db), 'error')
+            return render_template('p/empty.html')
 
         else:
             group = [(db, None, [[]])]
@@ -142,13 +136,10 @@ def views_db_info(db):
 @app.route('/db/info/<db>/<table>')
 @login_required
 def views_db_table_info(db, table):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
-
-    db_uri, session, metadata = user_db.get_db(current_user, db)
+    db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        return "БД не существует: {0}".format(db)
+        flash("Базы данных не существует: {0}".format(db), 'error')
+        return render_template('p/empty.html')
 
     return html(metadata.tables.get(table))
 
@@ -156,13 +147,10 @@ def views_db_table_info(db, table):
 @app.route('/db/info/<db>/<table>/<column>')
 @login_required
 def views_db_table_column_info(db, table, column):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
-
-    db_uri, session, metadata = user_db.get_db(current_user, db)
+    db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        return "БД не существует: {0}".format(db)
+        flash("Базы данных не существует: {0}".format(db), 'error')
+        return render_template('p/empty.html')
 
     mtable = metadata.tables.get(table)
 
@@ -172,13 +160,10 @@ def views_db_table_column_info(db, table, column):
 @app.route('/db/distinct/<db>/<table>/<column>')
 @login_required
 def views_db_table_column_distinct(db, table, column):
-    user_db = require_ext('user_db', 'html')
-
-    dbs_list = user_db.get_dbs_list(current_user)
-
-    db_uri, session, metadata = user_db.get_db(current_user, db)
+    db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        return "БД не существует: {0}".format(db)
+        flash("Базы данных не существует: {0}".format(db), 'error')
+        return render_template('p/empty.html')
 
     mtable = metadata.tables.get(table)
 
@@ -190,15 +175,15 @@ def views_db_table_column_distinct(db, table, column):
     return html([total, rows])
 
 
-@app.route('/db/<db>/<table1>/', methods=["GET", "POST"])
-@app.route('/db/<db>/<table1>/<table2>/', methods=["GET", "POST"])
-@app.route('/db/<db>/<table1>/<table2>/<table3>/', methods=["GET", "POST"])
-@app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/', methods=["GET", "POST"])
-@app.route('/db/<db>/<table1>/<table2>/<table3>/<table4>/<table5>/', methods=["GET", "POST"])
+@app.route('/db/<db>/<table>/', methods=["GET", "POST"])
 @login_required
-def views_db_table(db, table1=None, table2=None, table3=None, table4=None, table5=None):
-    # Обратный порядок - не менять!
-    tables = [i for i in [table5, table4, table3, table2, table1] if i]
+def views_db_table(db, table):
+    db_uri, session, metadata = initDb(current_user.home, db)
+    if not db_uri:
+        flash("Базы данных не существует: {0}".format(db), 'error')
+        return render_template('p/empty.html')
+
+    mtable = metadata.tables.get(table)
 
     offset = int(request.form.get('offset', 0))
     limit = int(request.form.get('limit', 100))
@@ -207,55 +192,33 @@ def views_db_table(db, table1=None, table2=None, table3=None, table4=None, table
         offset = 0
         limit = 0
 
-    query_params = dict(
-        user = current_user,
-        db = db,
-        tables  = tables,
-        search  = '',
-        filter  = {},
-        sorting = [],
-        offset  = offset,
-        limit   = limit,
-        columns = [],
-        distinct_columns = [],
-        plain = 1,
-    )
-
-    table_info, rows, error = qi_query(**query_params)
+    names, rows, total, filtered, showed, page, pages, s = get_rows_base(session, mtable, offset, limit)
 
     # Необходимые переменные
-    names = table_info.get('columns', ['no columns'])
     colspan = len(names)
-
-    lasttable = tables[0] if len(tables) > 1 else None
 
     # Выводим
     if request.method == 'POST':
         return jsonify(
-                 full_rows_count = table_info.get('full_rows_count', 0),
-                 filtered_rows_count = table_info.get('filtered_rows_count', 0),
-                 rows_count = table_info.get('rows_count', 0),
+                 full_rows_count = total,
+                 filtered_rows_count = filtered,
+                 rows_count = showed,
                  offset = offset,
                  limit = limit,
                  rows = rows,
                )
     else:
-        if error:
-            flash(error, 'error')
         return render_template('views/views_user_db/table.html',
                  title = 'Database: {0}'.format(db),
                  db = db,
-                 full_rows_count = table_info.get('full_rows_count', 0),
-                 filtered_rows_count = table_info.get('filtered_rows_count', 0),
-                 rows_count = table_info.get('rows_count', 0),
+                 full_rows_count = total,
+                 filtered_rows_count = filtered,
+                 rows_count = showed,
                  offset = offset,
                  limit = limit,
                  colspan = colspan,
                  names = names,
                  rows = rows,
-                 tables = tables,
-                 primary_tables = table_info.get('primary_tables', []),
-                 relative_tables = table_info.get('relative_tables', []),
-                 lasttable = lasttable,
-                 debug = table_info.get('query'),
+#                sequence = True,
+                 debug = str(s),
                )

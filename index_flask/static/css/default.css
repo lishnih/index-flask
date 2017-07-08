@@ -33,12 +33,12 @@ ul.flashes {
   background-color: Lightyellow;
 }
 
-li.errors {
+ul.errors {
+  font-weight: bold;
   color: Red;
 }
 
-ul.errors {
-  font-weight: bold;
+li.error {
   color: Red;
 }
 
@@ -51,6 +51,7 @@ a {
   color: Navy;
   cursor: pointer;
   cursor: hand;
+  list-style-type: none;
 }
 
 .a_selected {
@@ -151,6 +152,10 @@ div.debug {
   border: .1em dashed blue;
 }
 
+
+.inactive {
+  color: #888;
+}
 
 /*** Menu ***/
 

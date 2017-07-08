@@ -11,36 +11,17 @@
 </div>
 
 <div class="serial">
-  <a href="/db/{{ db }}">{{ db }}</a> ::&nbsp;
+  <a href="/db/{{ db }}">{{ db }}</a>
 </div>
 
-{%- if primary_tables %}
-<div class="serial">
-  {%- for table in primary_tables %}
-    <a href="{{ table }}">+{{ table }}</a> ::&nbsp;
-  {%- endfor %}
-</div>
-{%- endif %}
-
-{%- if lasttable %}
-<div class="serial">
-    <a href="..">-{{ lasttable }}</a> ::&nbsp;
-</div>
-{%- endif %}
-
-{%- if relative_tables %}
-<div class="serial">
-  {%- for table in relative_tables %}
-    <a href="/db/{{ db }}/{{ table }}">>{{ table }}</a> ::&nbsp;
-  {%- endfor %}
-</div>
-{%- endif %}
-
-<div>&nbsp;</div>
+<br />
 
 <table border="1">
   {%- if names %}
     <tr>
+      {%- if sequence %}
+        <th>#</th>
+      {%- endif %}
       {%- for name in names %}
         <th>{{ name }}</th>
       {%- endfor %}
@@ -49,6 +30,9 @@
 
   {%- for row in rows %}
     <tr>
+      {%- if sequence %}
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      {%- endif %}
       {%- for col in row %}
         <td>{{ col }}</td>
       {%- endfor %}

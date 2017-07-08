@@ -13,9 +13,9 @@ from sqlalchemy.sql import select
 
 
 def initDb(home, dbname, create=False):
-    fname = os.path.join(home, "{0}.sqlite".format(dbname))
-    if os.path.isfile(fname) or create:
-        db_uri = "{0}:///{1}".format('sqlite', fname)
+    filename = os.path.join(home, "{0}.sqlite".format(dbname))
+    if os.path.isfile(filename) or create:
+        db_uri = "{0}:///{1}".format('sqlite', filename)
 
         engine = create_engine(db_uri)
         metadata = MetaData(engine, reflect=True)
@@ -29,20 +29,15 @@ def initDb(home, dbname, create=False):
 
 
 def getDbList(home):
-    db_dict = {}
     try:
         ldir = os.listdir(home)
     except OSError:
         pass
     else:
         for name in ldir:
-            fullname = os.path.join(home, name)
-            if os.path.isfile(fullname):
-                filename, ext = os.path.splitext(name)
-                if ext == '.sqlite':
-                    db_dict[filename] = fullname
-
-    return db_dict
+            dbname, ext = os.path.splitext(name)
+            if ext == '.sqlite':
+                yield dbname
 
 
 def get_primary_tables(metadata, tablename):
@@ -77,8 +72,8 @@ def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=Non
 
     res = session.execute(s)
     names = res.keys()
-#   rows = [[j for j in i] for i in res.fetchall()]
-    rows = [i for i in res.fetchall()]
+#   rows = [i for i in res.fetchall()]
+    rows = [[j for j in i] for i in res.fetchall()]
     showed = len(rows)
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
