@@ -77,4 +77,5 @@ archive.list
 
 # index_flask
 index_flask/test/
-index_flask/static/ver.txt
+index_flask/app.db
+index_flask/templates/custom

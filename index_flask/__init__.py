@@ -9,7 +9,8 @@ from flask import Flask, request
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
-from flask_principal import Principal, RoleNeed, UserNeed, identity_loaded
+from flask_principal import ( Principal, RoleNeed, UserNeed,
+                              Identity, identity_loaded )
 
 from .core.backwardcompat import *
 from . import config
@@ -44,9 +45,14 @@ def my_token_loader(token):
     return User.query.filter_by(token=token).first()
 
 
-##### principals #####
+##### principal #####
 
-principals = Principal(app)
+principal = Principal(app)
+
+@principal.identity_loader
+def load_identity_when_session_expires():
+    if hasattr(current_user, 'id'):
+        return Identity(current_user.id)
 
 @identity_loaded.connect_via(app)
 def on_identity_loaded(sender, identity):

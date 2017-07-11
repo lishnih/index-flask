@@ -11,7 +11,6 @@ from flask_login import current_user
 from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
-from .core.dump_html import html
 
 from . import app
 

@@ -5,44 +5,44 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os, math
+import os, re, math
 
 from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.sql import select
 
 
+dbname_ptrn = re.compile("^[\w\-+=\.,\(\)\[\]\{\}';]+$")
+
+
 def initDb(home, dbname, create=False):
-    fname = os.path.join(home, "{0}.sqlite".format(dbname))
-    if os.path.isfile(fname) or create:
-        db_uri = "{0}:///{1}".format('sqlite', fname)
+    result = dbname_ptrn.match(dbname)
+    if result:
+        filename = os.path.join(home, "{0}.sqlite".format(dbname))
+        if os.path.isfile(filename) or create:
+            db_uri = "{0}:///{1}".format('sqlite', filename)
 
-        engine = create_engine(db_uri)
-        metadata = MetaData(engine, reflect=True)
+            engine = create_engine(db_uri)
+            metadata = MetaData(engine, reflect=True)
 
-        session = scoped_session(sessionmaker())
-        session.configure(bind=engine)
+            session = scoped_session(sessionmaker())
+            session.configure(bind=engine)
 
-        return db_uri, session, metadata
+            return db_uri, session, metadata
 
     return None, None, None
 
 
 def getDbList(home):
-    db_dict = {}
     try:
         ldir = os.listdir(home)
     except OSError:
         pass
     else:
         for name in ldir:
-            fullname = os.path.join(home, name)
-            if os.path.isfile(fullname):
-                filename, ext = os.path.splitext(name)
-                if ext == '.sqlite':
-                    db_dict[filename] = fullname
-
-    return db_dict
+            dbname, ext = os.path.splitext(name)
+            if ext == '.sqlite':
+                yield dbname
 
 
 def get_primary_tables(metadata, tablename):
@@ -58,7 +58,7 @@ def get_relative_tables(metadata, tablename):
                 yield i.parent.table.name
 
 
-def get_rows_base(session, mtable, offset, limit, criterion=None, order=None):
+def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=None):
     s = select('*').select_from(mtable)
     s_count = select([func.count('*')]).select_from(mtable)
     total, = session.execute(s_count).first()
@@ -70,12 +70,16 @@ def get_rows_base(session, mtable, offset, limit, criterion=None, order=None):
         filtered = total
     if order:
         s = s.order_by(*order)
-    s = s.offset(offset).limit(limit)
-    showed, = session.execute(s.count()).first()
+    s = s.offset(offset)
+    if limit:
+        s = s.limit(limit)
+#   showed, = session.execute(s.count()).first()
 
     res = session.execute(s)
-    names = [i.name for i in mtable.c]
-    rows = [i for i in res.fetchall()]
+    names = res.keys()
+#   rows = [i for i in res.fetchall()]
+    rows = [[j for j in i] for i in res.fetchall()]
+    showed = len(rows)
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0

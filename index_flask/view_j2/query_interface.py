@@ -42,6 +42,10 @@ def qi_columns_dict(user, db, tables, fullnames_option = 1):
     if isinstance(tables, basestring):
         tables = tables,
 
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
+
     metadata = user_db.get_metadata(user, db)
     mtables = [metadata.tables.get(i) for i in tables]
 
@@ -122,6 +126,10 @@ def qi_query_count(user, db, tables, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
+
     db_uri, session, metadata = user_db.get_db(user, db)
     if not db_uri:
         return {}, "БД не существует: {0}".format(db)
@@ -170,6 +178,10 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
 
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
+
     db_uri, session, metadata = user_db.get_db(user, db)
     if not db_uri:
         return {}, "БД не существует: {0}".format(db)
@@ -216,6 +228,10 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
 def qi_query_sum(user, db, tables, column, search=None, filter={}):
     if isinstance(tables, basestring):
         tables = tables,
+
+    user_db = require_ext('user_db')
+    if not user_db:
+        return None
 
     db_uri, session, metadata = user_db.get_db(user, db)
     if not db_uri:

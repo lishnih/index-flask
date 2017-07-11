@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 import time, math
 
-from flask import g, request, render_template, redirect, flash
+from flask import g, request, render_template
 from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
 
@@ -17,11 +17,13 @@ from wtforms import Form, StringField, IntegerField, SelectField, validators
 from ..core.backwardcompat import *
 from ..core.dump_html import html
 from ..models import db
+
 from .. import app
 
 
 ##### Role #####
 
+debug_permission = Permission(RoleNeed('debug'))
 statistics_permission = Permission(RoleNeed('statistics'))
 
 
@@ -206,6 +208,14 @@ def get_order(model, column, cond):
 
 
 ##### Routes #####
+
+@app.route('/debug/request_log')
+def debug_request_log():
+    if not debug_permission.can():
+        abort(404)
+
+    return html(g.record)
+
 
 @app.route('/request_log', methods=['GET', 'POST'])
 @login_required

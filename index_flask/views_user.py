@@ -7,14 +7,14 @@ from __future__ import ( division, absolute_import,
 
 import os
 
-from flask import session, request, render_template, redirect, flash, abort
+from flask import session, request, render_template, redirect, flash
 
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .core.backwardcompat import *
 from .core.db import getDbList
-from .core.dump_html import html
+# from .core.dump_html import html
 from .models import db, User
 from .forms import RegistrationForm, LoginForm
 
@@ -43,7 +43,6 @@ def user_register():
         db.session.commit()
 
         flash('Thanks for registering')
-
         return redirect(get_next('/login'))
 
     return render_template('user/register.html',
@@ -69,7 +68,6 @@ def user_login(user=None):
         identity_changed.send(app, identity=Identity(form.user.id))
 
         flash('Successfully logged in as {0}'.format(form.user.name))
-
         return redirect(get_next())
 
     return render_template('user/login.html',
@@ -151,7 +149,6 @@ def user_init_env():
     db.session.commit()
 
     flash("Task 'Init environment' executed!")
-
     return redirect(get_next('/profile'))
 
 
@@ -161,7 +158,6 @@ def user_send_verification():
     current_user.send_verification()
 
     flash("Task 'Send verification' executed!")
-
     return redirect(get_next('/profile'))
 
 

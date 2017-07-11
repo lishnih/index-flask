@@ -18,7 +18,7 @@ from sqlalchemy.sql import select
 from wtforms import Form, StringField, BooleanField, validators
 
 from ..core.backwardcompat import *
-from ..core.dump_html import html
+# from ..core.dump_html import html
 from ..core.html_helpers import parse_input
 from ..models import db, User
 
@@ -246,15 +246,11 @@ def ext_user_app_apps():
 
     apps = s.all()
     names = [i.name for i in App.__table__.c]
-    names.insert(0, '#')
-#   rows = [[seq if i == '#' else app.__dict__.get(i) for i in names] for seq, app in enumerate(apps, 1)]
     rows = []
-    for seq, app in enumerate(apps, 1):
+    for app in apps:
         row = []
         for i in names:
-            if i == '#':
-                row.append('<i>{0}</i>'.format(seq))
-            elif i == 'name':
+            if i == 'name':
                 row.append('<a href="/app{0}">{1}</a>'.format(app.id, app.name))
             else:
                 row.append(app.__dict__.get(i))
@@ -306,13 +302,13 @@ def ext_user_app_users():
     users = User.query.all()
     apps = App.query.all()
 
-    names = ['#', 'id', 'email']
+    names = ['id', 'email']
     for app in apps:
         names.append(app.id)
 
     rows = []
-    for seq, user in enumerate(users, 1):
-        row = ['<i>{0}</i>'.format(seq), user.id, user.email]
+    for user in users:
+        row = [user.id, user.email]
 
         for app in apps:
             row.append(parse_input('', app in user.ext_apps, 'toggle_record',

@@ -29,7 +29,7 @@ def get_data(user):
 
     user_db = storage.setdefault(user.id, {
         'dbs': {},
-        'dbs_list': getDbList(user.home),
+        'dbs_list': [i for i in getDbList(user.home)],
     })
 
     return user_db

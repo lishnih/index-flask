@@ -198,4 +198,18 @@ class Favorite(db.Model):     # Rev. 2017-05-06
         self.url = url
 
 
+class SQLTemplate(db.Model):  # Rev. 2017-07-11
+    __tablename__ = 'sqltemplate'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    value = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
+
+    def __init__(self, name, value=None, description=None):
+        self.name = name
+        self.value = value
+        self.description = description
+
+
 db.create_all()

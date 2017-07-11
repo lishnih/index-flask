@@ -363,6 +363,9 @@ def search_action(user, request_items, response):
     for db in dbs_list:
         drow = {}
         db_uri, session, metadata = user_db.get_db(user, db)
+        if not db_uri:
+            return response_with_message(response, "Базы данных не существует: {0}".format(db), 'error')
+
         for mtable in metadata.sorted_tables:
             tablename = unicode(mtable.name)
 
@@ -422,6 +425,9 @@ def query_action(user, request_items, response):
         return response_with_message(response, "База данных не задана!", 'error')
 
     db_uri, session, metadata = user_db.get_db(user, db)
+    if not db_uri:
+        return response_with_message(response, "Базы данных не существует: {0}".format(db), 'error')
+
     res = session.execute(query)
 
     response['names'] = res.keys()

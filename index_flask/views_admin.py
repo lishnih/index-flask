@@ -7,13 +7,12 @@ from __future__ import ( division, absolute_import,
 
 import os
 
-from flask import request, render_template, jsonify, redirect, flash, abort
+from flask import request, render_template, jsonify, redirect, flash
 
 from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
-from .core.dump_html import html
 from .core.html_helpers import parse_input, parse_span, dye_red, dye_green
 from .models import db, User, Group, Module
 from .forms import RegistrationForm, AddGroupForm
@@ -38,20 +37,16 @@ def admin():
 @admin_permission.require(403)
 def admin_users():
     s = User.query
+    users = s.all()
     total = s.count()
 
-    users = s.all()
     names = [i.name for i in User.__table__.c]
-    names.insert(0, '#')
-#   rows = [[seq if i == '#' else user.__dict__.get(i) for i in names] for seq, user in enumerate(users, 1)]
     rows = []
-    for seq, user in enumerate(users, 1):
+    for user in users:
         row = []
         for i in names:
-            if i == '#':
-                row.append('<i>{0}</i>'.format(seq))
-            elif i == 'email':
-                row.append('<a href="user/{0}">{0}</a>'.format(user.email))
+            if i == 'username':
+                row.append('<a href="user/{0}">{0}</a>'.format(user.username))
             else:
                 row.append(user.__dict__.get(i))
 
@@ -65,11 +60,11 @@ def admin_users():
            )
 
 
-@app.route('/admin/user/<email>')
+@app.route('/admin/user/<username>')
 @login_required
 @admin_permission.require(403)
-def admin_user(email):
-    user = User.query.filter_by(email=email).first()
+def admin_user(username):
+    user = User.query.filter_by(username=username).first()
 
     names = [i.name for i in User.__table__.c]
     rows = [[user.__dict__.get(i) for i in names]]
@@ -86,19 +81,15 @@ def admin_user(email):
 @admin_permission.require(403)
 def admin_groups():
     s = Group.query
+    groups = s.all()
     total = s.count()
 
-    groups = s.all()
     names = [i.name for i in Group.__table__.c]
-    names.insert(0, '#')
-#   rows = [[seq if i == '#' else groups.__dict__.get(i) for i in names] for seq, user in enumerate(groups, 1)]
     rows = []
-    for seq, group in enumerate(groups, 1):
+    for group in groups:
         row = []
         for i in names:
-            if i == '#':
-                row.append('<i>{0}</i>'.format(seq))
-            elif i == 'name':
+            if i == 'name':
                 row.append('<a href="group/{0}">{0}</a>'.format(group.name))
             else:
                 row.append(group.__dict__.get(i))
@@ -166,13 +157,13 @@ def admin_user_groups():
     users = User.query.all()
     groups = Group.query.all()
 
-    names = ['#', 'id', 'email']
+    names = ['id', 'email']
     for group in groups:
         names.append(group.name)
 
     rows = []
-    for seq, user in enumerate(users, 1):
-        row = ['<i>{0}</i>'.format(seq), user.id, user.email]
+    for user in users:
+        row = [user.id, user.email]
 
         for group in groups:
             row.append(parse_input('', group in user.groups, 'toggle_record',
@@ -206,7 +197,6 @@ def admin_add_user():
         db.session.commit()
 
         flash('User added!')
-
         return redirect(get_next('/admin/'))
 
     return render_template('user/register.html',
@@ -230,7 +220,6 @@ def admin_add_group():
         db.session.commit()
 
         flash('Group added!')
-
         return redirect(get_next('/admin/'))
 
     return render_template('admin/add_group.html',
@@ -280,15 +269,11 @@ def admin_modules():
 
     modules = s.order_by('folder', 'name').all()
     names = [i.name for i in Module.__table__.c]
-    names.insert(0, '#')
-#   rows = [[seq if i == '#' else module.__dict__.get(i) for i in names] for seq, module in enumerate(modules, 1)]
     rows = []
-    for seq, module in enumerate(modules, 1):
+    for module in modules:
         row = []
         for i in names:
-            if i == '#':
-                row.append('<i>{0}</i>'.format(seq))
-            elif i == 'active':
+            if i == 'active':
                 row.append(parse_input('', module.active, 'toggle_record',
                     id = module.id,
                 ))
