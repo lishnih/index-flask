@@ -13,9 +13,9 @@ from sqlalchemy.sql import select
 
 
 def initDb(home, dbname, create=False):
-    filename = os.path.join(home, "{0}.sqlite".format(dbname))
-    if os.path.isfile(filename) or create:
-        db_uri = "{0}:///{1}".format('sqlite', filename)
+    fname = os.path.join(home, "{0}.sqlite".format(dbname))
+    if os.path.isfile(fname) or create:
+        db_uri = "{0}:///{1}".format('sqlite', fname)
 
         engine = create_engine(db_uri)
         metadata = MetaData(engine, reflect=True)
@@ -29,15 +29,20 @@ def initDb(home, dbname, create=False):
 
 
 def getDbList(home):
+    db_dict = {}
     try:
         ldir = os.listdir(home)
     except OSError:
         pass
     else:
         for name in ldir:
-            dbname, ext = os.path.splitext(name)
-            if ext == '.sqlite':
-                yield dbname
+            fullname = os.path.join(home, name)
+            if os.path.isfile(fullname):
+                filename, ext = os.path.splitext(name)
+                if ext == '.sqlite':
+                    db_dict[filename] = fullname
+
+    return db_dict
 
 
 def get_primary_tables(metadata, tablename):
@@ -53,7 +58,7 @@ def get_relative_tables(metadata, tablename):
                 yield i.parent.table.name
 
 
-def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=None):
+def get_rows_base(session, mtable, offset, limit, criterion=None, order=None):
     s = select('*').select_from(mtable)
     s_count = select([func.count('*')]).select_from(mtable)
     total, = session.execute(s_count).first()
@@ -65,16 +70,12 @@ def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=Non
         filtered = total
     if order:
         s = s.order_by(*order)
-    s = s.offset(offset)
-    if limit:
-        s = s.limit(limit)
-#   showed, = session.execute(s.count()).first()
+    s = s.offset(offset).limit(limit)
+    showed, = session.execute(s.count()).first()
 
     res = session.execute(s)
-    names = res.keys()
-#   rows = [i for i in res.fetchall()]
-    rows = [[j for j in i] for i in res.fetchall()]
-    showed = len(rows)
+    names = [i.name for i in mtable.c]
+    rows = [i for i in res.fetchall()]
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
