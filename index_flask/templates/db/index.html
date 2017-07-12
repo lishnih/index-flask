@@ -7,15 +7,17 @@
 {%- endif %}
 
 {%- from "_debug.html" import dump_table_unsafe %}
-{{ dump_table_unsafe(names, dbs_list) }}
+{{ dump_table_unsafe(names, rows) }}
 
-{%- if group %}
-  {%- for label, names, table in group %}
+{%- for names, rows, description in obj %}
+
   {%- autoescape false %}
-  <i><b>{{ label }}</b></i>
+  <i style="background-color: yellow"> <b>{{ description }}</b> </i>
   {%- endautoescape %}
-  {{ dump_table_unsafe(names, table) }}
-  {%- endfor %}
-{%- endif %}
+  <br />
+  {{ dump_table_unsafe(names, rows) }}
+  <hr />
+
+{%- endfor %}
 
 {%- endblock %}

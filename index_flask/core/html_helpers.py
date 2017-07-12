@@ -5,8 +5,6 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os
-
 
 def parse_input(sid, checked, action, **kargs):
     kargs['action'] = action
@@ -37,11 +35,14 @@ def dye(text, color, background=None):
     background = ' background-color: {0}'.format(background) if background else ''
     return '<span style="color: {0};{1}"><b>{2}</b></span>'.format(color, background, text)
 
+
 def dye_red(text, background=None):
     return dye(text, 'Red', background)
 
-def dye_blue(text, background=None):
-    return dye(text, 'Blue', background)
 
 def dye_green(text, background=None):
     return dye(text, 'Green', background)
+
+
+def dye_blue(text, background=None):
+    return dye(text, 'Blue', background)

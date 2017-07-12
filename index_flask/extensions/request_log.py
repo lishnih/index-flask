@@ -252,7 +252,7 @@ def ext_request_log():
     page = int(math.floor(offset / limit)) + 1 if limit else 0
     if page > pages: page = 0
 
-    return render_template('table.html',
+    return render_template('db/table_params.html',
              form = form,
              names = names,
              rows = rows,
