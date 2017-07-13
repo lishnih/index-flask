@@ -1,14 +1,16 @@
 {% extends "_layout.html" %}
 
-{%- block head %}
-{%- endblock %}
-
 {%- block body %}
 
 {%- from "_tablehelpers.html" import render_tr, render_tr_filter, render_tr_sorting, render_navigator %}
 
 <div class="tabular">
-<form id="table_params" method=post action="?">
+{%- if form %}
+{%- if action %}
+<form id="table_params" method="post" action="{{ action }}">
+{%- else %}
+<form id="table_params" method="post" action="#">
+{%- endif %}
   <div class="serial">
     <fieldset>
       <legend>Вывод</legend>
@@ -38,20 +40,34 @@
     <fieldset>
       <legend>Сортировка</legend>
       <table border="1">
-        {{ render_tr_sorting(form.sort_dir1, form.sorting1) }}
-        {{ render_tr_sorting(form.sort_dir2, form.sorting2) }}
-        {{ render_tr_sorting(form.sort_dir3, form.sorting3) }}
+        {{ render_tr_sorting(form.sorting1, form.sort_dir1) }}
+        {{ render_tr_sorting(form.sorting2, form.sort_dir2) }}
+        {{ render_tr_sorting(form.sorting3, form.sort_dir3) }}
       </table>
     </fieldset>
   </div>
+
+  {%- if template %}
+  <div>
+    <table border="1">
+      {{ render_tr(form.template) }}
+      {{ render_tr(form.unlim) }}
+    </table>
+  </div>
+  {%- endif %}
 
   <p>
     <input type=submit value="Proceed">
   </p>
 </form>
+{%- else %}
+<i>Параметры отсутствуют</i>
+{%- endif %}
 </div>
 
+{%- if total %}
 <i>Выведено {{ showed }} из {{ filtered }} (всего {{ total }})</i>
+{%- endif %}
 
 {%- from "_debug.html" import dump_table_unsafe %}
 {{ dump_table_unsafe(names, rows) }}

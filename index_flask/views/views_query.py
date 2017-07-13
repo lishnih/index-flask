@@ -9,12 +9,13 @@ from flask import request, render_template, jsonify, url_for, flash
 
 from flask_login import login_required, current_user
 
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import getDbList, initDb
+from ..core.db import getDbList, initDb, get_rows_plain
 from ..core.render_template_custom import render_template_custom
-from ..core.dump_html import html
+from ..core.user_templates import get_user_templates
+from ..forms_tables import TableCondForm
 from ..models import db, SQLTemplate
 
 from .. import app
@@ -76,10 +77,12 @@ def views_query_db_dump(db, id):
         flash("Запроса не существует: {0}".format(id), 'error')
         return render_template('p/empty.html')
 
-    return html(sqltemplate.value)
+    return render_template('p/empty.html',
+             text = sqltemplate.value,
+    )
 
 
-@app.route('/query/<db>/<id>')
+@app.route('/query/<db>/<id>', methods=['GET', 'POST'])
 @login_required
 def views_query_db_id(db, id):
     db_uri, session, metadata = initDb(current_user.home, db)
@@ -92,11 +95,54 @@ def views_query_db_id(db, id):
         flash("Запроса не существует: {0}".format(id), 'error')
         return render_template('p/empty.html')
 
-    res = session.execute(sqltemplate.value)
-    names = res.keys()
-    rows = [[j for j in i] for i in res.fetchall()]
 
-    return render_template_custom('dump_table.html',
+    sql = sqltemplate.value
+    s = select('*').select_from(text("({0})".format(sql)))
+    try:
+        res = session.execute(s)
+    except Exception, e:
+        flash("Ошибка при выполнении запроса: {0}".format(0), 'error')
+        return render_template('p/empty.html')
+    names = res.keys()
+
+
+    templates_list = [i for i in get_user_templates(current_user)]
+
+
+    form = TableCondForm(request.form, columns=names, templates_list=templates_list)
+    if form.offset.data is None or form.limit.data is None:
+        form.offset.data = 0
+        form.limit.data = 10
+
+    if request.method == 'POST':
+        form.validate()
+
+    criterion = form.get_criterion()
+    order = form.get_order()
+    offset = form.offset.data
+    limit = form.limit.data
+
+
+    if form.template.data and form.template.data <> 'None':
+        template_name = 'custom/{0}.html'.format(form.template.data)
+        if form.unlim.data == 'on':
+            limit = 0
+    else:
+        template_name = 'db/table_params.html'
+
+
+    names, rows, total, filtered, showed, page, pages, s = get_rows_plain(session, sql, offset, limit, criterion, order)
+
+
+    return render_template(template_name,
+             form = form,
              names = names,
              rows = rows,
+             total = total,
+             filtered = filtered,
+             showed = showed,
+             page = page,
+             pages = pages,
+             template = templates_list,
+             debug = str(s),
            )

@@ -12,8 +12,9 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import select
 
 from ..core.backwardcompat import *
-from ..core.db import getDbList, initDb, get_rows_base
+from ..core.db import getDbList, initDb, get_rows_base, get_rows_ext
 from ..core.dump_html import html
+from ..forms_tables import TableCondForm
 
 from .. import app
 
@@ -34,10 +35,58 @@ def get_dbs_table(home, db=None):
     return names, dbs_table
 
 
+def views_ndt_db_func(db, tables):
+    db_uri, session, metadata = initDb(current_user.home, db)
+    if not db_uri:
+        flash("Базы данных не существует: {0}".format(db), 'error')
+        return render_template('p/empty.html')
+
+
+    mtables = [metadata.tables.get(i) for i in tables.split('|')]
+    mtables = [i for i in mtables if i is not None]
+
+    if not len(mtables):
+        flash("Проверьте таблицы: {0}".format(tables), 'error')
+        return render_template('p/empty.html')
+
+    mtable = mtables[0]
+
+    form = TableCondForm(request.form, mtables)
+    if form.offset.data is None or form.limit.data is None:
+        form.offset.data = 0
+        form.limit.data = 100
+
+    if request.method == 'POST':
+        form.validate()
+
+    criterion = form.get_criterion()
+    order = form.get_order()
+    offset = form.offset.data
+    limit = form.limit.data
+
+
+    names, rows, total, filtered, showed, page, pages, s = get_rows_ext(session,
+        metadata, tables, offset, limit, criterion, order)
+
+
+    return render_template('db/table_params.html',
+             form = form,
+             names = names,
+             rows = rows,
+             total = total,
+             filtered = filtered,
+             showed = showed,
+             page = page,
+             pages = pages,
+             action = "?tables={0}".format(tables),
+             debug = str(s),
+           )
+
+
 ### Routes ###
 
 @app.route('/db/')
-@app.route('/db/<db>/')
+@app.route('/db/<db>/', methods=["GET", "POST"])
 @login_required
 def views_db(db=None):
     names, dbs_table = get_dbs_table(current_user.home, db)
@@ -49,8 +98,15 @@ def views_db(db=None):
             flash("Базы данных не существует: {0}".format(db), 'error')
             return render_template('p/empty.html')
 
-        table_names = ['Tables']
+
+        tables = request.args.get('tables')
+        if tables:
+            return views_ndt_db_func(db, tables)
+
+
+        table_names = ['Tables', 'w/options']
         table_rows = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table=table), table),
+                       '<a href="{0}">{1}</a>'.format(url_for('views_db', db=db, tables=table), table)
                      ] for table in metadata.tables.keys()]
 
         obj.append((table_names, table_rows, db))

@@ -7,9 +7,9 @@ from __future__ import ( division, absolute_import,
 
 import os, re, math
 
-from sqlalchemy import create_engine, MetaData, func
+from sqlalchemy import create_engine, MetaData, func, join, and_
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, text
 
 
 dbname_ptrn = re.compile("^[\w\-+=\.,\(\)\[\]\{\}';]+$")
@@ -45,6 +45,40 @@ def getDbList(home):
                 yield dbname
 
 
+def get_columns(mtables):
+    if isinstance(mtables, (list, tuple)):
+        for mtable in mtables:
+            for c in mtable.c:
+                yield c
+    else:
+        for c in mtables.c:
+            yield c
+
+
+def get_columns_names(mtables):
+    if isinstance(mtables, (list, tuple)):
+        for mtable in mtables:
+            for c in mtable.c:
+                yield "{0}.{1}".format(c.table.name, c.name)
+    else:
+        for c in mtables.c:
+            yield c.name
+
+
+def get_column(mtables, column_name):
+    column_list = column_name.split('.')
+    column_list.insert(0, '')
+    table, column = column_list[-2:]
+
+    if column:
+        if isinstance(mtables, (list, tuple)):
+            for mtable in mtables:
+                if mtable.name == table:
+                    return mtable.c.get(column)
+        else:
+            return mtables.c.get(column)
+
+
 def get_primary_tables(metadata, tablename):
     mtable = metadata.tables.get(tablename)
     for key in mtable.foreign_keys:
@@ -58,22 +92,25 @@ def get_relative_tables(metadata, tablename):
                 yield i.parent.table.name
 
 
-def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=None):
+def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=None):
     s = select('*').select_from(mtable)
     s_count = select([func.count('*')]).select_from(mtable)
-    total, = session.execute(s_count).first()
+    total = session.execute(s_count).scalar()
+
     if criterion:
         s = s.where(*criterion)
         s_count = s_count.where(*criterion)
-        filtered, = session.execute(s_count).first()
+        filtered = session.execute(s_count).scalar()
     else:
         filtered = total
     if order:
         s = s.order_by(*order)
-    s = s.offset(offset)
+    if offset:
+        if offset > filtered:
+            offset = 0
+        s = s.offset(offset)
     if limit:
         s = s.limit(limit)
-#   showed, = session.execute(s.count()).first()
 
     res = session.execute(s)
     names = res.keys()
@@ -86,3 +123,81 @@ def get_rows_base(session, mtable, offset, limit=None, criterion=None, order=Non
     if page > pages: page = 0
 
     return names, rows, total, filtered, showed, page, pages, s
+
+
+def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=None):
+    s = select('*').select_from(text("({0})".format(sql)))
+    total = session.execute(s.count()).scalar()
+
+    if criterion:
+        s = s.where(' and '.join(criterion))
+        filtered = session.execute(s.count()).scalar()
+    else:
+        filtered = total
+    if order:
+        s = s.order_by(', '.join(order))
+    if offset:
+        if offset > filtered:
+            offset = 0
+        s = s.offset(offset)
+    if limit:
+        s = s.limit(limit)
+
+    res = session.execute(s)
+    names = res.keys()
+#   rows = [i for i in res.fetchall()]
+    rows = [[j for j in i] for i in res.fetchall()]
+    showed = len(rows)
+
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
+    if page > pages: page = 0
+
+    return names, rows, total, filtered, showed, page, pages, s
+
+
+def get_count(query):
+    return query.with_entities(func.count()).scalar()
+
+
+def get_rows_ext(session, metadata, tables, offset=0, limit=None, criterion=None, order=None):
+    mtables = [metadata.tables.get(i) for i in tables.split('|')]
+    mtables = [i for i in mtables if i is not None]
+
+    query = session.query(*mtables)
+
+    for i in mtables:
+        clauses = [key.column==key.parent for key in i.foreign_keys if key.column.table in mtables]
+        l = len(clauses)
+        if l == 1:
+            query = query.join(i, *clauses)
+        elif l > 1:
+            query = query.join(i, and_(*clauses))
+
+    total = query.count()
+
+    if criterion:
+        query = query.filter(*criterion)
+        filtered = query.count()
+    else:
+        filtered = total
+    if order:
+        query = query.order_by(*order)
+    if offset:
+        if offset > filtered:
+            offset = 0
+        query = query.offset(offset)
+    if limit:
+        query = query.limit(limit)
+
+    res = session.execute(query)
+    names = res.keys()
+#   rows = [i for i in res.fetchall()]
+    rows = [[j for j in i] for i in res.fetchall()]
+    showed = len(rows)
+
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
+    if page > pages: page = 0
+
+    return names, rows, total, filtered, showed, page, pages, query
