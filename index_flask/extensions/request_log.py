@@ -107,7 +107,7 @@ def ext_request_log():
     if offset > filtered:
         offset = 0
     s = s.order_by(*order).offset(offset).limit(limit)
-    showed = s.count()
+    shown = s.count()
 
     records = s.all()
     names = [i.name for i in RequestRecord.__table__.c]
@@ -117,13 +117,13 @@ def ext_request_log():
     page = int(math.floor(offset / limit)) + 1 if limit else 0
     if page > pages: page = 0
 
-    return render_template('db/table_params.html',
+    return render_template('db/table.html',
              form = form,
              names = names,
              rows = rows,
              total = total,
              filtered = filtered,
-             showed = showed,
+             shown = shown,
              page = page,
              pages = pages,
              debug = str(s),

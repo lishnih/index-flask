@@ -2,8 +2,12 @@ body {
   background-color: #d0d0ff;
 }
 
-textarea, select, input, input[type="text"] {
+textarea, select, input, input[type="text"], pre {
   background-color: #eaeaff;
+}
+
+pre {
+  background-color: #efefcf;
 }
 
 input[type="password"] {

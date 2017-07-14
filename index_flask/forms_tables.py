@@ -89,16 +89,16 @@ class TableCondForm(Form):
     def get_criterion(self):
         criterion = []
         if self.column1.data and self.column1.data <> 'None':
-            clause = self.parse_clause(self.column1.data, [self.condition1.data, self.value1.data])
-            if clause is not None:
+            mclause, clause = self.parse_clause(self.column1.data, [self.condition1.data, self.value1.data])
+            if clause:
                 criterion.append(clause)
         if self.column2.data and self.column2.data <> 'None':
-            clause = self.parse_clause(self.column2.data, [self.condition2.data, self.value2.data])
-            if clause is not None:
+            mclause, clause = self.parse_clause(self.column2.data, [self.condition2.data, self.value2.data])
+            if clause:
                 criterion.append(clause)
         if self.column3.data and self.column3.data <> 'None':
-            clause = self.parse_clause(self.column3.data, [self.condition3.data, self.value3.data])
-            if clause is not None:
+            mclause, clause = self.parse_clause(self.column3.data, [self.condition3.data, self.value3.data])
+            if clause:
                 criterion.append(clause)
 
         return criterion
@@ -107,82 +107,88 @@ class TableCondForm(Form):
     def get_order(self):
         order = []
         if self.sorting1.data and self.sorting1.data <> 'None':
-            sort_column = self.parse_order(self.sorting1.data, self.sort_dir1.data)
-            if sort_column is not None:
+            mcolumn, sort_column = self.parse_order(self.sorting1.data, self.sort_dir1.data)
+            if sort_column:
                 order.append(sort_column)
         if self.sorting2.data and self.sorting2.data <> 'None':
-            sort_column = self.parse_order(self.sorting2.data, self.sort_dir2.data)
-            if sort_column is not None:
+            mcolumn, sort_column = self.parse_order(self.sorting2.data, self.sort_dir2.data)
+            if sort_column:
                 order.append(sort_column)
         if self.sorting3.data and self.sorting3.data <> 'None':
-            sort_column = self.parse_order(self.sorting3.data, self.sort_dir3.data)
-            if sort_column is not None:
+            mcolumn, sort_column = self.parse_order(self.sorting3.data, self.sort_dir3.data)
+            if sort_column:
                 order.append(sort_column)
 
         return order
 
 
     def parse_clause(self, column, value):
-        mt = self.mtable is not None
-
-        if mt:
-            column = get_column(self.mtable, column)
-            if column is None:
+        mt = False
+        if self.mtable:
+            mt = True
+            mcolumn = get_column(self.mtable, column)
+            if mcolumn is None:
                 return
 
-        clause = None
+        clause = ''
+        mclause = None
+
         if value is None:
-            clause = column == None if mt else \
-                     "{0} is null".format(column)
+            clause = "{0} is null".format(column)
+            mclause = mcolumn == None if mt else clause
         elif isinstance(value, basestring) or isinstance(value, int):
-            clause = column == value if mt else \
-                     "{0}='{1}'".format(column, value)
+            clause = "{0}='{1}'".format(column, value)
+            mclause = mcolumn == value if mt else clause
         elif isinstance(value, float):
-            clause = column.like(value) if mt else \
-                     "{0} like '{1}'".format(column, value)
+            clause = "{0} like '{1}'".format(column, value)
+            mclause = mcolumn.like(value) if mt else clause
         else:
             condition, value = value
             if not condition and value:
-                clause = column == value if mt else \
-                         "{0}='{1}'".format(column, value)
+                clause = "{0}='{1}'".format(column, value)
+                mclause = mcolumn == value if mt else clause
             if condition == '=' or condition == '==':
-                clause = column == value if mt else \
-                         "{0}='{1}'".format(column, value)
+                clause = "{0}='{1}'".format(column, value)
+                mclause = mcolumn == value if mt else clause
             elif condition == '!=':
-                clause = column != value if mt else \
-                         "{0}!='{1}'".format(column, value)
+                clause = "{0}!='{1}'".format(column, value)
+                mclause = mcolumn != value if mt else clause
             elif condition == '~':
-                clause = column.like(value) if mt else \
-                         "{0} like '{1}'".format(column, value)
+                clause = "{0} like '{1}'".format(column, value)
+                mclause = mcolumn.like(value) if mt else clause
             elif condition == '!~':
-                clause = not_(column.like(value)) if mt else \
-                         "{0} not like '{1}'".format(column, value)
+                clause = "{0} not like '{1}'".format(column, value)
+                mclause = not_(mcolumn.like(value)) if mt else clause
             elif condition == '>':
-                clause = column > value if mt else \
-                         "{0}>'{1}'".format(column, value)
+                clause = "{0}>'{1}'".format(column, value)
+                mclause = mcolumn > value if mt else clause
             elif condition == '>=':
-                clause = column >= value if mt else \
-                         "{0}>='{1}'".format(column, value)
+                clause = "{0}>='{1}'".format(column, value)
+                mclause = mcolumn >= value if mt else clause
             elif condition == '<':
-                clause = column < value if mt else \
-                         "{0}<'{1}'".format(column, value)
+                clause = "{0}<'{1}'".format(column, value)
+                mclause = mcolumn < value if mt else clause
             elif condition == '<=':
-                clause = column <= value if mt else \
-                         "{0}<='{1}'".format(column, value)
+                clause = "{0}<='{1}'".format(column, value)
+                mclause = mcolumn <= value if mt else clause
             elif condition == 'consist':
-                clause = column.like("%{0}%".format(value)) if mt else \
-                         "{0} like '%{1}%'".format(column, value)
+                clause = "{0} like '%{1}%'".format(column, value)
+                mclause = mcolumn.like("%{0}%".format(value)) if mt else clause
 
-        return clause
+        return mclause, clause
 
 
     def parse_order(self, column, cond):
+        sort_column = "{0} desc".format(column) if cond == 'DESC' else column
+
         if self.mtable is not None:
             column = get_column(self.mtable, column)
             if column is None:
                 return
 
-            return desc(column) if cond == 'DESC' else column
+            mcolumn = desc(column) if cond == 'DESC' else column
 
         else:
-            return "{0} desc".format(column) if cond == 'DESC' else column
+            mcolumn = sort_column
+
+        return mcolumn, sort_column

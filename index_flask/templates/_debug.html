@@ -1,11 +1,8 @@
 {% macro debug_footer() %}
 {%- if debug %}
-<hr />
-<div>
-  {%- autoescape false %}
-  {{ debug }}
-  {%- endautoescape %}
-</div>
+<pre>
+{{ debug }}
+</pre>
 {%- endif %}
 {%- endmacro %}
 

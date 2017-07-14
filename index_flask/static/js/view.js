@@ -77,20 +77,26 @@ jQuery( function($) {
       return;
     }
 
+    url = new URL(location.href);
+    url.searchParams.append('format', 'json');
+
     data = {
       "offset": offset,
     };
 
+    if (typeof obj != "undefined")
+      data['query'] = $.toJSON(obj['table1']['query']);
+
     $.ajax({
       type: "POST",
       dataType: "json",
-      url: this.baseURI,
+      url: url,
       data: data,
 //    async: false,
       success: function(data) {
         append_rows(tr, data.rows);
 
-        if ( data.filtered_rows_count > data.offset + data.limit ) {
+        if ( data.filtered > data.offset + data.limit ) {
           td.data("offset", data.offset + data.limit);
           $("#shown").text(data.offset + data.limit);
         } else {
@@ -99,7 +105,7 @@ jQuery( function($) {
         }
       },
       error: function(xhr, error, thrown) {
-        debug(thrown);
+        debug("Ошибка при получении данных json!");
       },
     });
   } );
@@ -139,9 +145,12 @@ jQuery( function($) {
 
   function append_rows(tr, rows) {
     rows.forEach(function(entry) {
-      var td = "";
+      var td = "<td></td>";
       entry.forEach(function(i) {
-        td += "<td>" + i + "</td>";
+        if ( i == null )
+          td += '<td><i class="inactive">null<i></td>';
+        else
+          td += "<td>" + i + "</td>";
       });
       tr.before("<tr>" + td + "</tr>");
     });

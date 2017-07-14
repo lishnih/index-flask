@@ -92,7 +92,47 @@ def get_relative_tables(metadata, tablename):
                 yield i.parent.table.name
 
 
-def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=None):
+def get_count(query):
+    return query.with_entities(func.count()).scalar()
+
+
+def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=None, plain=1):
+    s = select('*').select_from(text("({0})".format(sql)))
+    total = session.execute(s.count()).scalar()
+
+    if criterion:
+        s = s.where(' and '.join(criterion))
+        filtered = session.execute(s.count()).scalar()
+    else:
+        filtered = total
+    if order:
+        s = s.order_by(', '.join(order))
+    if offset:
+        if offset > filtered:
+            offset = 0
+        s = s.offset(offset)
+    if limit:
+        s = s.limit(limit)
+
+    res = session.execute(s)
+    names = res.keys()
+
+    if plain:
+#       rows = [i for i in res.fetchall()]
+        rows = [[j for j in i] for i in res.fetchall()]
+    else:
+        rows = [dict(i.items()) for i in res.fetchall()]
+
+    shown = len(rows)
+
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
+    if page > pages: page = 0
+
+    return names, rows, total, filtered, shown, page, pages, s
+
+
+def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=None, plain=1):
     s = select('*').select_from(mtable)
     s_count = select([func.count('*')]).select_from(mtable)
     total = session.execute(s_count).scalar()
@@ -114,56 +154,22 @@ def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=N
 
     res = session.execute(s)
     names = res.keys()
-#   rows = [i for i in res.fetchall()]
-    rows = [[j for j in i] for i in res.fetchall()]
-    showed = len(rows)
 
-    pages = int(math.ceil(filtered / limit)) if limit else 0
-    page = int(math.floor(offset / limit)) + 1 if limit else 0
-    if page > pages: page = 0
-
-    return names, rows, total, filtered, showed, page, pages, s
-
-
-def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=None):
-    s = select('*').select_from(text("({0})".format(sql)))
-    total = session.execute(s.count()).scalar()
-
-    if criterion:
-        s = s.where(' and '.join(criterion))
-        filtered = session.execute(s.count()).scalar()
+    if plain:
+        rows = [[j for j in i] for i in res.fetchall()]
     else:
-        filtered = total
-    if order:
-        s = s.order_by(', '.join(order))
-    if offset:
-        if offset > filtered:
-            offset = 0
-        s = s.offset(offset)
-    if limit:
-        s = s.limit(limit)
+        rows = [dict(i.items()) for i in res.fetchall()]
 
-    res = session.execute(s)
-    names = res.keys()
-#   rows = [i for i in res.fetchall()]
-    rows = [[j for j in i] for i in res.fetchall()]
-    showed = len(rows)
+    shown = len(rows)
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
     if page > pages: page = 0
 
-    return names, rows, total, filtered, showed, page, pages, s
+    return names, rows, total, filtered, shown, page, pages, s
 
 
-def get_count(query):
-    return query.with_entities(func.count()).scalar()
-
-
-def get_rows_ext(session, metadata, tables, offset=0, limit=None, criterion=None, order=None):
-    mtables = [metadata.tables.get(i) for i in tables.split('|')]
-    mtables = [i for i in mtables if i is not None]
-
+def get_rows_ext(session, mtables, offset=0, limit=None, criterion=None, order=None, plain=1):
     query = session.query(*mtables)
 
     for i in mtables:
@@ -177,11 +183,13 @@ def get_rows_ext(session, metadata, tables, offset=0, limit=None, criterion=None
     total = query.count()
 
     if criterion:
+        criterion = [text(i) for i in criterion]
         query = query.filter(*criterion)
         filtered = query.count()
     else:
         filtered = total
     if order:
+        order = [text(i) for i in order]
         query = query.order_by(*order)
     if offset:
         if offset > filtered:
@@ -192,12 +200,16 @@ def get_rows_ext(session, metadata, tables, offset=0, limit=None, criterion=None
 
     res = session.execute(query)
     names = res.keys()
-#   rows = [i for i in res.fetchall()]
-    rows = [[j for j in i] for i in res.fetchall()]
-    showed = len(rows)
+
+    if plain:
+        rows = [[j for j in i] for i in res.fetchall()]
+    else:
+        rows = [dict(i.items()) for i in res.fetchall()]
+
+    shown = len(rows)
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
     if page > pages: page = 0
 
-    return names, rows, total, filtered, showed, page, pages, query
+    return names, rows, total, filtered, shown, page, pages, query

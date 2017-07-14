@@ -13,6 +13,9 @@ from sqlalchemy.sql import select
 
 from ..core.backwardcompat import *
 from ..core.db import getDbList, initDb, get_rows_base, get_rows_ext
+from ..core.obj_helpers import get_query_string, get_query
+from ..core.render_response import render_format
+from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
 from ..forms_tables import TableCondForm
 
@@ -35,26 +38,30 @@ def get_dbs_table(home, db=None):
     return names, dbs_table
 
 
-def views_ndt_db_func(db, tables):
+def views_db_func(db, tables):
+    format = request.args.get('format')
+
+
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
-        return render_template('p/empty.html')
+        flash_t = "База данных не существует: {0}".format(db), 'error'
+        return render_format('p/empty.html', format, flash_t)
 
 
     mtables = [metadata.tables.get(i) for i in tables.split('|')]
     mtables = [i for i in mtables if i is not None]
 
     if not len(mtables):
-        flash("Проверьте таблицы: {0}".format(tables), 'error')
-        return render_template('p/empty.html')
+        flash_t("Проверьте таблицы: {0}".format(tables), 'error')
+        return render_format('p/empty.html', format, flash_t)
 
-    mtable = mtables[0]
 
-    form = TableCondForm(request.form, mtables)
+    templates_list = [i for i in get_user_templates(current_user)]
+
+    form = TableCondForm(request.form, mtables, templates_list=templates_list)
     if form.offset.data is None or form.limit.data is None:
         form.offset.data = 0
-        form.limit.data = 100
+        form.limit.data = 30
 
     if request.method == 'POST':
         form.validate()
@@ -65,21 +72,72 @@ def views_ndt_db_func(db, tables):
     limit = form.limit.data
 
 
-    names, rows, total, filtered, showed, page, pages, s = get_rows_ext(session,
-        metadata, tables, offset, limit, criterion, order)
+    query = get_query(request.form.get('query'))
+    if query:
+#       db = query.get('db')
+#       tables = query.get('tables')
+        criterion = query.get('criterion')
+        order = query.get('order')
 
 
-    return render_template('db/table_params.html',
+    offset = int(request.form.get('offset', 0))
+    limit = int(request.form.get('limit', 30))
+
+
+    if 'all' in request.args.keys():
+        offset = 0
+        limit = 0
+
+
+    if form.template.data and form.template.data <> 'None':
+        template_name = 'custom/{0}.html'.format(form.template.data)
+        if form.unlim.data == 'on':
+            limit = 0
+    else:
+        template_name = 'db/table.html'
+
+
+    request_url = request.full_path
+    query_str = get_query_string(
+                  ver = 1,
+                  db = db,
+                  tables = tables,
+                  offset = offset,
+                  limit = limit,
+                  criterion = criterion,
+                  order = order,
+                )
+
+
+    names, rows, total, filtered, shown, page, pages, s = get_rows_ext(
+        session, mtables, offset, limit, criterion, order)
+
+
+    if form.template.data and form.template.data <> 'None':
+        debug = ''
+    else:
+        debug = str(s)
+
+
+    # Выводим
+    return render_format(template_name, format,
+             title = 'Database: {0}'.format(db),
              form = form,
+             action = request_url,
+             db = db,
              names = names,
              rows = rows,
              total = total,
              filtered = filtered,
-             showed = showed,
+             shown = shown,
              page = page,
              pages = pages,
-             action = "?tables={0}".format(tables),
-             debug = str(s),
+             colspan = len(names),
+             offset = offset,
+             limit = limit,
+             template = templates_list,
+             query_str = query_str,
+             debug = debug,
            )
 
 
@@ -93,15 +151,15 @@ def views_db(db=None):
     obj = []
 
     if db:
-        db_uri, session, metadata = initDb(current_user.home, db)
-        if not db_uri:
-            flash("Базы данных не существует: {0}".format(db), 'error')
-            return render_template('p/empty.html')
-
-
         tables = request.args.get('tables')
         if tables:
-            return views_ndt_db_func(db, tables)
+            return views_db_func(db, tables)
+
+
+        db_uri, session, metadata = initDb(current_user.home, db)
+        if not db_uri:
+            flash("База данных не существует: {0}".format(db), 'error')
+            return render_template('p/empty.html')
 
 
         table_names = ['Tables', 'w/options']
@@ -124,7 +182,7 @@ def views_db(db=None):
 def views_db_session(db):
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     return html(session)
@@ -135,7 +193,7 @@ def views_db_session(db):
 def views_db_metadata(db):
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     return html(metadata)
@@ -149,7 +207,7 @@ def views_db_info(db):
 
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     table_names = ['Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement', 'unique', 'default', 'foreign_keys', 'onupdate']
@@ -176,7 +234,7 @@ def views_db_info(db):
 def views_db_table_info(db, table):
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     mtable = metadata.tables.get(table)
@@ -192,7 +250,7 @@ def views_db_table_info(db, table):
 def views_db_table_column_info(db, table, column):
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     mtable = metadata.tables.get(table)
@@ -213,7 +271,7 @@ def views_db_table_column_info(db, table, column):
 def views_db_table_column_distinct(db, table, column):
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
+        flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
     mtable = metadata.tables.get(table)
@@ -241,47 +299,44 @@ def views_db_table_column_distinct(db, table, column):
 @app.route('/db/<db>/<table>/', methods=["GET", "POST"])
 @login_required
 def views_db_table(db, table):
+    format = request.args.get('format')
+
+
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
-        flash("Базы данных не существует: {0}".format(db), 'error')
-        return render_template('p/empty.html')
+        flash_t = "База данных не существует: {0}".format(db), 'error'
+        return render_format('p/empty.html', format, flash_t)
 
     mtable = metadata.tables.get(table)
     if mtable is None:
-        flash("Таблицы не существует: {0}".format(table), 'error')
-        return render_template('p/empty.html')
+        flash_t = "Таблица не существует: {0}".format(table), 'error'
+        return render_format('p/empty.html', format, flash_t)
+
 
     offset = int(request.form.get('offset', 0))
-    limit = int(request.form.get('limit', 100))
+    limit = int(request.form.get('limit', 30))
 
     if 'all' in request.args.keys():
         offset = 0
         limit = 0
 
-    names, rows, total, filtered, showed, page, pages, s = get_rows_base(session, mtable, offset, limit)
+
+    names, rows, total, filtered, shown, page, pages, s = get_rows_base(session, mtable, offset, limit)
+
 
     # Выводим
-    if request.method == 'POST':
-        return jsonify(
-                 full_rows_count = total,
-                 filtered_rows_count = filtered,
-                 rows_count = showed,
-                 offset = offset,
-                 limit = limit,
-                 rows = rows,
-               )
-    else:
-        return render_template('db/table.html',
-                 title = 'Database: {0}'.format(db),
-                 db = db,
-                 full_rows_count = total,
-                 filtered_rows_count = filtered,
-                 rows_count = showed,
-                 offset = offset,
-                 limit = limit,
-                 colspan = len(names),
-                 names = names,
-                 rows = rows,
-#                sequence = True,
-                 debug = str(s),
-               )
+    return render_format('db/table.html', format,
+             title = 'Database: {0}'.format(db),
+             db = db,
+             names = names,
+             rows = rows,
+             total = total,
+             filtered = filtered,
+             shown = shown,
+             page = page,
+             pages = pages,
+             colspan = len(names),
+             offset = offset,
+             limit = limit,
+             debug = str(s),
+           )

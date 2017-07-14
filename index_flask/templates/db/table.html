@@ -1,51 +1,155 @@
 {% extends "_layout.html" %}
 
+
+{%- if query_str %}
+{%- block head %}
+
+  <script type="text/javascript">
+
+    obj = {};
+    tables = ['table1'];
+
+    obj['table1'] = {
+      {%- autoescape false %}
+      "query": {{ query_str }}
+      {%- endautoescape %}
+    };
+
+  </script>
+
+{%- endblock %}
+{%- endif %}
+
+
 {%- block body %}
 
-<div class="serial">
-  Count: {{ full_rows_count }} > {{ filtered_rows_count }} ({{ rows_count }}) ::&nbsp;
-</div>
+{%- from "_tablehelpers.html" import render_tr, render_tr_filter, render_tr_sorting, render_navigator %}
 
-<div class="serial">
-  <a href="/db/">Список баз данных</a> ::&nbsp;
-</div>
+{%- if form %}
+{%- if action %}
+<form id="table_params" method="post" action="{{ action }}">
+{%- else %}
+<form id="table_params" method="post" action="#">
+{%- endif %}
 
-<div class="serial">
-  <a href="/db/{{ db }}">{{ db }}</a>
-</div>
+<div class="tabular">
+  <div class="serial">
+    <table border="1">
+      <tr>
+        <th colspan="2"><i>Вывод</i></th>
+      </tr>
+      {{ render_tr(form.offset) }}
+      {{ render_tr(form.limit) }}
+      <tr>
+        <td></td>
+        <td>{{ render_navigator(page, pages, filtered) }}</td>
+      </tr>
+    </table>
+  </div>
 
-<br />
+  <div class="serial">
+    <table border="1">
+      <tr>
+        <th colspan="3"><i>Фильтр</i>
+          {%- if total %}
+          <div class="right" style="font-weight: normal;"><i>Выведено {{ shown }} из {{ filtered }} (без фильтра {{ total }})</i></div>
+          {%- endif %}
+        </th>
+      </tr>
+      {{ render_tr_filter(form.column1, form.condition1, form.value1) }}
+      {{ render_tr_filter(form.column2, form.condition2, form.value2) }}
+      {{ render_tr_filter(form.column3, form.condition3, form.value3) }}
+    </table>
+  </div>
 
-<table border="1">
-  {%- if names %}
-    <tr>
-      {%- if sequence %}
-        <th>#</th>
-      {%- endif %}
-      {%- for name in names %}
-        <th>{{ name }}</th>
-      {%- endfor %}
-    </tr>
+  <div class="serial">
+    <table border="1">
+      <tr>
+        <th colspan="2"><i>Сортировка</i></th>
+      </tr>
+      {{ render_tr_sorting(form.sorting1, form.sort_dir1) }}
+      {{ render_tr_sorting(form.sorting2, form.sort_dir2) }}
+      {{ render_tr_sorting(form.sorting3, form.sort_dir3) }}
+    </table>
+  </div>
+
+  {%- if template %}
+  <div class="serial">
+    <table border="1">
+      <tr>
+        <th colspan="2"><i>Опции</i></th>
+      </tr>
+      {{ render_tr(form.template) }}
+      {{ render_tr(form.unlim) }}
+    </table>
+  </div>
   {%- endif %}
+</div>
 
-  {%- for row in rows %}
+
+<div>
+  <input type=submit value="Proceed">
+</div>
+
+</form>
+{%- else %}
+{%- if total %}
+<div><i>Выведено {{ shown }} из {{ filtered }} (без фильтра {{ total }})</i></div>
+{%- endif %}
+{%- endif %}
+
+
+<div class="table">
+<table id="table1" border="1">
+  <thead>
+    {%- if names %}
     <tr>
-      {%- if sequence %}
-      <td><i class="inactive">{{ loop.index }}</i></td>
-      {%- endif %}
-      {%- for col in row %}
-        <td>{{ col }}</td>
+      <th>#</th>
+      {%- for name in names %}
+      <th>{{ name }}</th>
       {%- endfor %}
     </tr>
-  {%- endfor %}
+    {%- endif %}
+  </thead>
 
-  {%- if filtered_rows_count > offset + limit %}
+  <tbody>
+    {%- if rows %}
+    {%- for row in rows %}
     <tr>
-        <td class="a extendtable" colspan="{{ colspan }}" data-offset="{{ offset + limit }}">
-Показать ещё {{ limit }} (показано <span id="shown">{{ offset + limit }}</span> записей) | <a href="?all">Показать всё</a>
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      {%- autoescape false %}
+      {%- for col in row %}
+      {%- if col is none %}
+      <td><i class="inactive">null<i></td>
+      {%- else %}
+      <td>{{ col }}</td>
+      {%- endif %}
+      {%- endfor %}
+      {%- endautoescape %}
+    </tr>
+    {%- endfor %}
+
+
+    {%- if colspan and limit and filtered > offset + limit %}
+    <tr>
+        <td class="a extendtable" colspan="{{ colspan+1 }}" data-offset="{{ offset + limit }}">
+          Показать ещё {{ limit }} |
+{%- if action %}
+          <a href="{{ action }}&all">Показать всё</a>
+{%- else %}
+          <a href="?all">Показать всё</a>
+{%- endif %}
         </td>
     </tr>
-  {%- endif %}
+    {%- endif %}
+
+
+    {%- endif %}
+  </tbody>
 </table>
+{%- if not rows %}
+<i>Нет данных</i>
+{%- endif %}
+</div>
 
 {%- endblock %}
