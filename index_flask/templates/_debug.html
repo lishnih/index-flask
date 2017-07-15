@@ -7,26 +7,52 @@
 {%- endmacro %}
 
 
+{% macro dump_value(value) %}
+{%- if value is mapping %}
+  {{ dump_dict(value) }}
+{%- elif value is none %}
+  <i class="inactive">null</i>
+{%- else %}
+  {{ value }}
+{%- endif %}
+{%- endmacro %}
+
+
+{% macro dump_value_unsafe(value) %}
+{%- autoescape false %}
+{%- if value is mapping %}
+  {{ dump_dict(value) }}
+{%- elif value is none %}
+  <i class="inactive">null</i>
+{%- else %}
+  {{ value }}
+{%- endif %}
+{%- endautoescape %}
+{%- endmacro %}
+
+
 {% macro dump_dict(obj) %}
-<dl>
-  {%- for key, value in obj | dictsort %}
-  <dt>{{ key }}</dt>
-  <dd style="border: .1em dotted blue;">
-  {%- if value is mapping %}
-    {{ dump_dict(value) }}
-  {%- else %}
-    {{ value }}
-  {%- endif %}
-  </dd>
-  {%- endfor %}
-</dl>
+{%- if obj is mapping %}
+<table border="1">
+{%- for key, value in obj | dictsort %}
+<tr>
+  <th>{{ key }}</th>
+  <td>
+{{ dump_value(value) }}
+  </td>
+</tr>
+{%- endfor %}
+</table>
+{%- else %}
+<i>Value is not mapping:</i> {{ dump_value(obj) }}<br />
+{%- endif %}
 {%- endmacro %}
 
 
 {% macro dump_list(obj) %}
 <ul>
   {%- for value in obj %}
-  <li>{{ value }}</li>
+  <li>{{ dump_value(value) }}</li>
   {%- endfor %}
 </ul>
 {%- endmacro %}
@@ -35,9 +61,34 @@
 {% macro dump_list_a(obj) %}
 <ul>
   {%- for value in obj %}
-  <li class=a><a href="{{ value }}">{{ value }}</a></li>
+  <li class=a><a href="{{ value }}">{{ dump_value(value) }}</a></li>
   {%- endfor %}
 </ul>
+{%- endmacro %}
+
+
+{% macro dump_json(rows) %}
+{%- for row in rows %}
+{%- if row is mapping %}
+<table border="1">
+<tr>
+{%- for key, value in row | dictsort %}
+<th>{{ key }}</th>
+{%- endfor %}
+</tr>
+<tr>
+{%- for key, value in row | dictsort %}
+<td>
+{{ dump_value(value) }}
+</td>
+{%- endfor %}
+</tr>
+</table>
+{%- else %}
+<i>Value is not mapping:</i> {{ dump_value(row) }}<br />
+{%- endif %}
+<br />
+{%- endfor %}
 {%- endmacro %}
 
 
@@ -61,11 +112,9 @@
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
       {%- for col in row %}
-      {%- if col is none %}
-      <td><i class="inactive">null<i></td>
-      {%- else %}
-      <td>{{ col }}</td>
-      {%- endif %}
+      <td>
+      {{ dump_value(col) }}
+      </td>
       {%- endfor %}
     </tr>
     {%- endfor %}
@@ -80,6 +129,7 @@
 
 
 {% macro dump_table_unsafe(names, rows) %}
+{%- autoescape false %}
 <div class="table">
 <table border="1">
   <thead>
@@ -98,15 +148,11 @@
     {%- for row in rows %}
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
-      {%- autoescape false %}
       {%- for col in row %}
-      {%- if col is none %}
-      <td><i class="inactive">null<i></td>
-      {%- else %}
-      <td>{{ col }}</td>
-      {%- endif %}
+      <td>
+      {{ dump_value_unsafe(col) }}
+      </td>
       {%- endfor %}
-      {%- endautoescape %}
     </tr>
     {%- endfor %}
     {%- endif %}
@@ -116,4 +162,5 @@
 <i>Нет данных</i>
 {%- endif %}
 </div>
+{%- endautoescape %}
 {%- endmacro %}
