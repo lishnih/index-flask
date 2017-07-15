@@ -1,24 +1,48 @@
 {% extends "_layout.html" %}
 
 
-{%- if query_str %}
 {%- block head %}
 
   <script type="text/javascript">
 
-    obj = {};
-    tables = ['table1'];
+    jQuery( function($) {
 
-    obj['table1'] = {
-      {%- autoescape false %}
-      "query": {{ query_str }}
-      {%- endautoescape %}
-    };
+
+      // Share dialog
+      $( "#dialog" ).dialog({
+      	autoOpen: false,
+      	width: 400,
+      	buttons: [
+      		{
+      			text: "Ok",
+      			click: function() {
+      				$( this ).dialog( "close" );
+      			}
+      		},
+      	]
+      });
+
+
+      $("table#table1 th").click(function( event ) {
+        th = $(this);
+        table = th.closest("table");
+
+        var offset = table.data("offset");
+        var limit = table.data("limit");
+        var query = table.data("query");
+
+        $( "#dialog #dialog_content" ).html("offset: {0}<br />limit: {1}<br />{2}".format(offset, limit, var_dump1(query)));
+      	$( "#dialog" ).attr( "title", "info" );
+      	$( "#dialog" ).dialog( "open" );
+      	event.preventDefault();
+      });
+
+
+    } );
 
   </script>
 
 {%- endblock %}
-{%- endif %}
 
 
 {%- block body %}
@@ -73,7 +97,7 @@
     </table>
   </div>
 
-  {%- if template %}
+  {%- if templates_list %}
   <div class="serial">
     <table border="1">
       <tr>
@@ -81,6 +105,7 @@
       </tr>
       {{ render_tr(form.template) }}
       {{ render_tr(form.unlim) }}
+      {{ render_tr(form.plain) }}
     </table>
   </div>
   {%- endif %}
@@ -100,7 +125,8 @@
 
 
 <div class="table">
-<table id="table1" border="1">
+<table id="table1" border="1" data-offset="{{ offset }}" data-limit="{{ limit }}"
+       data-query='{{ query_json }}'>
   <thead>
     {%- if names %}
     <tr>
@@ -132,7 +158,7 @@
 
     {%- if colspan and limit and filtered > offset + limit %}
     <tr>
-        <td class="a extendtable" colspan="{{ colspan+1 }}" data-offset="{{ offset + limit }}">
+        <td class="a extendtable" colspan="{{ colspan+1 }}">
           Показать ещё {{ limit }} |
 {%- if action %}
           <a href="{{ action }}&all">Показать всё</a>
@@ -150,6 +176,10 @@
 {%- if not rows %}
 <i>Нет данных</i>
 {%- endif %}
+</div>
+
+<div id="dialog" title="Dialog">
+  <div id="dialog_content"></div>
 </div>
 
 {%- endblock %}

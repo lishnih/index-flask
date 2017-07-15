@@ -46,6 +46,7 @@ class TableCondForm(Form):
 
     template = SelectField('Template')
     unlim = SelectField('Unlimited')
+    plain = SelectField('Plain')
 
 
     def __init__(self, form, mtable=None, columns=None, templates_list=None, **kwargs):
@@ -76,6 +77,7 @@ class TableCondForm(Form):
         self.template.choices = fields
 
         self.unlim.choices = [['off', 'Off'], ['on', 'On']]
+        self.plain.choices = [['on', 'On'], ['off', 'Off']]
 
 
     def validate(self):

@@ -5,6 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
+import json
+
 from flask import request, render_template, jsonify, url_for, flash
 
 from flask_login import login_required, current_user
@@ -13,7 +15,6 @@ from sqlalchemy.sql import select
 
 from ..core.backwardcompat import *
 from ..core.db import getDbList, initDb, get_rows_base, get_rows_ext
-from ..core.obj_helpers import get_query_string, get_query
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
@@ -39,13 +40,16 @@ def get_dbs_table(home, db=None):
 
 
 def views_db_func(db, tables):
-    format = request.args.get('format')
+    template_name = 'db/table.html'
+    templates_list = None
+    form = None
+    limit_default = 15
 
 
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
-        return render_format('p/empty.html', format, flash_t)
+        return render_format('p/empty.html', flash_t)
 
 
     mtables = [metadata.tables.get(i) for i in tables.split('|')]
@@ -53,35 +57,47 @@ def views_db_func(db, tables):
 
     if not len(mtables):
         flash_t("Проверьте таблицы: {0}".format(tables), 'error')
-        return render_format('p/empty.html', format, flash_t)
+        return render_format('p/empty.html', flash_t)
 
 
-    templates_list = [i for i in get_user_templates(current_user)]
-
-    form = TableCondForm(request.form, mtables, templates_list=templates_list)
-    if form.offset.data is None or form.limit.data is None:
-        form.offset.data = 0
-        form.limit.data = 30
-
-    if request.method == 'POST':
-        form.validate()
-
-    criterion = form.get_criterion()
-    order = form.get_order()
-    offset = form.offset.data
-    limit = form.limit.data
+    offset = request.values.get('offset', '')
+    offset = int(offset) if offset.isdigit() else 0
+    limit = request.values.get('limit', '')
+    limit = int(limit) if limit.isdigit() else limit_default
+    query_json = request.values.get('query_json')
 
 
-    query = get_query(request.form.get('query'))
-    if query:
+    if query_json:
+        query = json.loads(query_json)
 #       db = query.get('db')
 #       tables = query.get('tables')
         criterion = query.get('criterion')
         order = query.get('order')
 
 
-    offset = int(request.form.get('offset', 0))
-    limit = int(request.form.get('limit', 30))
+    else:
+        templates_list = [i for i in get_user_templates(current_user)]
+
+        form = TableCondForm(request.values, mtables, templates_list=templates_list)
+        form.offset.data = str(offset)
+        form.limit.data = str(limit_default)
+
+
+        if request.method == 'POST':
+            form.validate()
+
+
+        criterion = form.get_criterion()
+        order = form.get_order()
+#       offset = form.offset.data
+#       limit = form.limit.data
+        template = form.template.data
+
+
+        if template and template <> 'None':
+            template_name = 'custom/{0}.html'.format(template)
+            if form.unlim.data == 'on':
+                limit = 0
 
 
     if 'all' in request.args.keys():
@@ -89,38 +105,24 @@ def views_db_func(db, tables):
         limit = 0
 
 
-    if form.template.data and form.template.data <> 'None':
-        template_name = 'custom/{0}.html'.format(form.template.data)
-        if form.unlim.data == 'on':
-            limit = 0
-    else:
-        template_name = 'db/table.html'
-
-
     request_url = request.full_path
-    query_str = get_query_string(
-                  ver = 1,
-                  db = db,
-                  tables = tables,
-                  offset = offset,
-                  limit = limit,
-                  criterion = criterion,
-                  order = order,
-                )
+    query_json = json.dumps(dict(
+                   ver = 1,
+                   db = db,
+                   tables = tables,
+                   offset = offset,
+                   limit = limit,
+                   criterion = criterion,
+                   order = order,
+                 ))
 
 
     names, rows, total, filtered, shown, page, pages, s = get_rows_ext(
         session, mtables, offset, limit, criterion, order)
 
 
-    if form.template.data and form.template.data <> 'None':
-        debug = ''
-    else:
-        debug = str(s)
-
-
     # Выводим
-    return render_format(template_name, format,
+    return render_format(template_name,
              title = 'Database: {0}'.format(db),
              form = form,
              action = request_url,
@@ -135,9 +137,9 @@ def views_db_func(db, tables):
              colspan = len(names),
              offset = offset,
              limit = limit,
-             template = templates_list,
-             query_str = query_str,
-             debug = debug,
+             templates_list = templates_list,
+             query_json = query_json,
+             debug = str(s),
            )
 
 
@@ -299,9 +301,6 @@ def views_db_table_column_distinct(db, table, column):
 @app.route('/db/<db>/<table>/', methods=["GET", "POST"])
 @login_required
 def views_db_table(db, table):
-    format = request.args.get('format')
-
-
     db_uri, session, metadata = initDb(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
@@ -325,7 +324,7 @@ def views_db_table(db, table):
 
 
     # Выводим
-    return render_format('db/table.html', format,
+    return render_format('db/table.html',
              title = 'Database: {0}'.format(db),
              db = db,
              names = names,

@@ -101,12 +101,12 @@ def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=Non
     total = session.execute(s.count()).scalar()
 
     if criterion:
-        s = s.where(' and '.join(criterion))
+        s = s.where(text(' and '.join(criterion)))
         filtered = session.execute(s.count()).scalar()
     else:
         filtered = total
     if order:
-        s = s.order_by(', '.join(order))
+        s = s.order_by(text(', '.join(order)))
     if offset:
         if offset > filtered:
             offset = 0

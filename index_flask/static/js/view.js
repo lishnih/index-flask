@@ -70,22 +70,25 @@ jQuery( function($) {
   $(".extendtable").click( function(event) {
     td = $(this);
     tr = td.closest("tr");
+    table = tr.closest("table");
 
-    var offset = td.data("offset");
+    var offset = table.data("offset");
     if ( offset == -1 ) {
       tr.remove();
       return;
     }
 
+    var limit = table.data("limit");
+    var query = table.data("query");
+
     url = new URL(location.href);
     url.searchParams.append('format', 'json');
 
     data = {
-      "offset": offset,
+      "offset": offset + limit,
+      "limit": limit,
+      "query_json": $.toJSON(query),
     };
-
-    if (typeof obj != "undefined")
-      data['query'] = $.toJSON(obj['table1']['query']);
 
     $.ajax({
       type: "POST",
@@ -97,11 +100,12 @@ jQuery( function($) {
         append_rows(tr, data.rows);
 
         if ( data.filtered > data.offset + data.limit ) {
-          td.data("offset", data.offset + data.limit);
-          $("#shown").text(data.offset + data.limit);
+          table.data("offset", data.offset);
+          table.data("limit", data.limit);
+//        $("#shown").text(data.offset + data.limit);
         } else {
           td.html("<i>Данные выведены полностью!</i>");
-          td.data("offset", -1);
+          table.data("offset", -1);
         }
       },
       error: function(xhr, error, thrown) {

@@ -21,22 +21,20 @@ def render_template_custom(tmpl_name, **kargs):
     return render_template(custom_name, **kargs)
 
 
-def render_format(tmpl_name, format=None, flash_t=None, **kargs):
-    if format == 'json':
-        if flash_t:
-            message, result = flash_t if len(flash_t) > 1 else flash_t, 'prompt'
-        else:
-            message, result = None, None
+def render_format(tmpl_name, flash_t=None, **kargs):
+    format = request.args.get('format')
 
+    if format == 'json':
         for key, val in kargs.items():
             if not isinstance(val, all_types):
                 kargs.pop(key)
 
-        return jsonify(
-                 result = result,
-                 message = message,
-                 **kargs
-               )
+        if flash_t:
+            message, result = flash_t if len(flash_t) > 1 else flash_t, 'prompt'
+            kargs['flash_cat'] = result
+            kargs['flash_message'] = message
+
+        return jsonify(**kargs)
 
     else:
         if flash_t:

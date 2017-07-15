@@ -61,7 +61,11 @@
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
       {%- for col in row %}
+      {%- if col is none %}
+      <td><i class="inactive">null<i></td>
+      {%- else %}
       <td>{{ col }}</td>
+      {%- endif %}
       {%- endfor %}
     </tr>
     {%- endfor %}
@@ -96,7 +100,11 @@
       <td><i class="inactive">{{ loop.index }}</i></td>
       {%- autoescape false %}
       {%- for col in row %}
+      {%- if col is none %}
+      <td><i class="inactive">null<i></td>
+      {%- else %}
       <td>{{ col }}</td>
+      {%- endif %}
       {%- endfor %}
       {%- endautoescape %}
     </tr>
