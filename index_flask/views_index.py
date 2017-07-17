@@ -15,10 +15,14 @@ from .core.backwardcompat import *
 from . import app
 
 
+##### Roles #####
+
 admin_permission = Permission(RoleNeed('admin'))
 debug_permission = Permission(RoleNeed('debug'))
 statistics_permission = Permission(RoleNeed('statistics'))
 
+
+### Routes ###
 
 @app.route("/")
 def index():

@@ -18,9 +18,27 @@ from ..core.db import getDbList, initDb, get_rows_plain
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..forms_tables import TableCondForm
-from ..models import db, SQLTemplate
+from ..models import db
 
 from .. import app
+
+
+##### Models #####
+
+class SQLTemplate(db.Model):  # Rev. 2017-07-16
+    __tablename__ = 'sqltemplate'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    value = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
+    created = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, name, value=None, description=None):
+        self.name = name
+        self.value = value
+        self.description = description
+        self.created = datetime.utcnow()
 
 
 ### Interface ###
@@ -79,7 +97,7 @@ def views_query_func(db, id):
         try:
             res = session.execute(s)
         except Exception, e:
-            flash_t = "Ошибка при выполнении запроса: {0}".format(id), 'error'
+            flash_t = "Ошибка при выполнении запроса: '{0}'".format(e.message), 'error'
             return render_format('p/empty.html', flash_t)
 
 

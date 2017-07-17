@@ -7,11 +7,16 @@ from __future__ import ( division, absolute_import,
 
 from flask import request, render_template, jsonify, flash
 
+from flask_principal import Permission, RoleNeed
+
 from ..core.backwardcompat import *
 
 
+debug_permission = Permission(RoleNeed('debug'))
+
+
 def render_template_custom(tmpl_name, **kargs):
-    custom = request.args.get('custom')
+    custom = request.values.get('custom')
 
     if not custom:
         flash("На этой странице Вы можете задать шаблон")
@@ -22,7 +27,10 @@ def render_template_custom(tmpl_name, **kargs):
 
 
 def render_format(tmpl_name, flash_t=None, **kargs):
-    format = request.args.get('format')
+    format = request.values.get('format')
+
+    if not debug_permission.can():
+        kargs.pop('debug')
 
     if format == 'json':
         for key, val in kargs.items():

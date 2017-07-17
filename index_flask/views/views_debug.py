@@ -20,8 +20,12 @@ from ..core.dump_html import html
 from .. import app, get_next
 
 
+##### Roles #####
+
 debug_permission = Permission(RoleNeed('debug'))
 
+
+### Routes ###
 
 @app.route('/debug/')
 def debug():

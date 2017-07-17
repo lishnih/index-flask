@@ -101,7 +101,7 @@ def ext_user_db():
 @app.route('/user_db_set_default_db/')
 @login_required
 def ext_user_db_set_default_db():
-    default_db = request.args.get('default_db')
+    default_db = request.values.get('default_db')
     set_default_db(current_user, default_db)
 
     return redirect(get_next())

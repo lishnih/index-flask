@@ -20,8 +20,12 @@ from .forms import RegistrationForm, AddGroupForm
 from . import app, get_next
 
 
+##### Roles #####
+
 admin_permission = Permission(RoleNeed('admin'))
 
+
+### Routes ###
 
 @app.route('/admin/')
 @login_required

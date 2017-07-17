@@ -114,13 +114,13 @@ class User(db.Model):         # Rev. 2016-06-23
         return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
 
 
-class Group(db.Model):        # Rev. 2016-06-29
+class Group(db.Model):        # Rev. 2017-07-16
     __tablename__ = 'group'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime)
+    created = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, name, description=''):
         self.name = name.lower()
@@ -165,7 +165,7 @@ class Module(db.Model):       # Rev. 2016-07-12
         self.loaded = datetime(2000, 1, 1)
 
 
-class Register(db.Model):     # Rev. 2017-04-30
+class Register(db.Model):     # Rev. 2017-07-16
     __tablename__ = 'register'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -175,6 +175,7 @@ class Register(db.Model):     # Rev. 2017-04-30
     dir = db.Column(db.String)
     name = db.Column(db.String, nullable=False)
     value = db.Column(db.Text, nullable=False)
+    created = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, section, name, value, user=None, group=None):
         self._user_id = user.id
@@ -182,34 +183,23 @@ class Register(db.Model):     # Rev. 2017-04-30
         self.section = section
         self.name = name
         self.value = value
+        self.created = datetime.utcnow()
 
 
-class Favorite(db.Model):     # Rev. 2017-05-06
+class Favorite(db.Model):     # Rev. 2017-07-16
     __tablename__ = 'favorite'
 
     id = db.Column(db.Integer, primary_key=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String)
     url = db.Column(db.String)
+    created = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, title, url, user=None):
         self._user_id = user.id
         self.title = title
         self.url = url
-
-
-class SQLTemplate(db.Model):  # Rev. 2017-07-11
-    __tablename__ = 'sqltemplate'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    value = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text)
-
-    def __init__(self, name, value=None, description=None):
-        self.name = name
-        self.value = value
-        self.description = description
+        self.created = datetime.utcnow()
 
 
 db.create_all()

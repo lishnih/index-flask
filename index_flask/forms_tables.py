@@ -126,7 +126,7 @@ class TableCondForm(Form):
 
     def parse_clause(self, column, value):
         mt = False
-        if self.mtable:
+        if self.mtable is not None:
             mt = True
             mcolumn = get_column(self.mtable, column)
             if mcolumn is None:
@@ -135,25 +135,28 @@ class TableCondForm(Form):
         clause = ''
         mclause = None
 
-        if value is None:
-            clause = "{0} is null".format(column)
-            mclause = mcolumn == None if mt else clause
-        elif isinstance(value, basestring) or isinstance(value, int):
-            clause = "{0}='{1}'".format(column, value)
-            mclause = mcolumn == value if mt else clause
-        elif isinstance(value, float):
-            clause = "{0} like '{1}'".format(column, value)
-            mclause = mcolumn.like(value) if mt else clause
-        else:
+        if isinstance(value, list):
             condition, value = value
-            if not condition and value:
-                clause = "{0}='{1}'".format(column, value)
+        else:
+            condition = ''
+
+        if not condition:
+            if value is None:
+                clause = "{0} is null".format(column)
+                mclause = mcolumn == None if mt else clause
+            elif isinstance(value, basestring) or isinstance(value, int):
+                clause = "{0} = '{1}'".format(column, value)
                 mclause = mcolumn == value if mt else clause
+            elif isinstance(value, float):
+                clause = "{0} like '{1}'".format(column, value)
+                mclause = mcolumn.like(value) if mt else clause
+
+        else:
             if condition == '=' or condition == '==':
-                clause = "{0}='{1}'".format(column, value)
+                clause = "{0} = '{1}'".format(column, value)
                 mclause = mcolumn == value if mt else clause
             elif condition == '!=':
-                clause = "{0}!='{1}'".format(column, value)
+                clause = "{0} != '{1}'".format(column, value)
                 mclause = mcolumn != value if mt else clause
             elif condition == '~':
                 clause = "{0} like '{1}'".format(column, value)
@@ -162,20 +165,52 @@ class TableCondForm(Form):
                 clause = "{0} not like '{1}'".format(column, value)
                 mclause = not_(mcolumn.like(value)) if mt else clause
             elif condition == '>':
-                clause = "{0}>'{1}'".format(column, value)
+                clause = "{0} > '{1}'".format(column, value)
                 mclause = mcolumn > value if mt else clause
             elif condition == '>=':
-                clause = "{0}>='{1}'".format(column, value)
+                clause = "{0} >= '{1}'".format(column, value)
                 mclause = mcolumn >= value if mt else clause
             elif condition == '<':
-                clause = "{0}<'{1}'".format(column, value)
+                clause = "{0} < '{1}'".format(column, value)
                 mclause = mcolumn < value if mt else clause
             elif condition == '<=':
-                clause = "{0}<='{1}'".format(column, value)
+                clause = "{0} <= '{1}'".format(column, value)
                 mclause = mcolumn <= value if mt else clause
             elif condition == 'consist':
                 clause = "{0} like '%{1}%'".format(column, value)
                 mclause = mcolumn.like("%{0}%".format(value)) if mt else clause
+
+            elif condition == 'in':
+                values = value.split(',')
+                value = "','".join(values)
+                clause = "{0} in ('{1}')".format(column, value)
+                mclause = clause
+            elif condition == 'not in':
+                values = value.split(',')
+                value = "','".join(values)
+                clause = "{0} not in ('{1}')".format(column, value)
+                mclause = clause
+            elif condition == 'between':
+                value1, value2 = value.split(',')
+                clause = "{0} between '{1}' and '{2}'".format(column, value1, value2)
+                mclause = clause
+            elif condition == 'not between':
+                value1, value2 = value.split(',')
+                clause = "{0} not between '{1}' and '{2}'".format(column, value1, value2)
+                mclause = clause
+
+            elif condition == 'is None':
+                clause = "{0} is null".format(column)
+                mclause = mcolumn == None if mt else clause
+            elif condition == 'is not None':
+                clause = "{0} is not null".format(column)
+                mclause = mcolumn != None if mt else clause
+            elif condition == 'is empty':
+                clause = "{0} = ''".format(column)
+                mclause = mcolumn == '' if mt else clause
+            elif condition == 'is not empty':
+                clause = "{0} != ''".format(column)
+                mclause = mcolumn != '' if mt else clause
 
         return mclause, clause
 

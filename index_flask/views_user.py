@@ -21,6 +21,8 @@ from .forms import RegistrationForm, LoginForm
 from . import app, get_next
 
 
+### Routes ###
+
 @app.route('/register', methods=['GET', 'POST'])
 def user_register():
     if not current_user.is_anonymous:

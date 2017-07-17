@@ -81,19 +81,17 @@ jQuery( function($) {
     var limit = table.data("limit");
     var query = table.data("query");
 
-    url = new URL(location.href);
-    url.searchParams.append('format', 'json');
-
     data = {
       "offset": offset + limit,
       "limit": limit,
       "query_json": $.toJSON(query),
+      "format": "json",
     };
 
     $.ajax({
       type: "POST",
       dataType: "json",
-      url: url,
+      url: location.href,
       data: data,
 //    async: false,
       success: function(data) {

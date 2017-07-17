@@ -10,12 +10,14 @@ jQuery( function($) {
 
   $("span.for_action").click( function(event) {
     span = $(this);
-    span1 = span[0];
 
-    data = get_data(span1);
+    tr = span.closest("tr");
 
-    $.post(this.baseURI, data, function(data) {
+    $.post(this.baseURI, span.data(), function(data) {
         debug(data);
+
+        if ( data.result == 'accepted' )
+          tr.remove();
     } );
   } );
 
@@ -24,29 +26,14 @@ jQuery( function($) {
 
   $("input.for_action").click( function(event) {
     input = $(this);
-    input1 = input[0];
 
-    data = get_data(input1);
+    data = input.data();
     data["checked"] = input.prop('checked')
 
-    $.post(this.baseURI, data, function(data) {
+    $.post(this.baseURI, input.data(), function(data) {
         debug(data);
     } );
   } );
-
-
-  /*** FUNCTIONS ***/
-
-  function get_data(cls) {
-    data = {}
-    for (name in cls.attributes) {
-      obj = cls.attributes[name];
-      if ( typeof obj == "object" && obj.name.indexOf("data-") === 0 )
-          data[obj.name.slice(5)] = obj.value
-    } // for
-
-    return data;
-  } // get_data
 
 
 } );

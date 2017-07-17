@@ -14,7 +14,7 @@ from ..models import db, User
 from .. import app
 
 
-##### Model #####
+##### Models #####
 
 class Dict(db.Model):         # Rev. 2016-07-02
     __tablename__ = 'dict'

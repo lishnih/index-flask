@@ -14,8 +14,12 @@ from ..core.backwardcompat import *
 from .. import app
 
 
+##### Roles #####
+
 debug_permission = Permission(RoleNeed('debug'))
 
+
+### Routes ###
 
 @app.route('/debug/tests/')
 def debug_tests():

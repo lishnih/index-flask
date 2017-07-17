@@ -23,6 +23,11 @@ from ..forms_tables import TableCondForm
 from .. import app
 
 
+### Constants ###
+
+limit_default = 15
+
+
 ### Interface ###
 
 def get_dbs_table(home, db=None):
@@ -43,7 +48,7 @@ def views_db_func(db, tables):
     template_name = 'db/table.html'
     templates_list = None
     form = None
-    limit_default = 15
+    plain = 1
 
 
     db_uri, session, metadata = initDb(current_user.home, db)
@@ -98,6 +103,8 @@ def views_db_func(db, tables):
             template_name = 'custom/{0}.html'.format(template)
             if form.unlim.data == 'on':
                 limit = 0
+            if form.plain.data == 'off':
+                plain = 0
 
 
     if 'all' in request.args.keys():
@@ -153,7 +160,7 @@ def views_db(db=None):
     obj = []
 
     if db:
-        tables = request.args.get('tables')
+        tables = request.values.get('tables')
         if tables:
             return views_db_func(db, tables)
 
@@ -312,8 +319,8 @@ def views_db_table(db, table):
         return render_format('p/empty.html', format, flash_t)
 
 
-    offset = int(request.form.get('offset', 0))
-    limit = int(request.form.get('limit', 30))
+    offset = int(request.values.get('offset', 0))
+    limit = int(request.values.get('limit', limit_default))
 
     if 'all' in request.args.keys():
         offset = 0

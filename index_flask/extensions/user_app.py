@@ -25,10 +25,12 @@ from ..models import db, User
 from .. import app, require_ext
 
 
+##### Roles #####
+
 admin_permission = Permission(RoleNeed('admin'))
 
 
-##### Model #####
+##### Models #####
 
 relationship_user_app = db.Table('rs_user_app',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
@@ -87,7 +89,7 @@ User.ext_apps = db.relationship('App', secondary=relationship_user_app,
 db.create_all()
 
 
-##### Form #####
+##### Forms #####
 
 class AddAppForm(Form):
     name = StringField('Name *', [
