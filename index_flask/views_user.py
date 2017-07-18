@@ -13,7 +13,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .core.backwardcompat import *
-from .core.db import getDbList
+from .core.db import get_db_list
 # from .core.dump_html import html
 from .models import db, User
 from .forms import RegistrationForm, LoginForm
@@ -137,7 +137,7 @@ def user_edit():
 @login_required
 def user_append_db():
     dbpath = os.path.expanduser("~/.config/index/{0}".format(current_user.username))
-    dbs_list = getDbList(current_user.home)
+    dbs_list = get_db_list(current_user.home)
 
     return render_template('dump_list.html',
              obj = dbs_list,

@@ -15,7 +15,7 @@ from sqlalchemy.sql import select, text
 dbname_ptrn = re.compile("^[\w\-+=\.,\(\)\[\]\{\}';]+$")
 
 
-def initDb(home, dbname, create=False):
+def init_db(home, dbname, create=False):
     result = dbname_ptrn.match(dbname)
     if result:
         filename = os.path.join(home, "{0}.sqlite".format(dbname))
@@ -33,7 +33,7 @@ def initDb(home, dbname, create=False):
     return None, None, None
 
 
-def getDbList(home):
+def get_db_list(home):
     try:
         ldir = os.listdir(home)
     except OSError:
@@ -107,9 +107,7 @@ def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=Non
         filtered = total
     if order:
         s = s.order_by(text(', '.join(order)))
-    if offset:
-        if offset > filtered:
-            offset = 0
+    if offset and offset < filtered:
         s = s.offset(offset)
     if limit:
         s = s.limit(limit)
@@ -122,6 +120,39 @@ def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=Non
         rows = [[j for j in i] for i in res.fetchall()]
     else:
         rows = [dict(i.items()) for i in res.fetchall()]
+
+    shown = len(rows)
+
+    pages = int(math.ceil(filtered / limit)) if limit else 0
+    page = int(math.floor(offset / limit)) + 1 if limit else 0
+    if page > pages: page = 0
+
+    return names, rows, total, filtered, shown, page, pages, s
+
+
+def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plain=1):
+    s = model.query
+    total = s.count()
+
+    if criterion:
+        s = s.filter(*criterion)
+        filtered = s.count()
+    else:
+        filtered = total
+    if order:
+        s = s.order_by(*order)
+    if offset and offset < filtered:
+        s = s.offset(offset)
+    if limit:
+        s = s.limit(limit)
+
+    res = s.all()
+    names = [i.name for i in model.__table__.c]
+
+    if plain:
+        rows = [[row.__dict__.get(i) for i in names] for row in res]
+    else:
+        rows = [dict((i, row.__dict__.get(i)) for i in names)]
 
     shown = len(rows)
 
@@ -145,9 +176,7 @@ def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=N
         filtered = total
     if order:
         s = s.order_by(*order)
-    if offset:
-        if offset > filtered:
-            offset = 0
+    if offset and offset < filtered:
         s = s.offset(offset)
     if limit:
         s = s.limit(limit)
@@ -183,17 +212,13 @@ def get_rows_ext(session, mtables, offset=0, limit=None, criterion=None, order=N
     total = query.count()
 
     if criterion:
-        criterion = [text(i) for i in criterion]
         query = query.filter(*criterion)
         filtered = query.count()
     else:
         filtered = total
     if order:
-        order = [text(i) for i in order]
         query = query.order_by(*order)
-    if offset:
-        if offset > filtered:
-            offset = 0
+    if offset and offset < filtered:
         query = query.offset(offset)
     if limit:
         query = query.limit(limit)

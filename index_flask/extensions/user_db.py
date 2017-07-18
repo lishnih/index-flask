@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from ..core.backwardcompat import *
 from ..core.dump_html import html
-from ..core.db import initDb, getDbList
+from ..core.db import init_db, get_db_list
 
 from .. import app, get_next
 
@@ -29,7 +29,7 @@ def get_data(user):
 
     user_db = storage.setdefault(user.id, {
         'dbs': {},
-        'dbs_list': [i for i in getDbList(user.home)],
+        'dbs_list': [i for i in get_db_list(user.home)],
     })
 
     return user_db
@@ -67,7 +67,7 @@ def get_db(user, dbname, create=False):
         return None, None, None
 
     if dbname not in user_db.get('dbs', {}):
-        db_uri, session, metadata = initDb(user.home, dbname, create)
+        db_uri, session, metadata = init_db(user.home, dbname, create)
         if not db_uri:
             return None, None, None
 

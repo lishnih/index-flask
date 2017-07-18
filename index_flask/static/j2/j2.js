@@ -151,9 +151,9 @@ jQuery.fn.extend({
           jtable_info.text('Таблица не задана!');
           return;
         }
-      
+
         var tableisempty = true;
-      
+
         if (typeof event.columns != "undefined") {
           tableisempty = false;
           jtable.append('<thead><tr>');
@@ -161,7 +161,7 @@ jQuery.fn.extend({
             $("thead tr", self).append('<th>' + val + '</th>');
           } );
         }
-      
+
         if (typeof event.rows != "undefined") {
           tableisempty = false;
           jtable.append('<tbody>');
@@ -182,7 +182,7 @@ jQuery.fn.extend({
           } );
           update_gtb();
         }
-      
+
         if (tableisempty) {
           jtable_info.text('Данные отсутствуют!');
           return;
@@ -258,7 +258,7 @@ jQuery.fn.extend({
           this.value = "";
         }
       } );
-       
+
       $("input", tfoot).blur( function(i) {
         if (this.value == "") {
           this.className = "search_init";
@@ -334,10 +334,10 @@ jQuery.fn.extend({
 
 //        request_action("table_view", aoData, fnCallback);
           $.ajax({
-            url: sSource, 
+            url: sSource,
             type: "POST",
-            data: aoData, 
-            dataType: 'json', 
+            data: aoData,
+            dataType: 'json',
             cache: false,
 //          beforeSend: function(xhr) {
 //            xhr.setRequestHeader("Content-type", "application/json; charset=utf-8");

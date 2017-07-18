@@ -14,13 +14,18 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import getDbList, initDb, get_rows_plain
+from ..core.db import init_db, get_db_list, get_rows_plain
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..forms_tables import TableCondForm
 from ..models import db
 
 from .. import app
+
+
+### Constants ###
+
+limit_default = 15
 
 
 ##### Models #####
@@ -44,7 +49,7 @@ class SQLTemplate(db.Model):  # Rev. 2017-07-16
 ### Interface ###
 
 def get_dbs_table(home, db=None):
-    dbs_list = getDbList(home)
+    dbs_list = get_db_list(home)
 
     names = ['Databases', 'Info']
     dbs_table = [['<a href="{0}"><b><i>{1}</i></b></a>'.format(url_for('views_query', db=dbname), dbname) if db == dbname else
@@ -60,10 +65,9 @@ def views_query_func(db, id):
     templates_list = None
     form = None
     plain = 1
-    limit_default = 15
 
 
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
         return render_format('p/empty.html', flash_t)
@@ -89,7 +93,9 @@ def views_query_func(db, id):
 #       db = query.get('db')
 #       tables = query.get('tables')
         criterion = query.get('criterion')
+        mcriterion = criterion
         order = query.get('order')
+        morder = order
 
 
     else:
@@ -113,8 +119,8 @@ def views_query_func(db, id):
             form.validate()
 
 
-        criterion = form.get_criterion()
-        order = form.get_order()
+        mcriterion, criterion = form.get_criterion()
+        morder, order = form.get_order()
 #       offset = form.offset.data
 #       limit = form.limit.data
         template = form.template.data
@@ -133,6 +139,10 @@ def views_query_func(db, id):
         limit = 0
 
 
+    names, rows, total, filtered, shown, page, pages, s = get_rows_plain(
+        session, sql, offset, limit, mcriterion, morder, plain)
+
+
     request_url = request.full_path
     query_json = json.dumps(dict(
                    ver = 1,
@@ -143,10 +153,6 @@ def views_query_func(db, id):
                    criterion = criterion,
                    order = order,
                  ))
-
-
-    names, rows, total, filtered, shown, page, pages, s = get_rows_plain(
-        session, sql, offset, limit, criterion, order, plain)
 
 
     # Выводим
@@ -181,7 +187,7 @@ def views_query(db=None):
     obj = []
 
     if db:
-        db_uri, session, metadata = initDb(current_user.home, db)
+        db_uri, session, metadata = init_db(current_user.home, db)
         if not db_uri:
             flash("База данных не существует: {0}".format(db), 'error')
             return render_template('p/empty.html')

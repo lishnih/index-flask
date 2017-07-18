@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 import time, math
 
-from sqlalchemy import desc, distinct, func, and_, or_, not_
+from sqlalchemy import desc, not_
 from wtforms import Form, StringField, IntegerField, SelectField, validators
 
 from .core.backwardcompat import *
@@ -24,8 +24,10 @@ class TableCondForm(Form):
 
     conditions = [[i, i] for i in [
         '', '=', '!=', '~', '!~', '>', '>=', '<', '<=',
-        'consist', 'in', 'not in', 'between', 'not between',
+        'consist', 'starts with', 'ends with',
+        'in', 'not in', 'between', 'not between',
         'is None', 'not is None', 'is empty', 'not is empty',
+
     ]]
     condition1 = SelectField('Filter', choices=conditions)
     condition2 = SelectField('Filter', choices=conditions)
@@ -89,39 +91,47 @@ class TableCondForm(Form):
 
 
     def get_criterion(self):
+        mcriterion = []
         criterion = []
         if self.column1.data and self.column1.data <> 'None':
             mclause, clause = self.parse_clause(self.column1.data, [self.condition1.data, self.value1.data])
             if clause:
+                mcriterion.append(mclause)
                 criterion.append(clause)
         if self.column2.data and self.column2.data <> 'None':
             mclause, clause = self.parse_clause(self.column2.data, [self.condition2.data, self.value2.data])
             if clause:
+                mcriterion.append(mclause)
                 criterion.append(clause)
         if self.column3.data and self.column3.data <> 'None':
             mclause, clause = self.parse_clause(self.column3.data, [self.condition3.data, self.value3.data])
             if clause:
+                mcriterion.append(mclause)
                 criterion.append(clause)
 
-        return criterion
+        return mcriterion, criterion
 
 
     def get_order(self):
+        morder = []
         order = []
         if self.sorting1.data and self.sorting1.data <> 'None':
             mcolumn, sort_column = self.parse_order(self.sorting1.data, self.sort_dir1.data)
             if sort_column:
+                morder.append(mcolumn)
                 order.append(sort_column)
         if self.sorting2.data and self.sorting2.data <> 'None':
             mcolumn, sort_column = self.parse_order(self.sorting2.data, self.sort_dir2.data)
             if sort_column:
+                morder.append(mcolumn)
                 order.append(sort_column)
         if self.sorting3.data and self.sorting3.data <> 'None':
             mcolumn, sort_column = self.parse_order(self.sorting3.data, self.sort_dir3.data)
             if sort_column:
+                morder.append(mcolumn)
                 order.append(sort_column)
 
-        return order
+        return morder, order
 
 
     def parse_clause(self, column, value):
@@ -176,39 +186,47 @@ class TableCondForm(Form):
             elif condition == '<=':
                 clause = "{0} <= '{1}'".format(column, value)
                 mclause = mcolumn <= value if mt else clause
+
             elif condition == 'consist':
                 clause = "{0} like '%{1}%'".format(column, value)
                 mclause = mcolumn.like("%{0}%".format(value)) if mt else clause
+            elif condition == 'starts with':
+                clause = "{0} like '{1}%'".format(column, value)
+                mclause = mcolumn.like("{0}%".format(value)) if mt else clause
+            elif condition == 'ends with':
+                clause = "{0} like '%{1}'".format(column, value)
+                mclause = mcolumn.like("%{0}".format(value)) if mt else clause
+
 
             elif condition == 'in':
                 values = value.split(',')
                 value = "','".join(values)
                 clause = "{0} in ('{1}')".format(column, value)
-                mclause = clause
+                mclause = mcolumn.in_(*[values]) if mt else clause
             elif condition == 'not in':
                 values = value.split(',')
                 value = "','".join(values)
                 clause = "{0} not in ('{1}')".format(column, value)
-                mclause = clause
+                mclause = not_(mcolumn.in_(*[values])) if mt else clause
             elif condition == 'between':
                 value1, value2 = value.split(',')
                 clause = "{0} between '{1}' and '{2}'".format(column, value1, value2)
-                mclause = clause
+                mclause = mcolumn.between(value1, value2) if mt else clause
             elif condition == 'not between':
                 value1, value2 = value.split(',')
                 clause = "{0} not between '{1}' and '{2}'".format(column, value1, value2)
-                mclause = clause
+                mclause = not_(mcolumn.between(value1, value2)) if mt else clause
 
             elif condition == 'is None':
                 clause = "{0} is null".format(column)
                 mclause = mcolumn == None if mt else clause
-            elif condition == 'is not None':
+            elif condition == 'not is None':
                 clause = "{0} is not null".format(column)
                 mclause = mcolumn != None if mt else clause
             elif condition == 'is empty':
                 clause = "{0} = ''".format(column)
                 mclause = mcolumn == '' if mt else clause
-            elif condition == 'is not empty':
+            elif condition == 'not is empty':
                 clause = "{0} != ''".format(column)
                 mclause = mcolumn != '' if mt else clause
 

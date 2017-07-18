@@ -11,10 +11,10 @@ from flask import request, render_template, jsonify, url_for, flash
 
 from flask_login import login_required, current_user
 
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import getDbList, initDb, get_rows_base, get_rows_ext
+from ..core.db import init_db, get_db_list, get_rows_base, get_rows_ext
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
@@ -31,7 +31,7 @@ limit_default = 15
 ### Interface ###
 
 def get_dbs_table(home, db=None):
-    dbs_list = getDbList(home)
+    dbs_list = get_db_list(home)
 
     names = ['Databases', 'Info', 'Session', 'Metadata']
     dbs_table = [['<a href="{0}"><b><i>{1}</i></b></a>'.format(url_for('views_db', db=dbname), dbname) if db == dbname else
@@ -51,7 +51,7 @@ def views_db_func(db, tables):
     plain = 1
 
 
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
         return render_format('p/empty.html', flash_t)
@@ -77,7 +77,9 @@ def views_db_func(db, tables):
 #       db = query.get('db')
 #       tables = query.get('tables')
         criterion = query.get('criterion')
+        mcriterion = criterion
         order = query.get('order')
+        morder = order
 
 
     else:
@@ -92,8 +94,8 @@ def views_db_func(db, tables):
             form.validate()
 
 
-        criterion = form.get_criterion()
-        order = form.get_order()
+        mcriterion, criterion = form.get_criterion()
+        morder, order = form.get_order()
 #       offset = form.offset.data
 #       limit = form.limit.data
         template = form.template.data
@@ -112,6 +114,10 @@ def views_db_func(db, tables):
         limit = 0
 
 
+    names, rows, total, filtered, shown, page, pages, s = get_rows_ext(
+        session, mtables, offset, limit, mcriterion, morder)
+
+
     request_url = request.full_path
     query_json = json.dumps(dict(
                    ver = 1,
@@ -122,10 +128,6 @@ def views_db_func(db, tables):
                    criterion = criterion,
                    order = order,
                  ))
-
-
-    names, rows, total, filtered, shown, page, pages, s = get_rows_ext(
-        session, mtables, offset, limit, criterion, order)
 
 
     # Выводим
@@ -165,7 +167,7 @@ def views_db(db=None):
             return views_db_func(db, tables)
 
 
-        db_uri, session, metadata = initDb(current_user.home, db)
+        db_uri, session, metadata = init_db(current_user.home, db)
         if not db_uri:
             flash("База данных не существует: {0}".format(db), 'error')
             return render_template('p/empty.html')
@@ -189,7 +191,7 @@ def views_db(db=None):
 @app.route('/db/session/<db>/')
 @login_required
 def views_db_session(db):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -200,7 +202,7 @@ def views_db_session(db):
 @app.route('/db/metadata/<db>/')
 @login_required
 def views_db_metadata(db):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -214,7 +216,7 @@ def views_db_info(db):
     names, dbs_table = get_dbs_table(current_user.home, db)
     obj = []
 
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -241,7 +243,7 @@ def views_db_info(db):
 @app.route('/db/info/<db>/<table>')
 @login_required
 def views_db_table_info(db, table):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -257,7 +259,7 @@ def views_db_table_info(db, table):
 @app.route('/db/info/<db>/<table>/<column>')
 @login_required
 def views_db_table_column_info(db, table, column):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -278,7 +280,7 @@ def views_db_table_column_info(db, table, column):
 @app.route('/db/distinct/<db>/<table>/<column>')
 @login_required
 def views_db_table_column_distinct(db, table, column):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
@@ -308,7 +310,7 @@ def views_db_table_column_distinct(db, table, column):
 @app.route('/db/<db>/<table>/', methods=["GET", "POST"])
 @login_required
 def views_db_table(db, table):
-    db_uri, session, metadata = initDb(current_user.home, db)
+    db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
         return render_format('p/empty.html', format, flash_t)
