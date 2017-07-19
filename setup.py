@@ -27,6 +27,19 @@ except IOError:
 from index_flask.core.info import __pkgname__, __description__, __version__
 
 
+data_files = []
+
+start_point = os.path.join(__pkgname__, 'static')
+for root, dirs, files in os.walk(start_point):
+    root_files = [os.path.join(root, i) for i in files]
+    data_files.append((root, root_files))
+
+start_point = os.path.join(__pkgname__, 'templates')
+for root, dirs, files in os.walk(start_point):
+    root_files = [os.path.join(root, i) for i in files]
+    data_files.append((root, root_files))
+
+
 if __name__ == '__main__':
     setup(
         name = __pkgname__,
@@ -43,9 +56,13 @@ if __name__ == '__main__':
 
         packages = find_packages(),
 #       include_package_data=True,
-        package_data = {__pkgname__: []},
+#       package_data = {__pkgname__: []},
+
+        data_files = data_files,
+
         scripts = [
         ],
+
         install_requires = [
             'flask_sqlalchemy',
             'flask_login',

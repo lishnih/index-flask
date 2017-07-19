@@ -1,0 +1,12 @@
+{% extends "_layout_nojs.html" %}
+
+{%- block title %}
+  <title>Json dumping</title>
+{%- endblock %}
+
+{%- block body %}
+
+{%- from "_debug.html" import dump_json %}
+{{ dump_json(rows) }}
+
+{%- endblock %}

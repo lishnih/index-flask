@@ -1,0 +1,16 @@
+{% extends "_layout_nojs.html" %}
+
+{%- block title %}
+  <title>Table dumping</title>
+{%- endblock %}
+
+{%- block body %}
+
+{%- if total %}
+<i>Всего: {{ total }}</i><br />
+{%- endif %}
+
+{%- from "_debug.html" import dump_table %}
+{{ dump_table(names, rows) }}
+
+{%- endblock %}
