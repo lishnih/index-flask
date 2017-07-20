@@ -15,6 +15,23 @@ jQuery( function($) {
   } );
 
 
+  /*** Dialogs ***/
+
+  // Common dialog
+  $( "#dialog" ).dialog({
+  	autoOpen: false,
+  	width: 400,
+  	buttons: [
+  		{
+  			text: "Ok",
+  			click: function() {
+  				$( this ).dialog( "close" );
+  			}
+  		},
+  	]
+  });
+
+
   /*** EVENTS ***/
 
   /* Navigation */
@@ -68,50 +85,22 @@ jQuery( function($) {
   /* Extend table */
 
   $(".extendtable").click( function(event) {
-    td = $(this);
-    tr = td.closest("tr");
-    table = tr.closest("table");
+    span = $(this);
+    td = span.closest("td");
 
-    var offset = table.data("offset");
-    if ( offset == -1 ) {
-      tr.remove();
-      return;
-    }
-
-    var limit = table.data("limit");
-    var query = table.data("query");
-
-    data = {
-      "offset": offset + limit,
-      "limit": limit,
-      "query_json": $.toJSON(query),
-      "format": "json",
-    };
-
-    $.ajax({
-      type: "POST",
-      dataType: "json",
-      url: location.href,
-      data: data,
-//    async: false,
-      success: function(data) {
-        append_rows(tr, data.rows);
-
-        if ( data.filtered > data.offset + data.limit ) {
-          table.data("offset", data.offset);
-          table.data("limit", data.limit);
-//        $("#shown").text(data.offset + data.limit);
-        } else {
-          td.html("<i>Данные выведены полностью!</i>");
-          table.data("offset", -1);
-        }
-      },
-      error: function(xhr, error, thrown) {
-        debug("Ошибка при получении данных json!");
-      },
-    });
+    get_rows(td);
   } );
 
+
+  $(".show_all").click( function(event) {
+    span = $(this);
+    td = span.closest("td");
+
+    get_rows(td, 'all');
+  } );
+
+
+  /* Remove flash */
 
   $("li.flashes").click( function(event) {
     li = $(this);
@@ -143,6 +132,54 @@ jQuery( function($) {
     });
     return true;
   } // doFormSubmit
+
+
+  function get_rows(td, unlim) {
+    if (typeof unlim == "undefined")
+      var unlim = 0;
+
+    tr = td.closest("tr");
+    table = tr.closest("table");
+
+    var offset = table.data("offset");
+    var limit = table.data("limit");
+    var query = table.data("query");
+
+    data = {
+      "offset": offset + limit,
+      "limit": unlim ? 0 : limit,
+      "query_json": $.toJSON(query),
+      "format": "json",
+    };
+
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: location.href,
+      data: data,
+//    async: false,
+      success: function(data) {
+        append_rows(tr, data.rows);
+
+        if ( data.filtered > data.offset + data.shown ) {
+          table.data("offset", data.offset);
+          table.data("limit", data.limit);
+        } else {
+          table.data("offset", null);
+          table.data("limit", null);
+          td.html('<i>Данные выведены полностью!</i>')
+            .click( function(event) {
+              td = $(this);
+              tr = td.closest("tr");
+              tr.remove();
+            } );
+        };
+      },
+      error: function(xhr, error, thrown) {
+        debug("Ошибка при получении данных json!");
+      },
+    });
+  } // get_rows
 
 
   function append_rows(tr, rows) {

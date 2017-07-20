@@ -145,7 +145,6 @@ def views_query_func(db, id):
 
     request_url = request.full_path
     query_json = json.dumps(dict(
-                   ver = 1,
                    db = db,
                    sqlid = id,
                    offset = offset,

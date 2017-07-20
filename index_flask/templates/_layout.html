@@ -59,6 +59,9 @@
 {%- endblock %}
 </div>
 
+{%- from "_common.html" import text_dialog %}
+{{ text_dialog() }}
+
 {%- from "_debug.html" import debug_footer with context %}
 {{ debug_footer() }}
 

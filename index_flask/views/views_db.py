@@ -120,7 +120,6 @@ def views_db_func(db, tables):
 
     request_url = request.full_path
     query_json = json.dumps(dict(
-                   ver = 1,
                    db = db,
                    tables = tables,
                    offset = offset,

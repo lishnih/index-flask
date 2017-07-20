@@ -91,7 +91,7 @@ db.create_all()
 
 @app.before_request
 def before_request():
-    if request.endpoint not in ['static']:
+    if request.endpoint not in ['static', 'user_login']:
         g.record = RequestRecord()
         db.session.add(g.record)
         db.session.commit()
@@ -120,8 +120,6 @@ def views_request_func():
 
     if query_json:
         query = json.loads(query_json)
-#       db = query.get('db')
-#       tables = query.get('tables')
         criterion = query.get('criterion')
         mcriterion = criterion
         order = query.get('order')
@@ -134,8 +132,8 @@ def views_request_func():
             form.sort_dir1.data = 'DESC'
             form.sorting1.data = 'start'
 
-        form.offset.data = str(offset)
-        form.limit.data = str(limit_default)
+        form.offset.data = offset
+        form.limit.data = limit
 
 
         if request.method == 'POST':
@@ -147,6 +145,10 @@ def views_request_func():
 #       offset = form.offset.data
 #       limit = form.limit.data
 #       template = form.template.data
+
+        criterion = []
+        for i in mcriterion:
+            criterion.append(str(i.compile(db.engine, compile_kwargs={"literal_binds": True})))
 
 
     if 'all' in request.args.keys():
@@ -160,7 +162,6 @@ def views_request_func():
 
     request_url = request.full_path
     query_json = json.dumps(dict(
-                   ver = 1,
                    offset = offset,
                    limit = limit,
                    criterion = criterion,

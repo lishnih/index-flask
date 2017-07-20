@@ -8,22 +8,7 @@
     jQuery( function($) {
 
 
-      // Share dialog
-      $( "#dialog" ).dialog({
-      	autoOpen: false,
-      	width: 400,
-      	buttons: [
-      		{
-      			text: "Ok",
-      			click: function() {
-      				$( this ).dialog( "close" );
-      			}
-      		},
-      	]
-      });
-
-
-      $("table#table1 th").click(function( event ) {
+      $("table#table1 th:eq(0)").click(function( event ) {
         th = $(this);
         table = th.closest("table");
 
@@ -36,6 +21,39 @@
       	$( "#dialog" ).dialog( "open" );
       	event.preventDefault();
       });
+
+
+      $(".output_params").click( function(event) {
+        $('input#offset').val(0);
+        $('input#limit').val(15);
+      } );
+
+
+      $(".output_clause").click( function(event) {
+        $('select#column1').val('');
+        $('select#condition1').val('');
+        $('input#value1').val('');
+
+        $('select#column2').val('');
+        $('select#condition2').val('');
+        $('input#value2').val('');
+
+        $('select#column3').val('');
+        $('select#condition3').val('');
+        $('input#value3').val('');
+      } );
+
+
+      $(".output_sorting").click( function(event) {
+        $('select#sorting1').val('');
+        $('select#sort_dir1').val('ASC');
+
+        $('select#sorting2').val('');
+        $('select#sort_dir2').val('ASC');
+
+        $('select#sorting3').val('');
+        $('select#sort_dir3').val('ASC');
+      } );
 
 
     } );
@@ -60,7 +78,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th colspan="2"><i>Вывод</i></th>
+        <th class="output_params" colspan="2"><i>Вывод</i></th>
       </tr>
       {{ render_tr(form.offset) }}
       {{ render_tr(form.limit) }}
@@ -74,7 +92,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th colspan="3"><i>Фильтр</i>
+        <th class="output_clause" colspan="3"><i>Фильтр</i>
           {%- if total %}
           <div class="right" style="font-weight: normal;"><i>Выведено {{ shown }} из {{ filtered }} (без фильтра {{ total }})</i></div>
           {%- endif %}
@@ -89,7 +107,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th colspan="2"><i>Сортировка</i></th>
+        <th class="output_sorting" colspan="2"><i>Сортировка</i></th>
       </tr>
       {{ render_tr_sorting(form.sorting1, form.sort_dir1) }}
       {{ render_tr_sorting(form.sorting2, form.sort_dir2) }}
@@ -111,7 +129,6 @@
   {%- endif %}
 </div>
 
-
 <div>
   <input type=submit value="Proceed">
 </div>
@@ -124,6 +141,7 @@
 {%- endif %}
 
 
+{%- from "_debug.html" import dump_value_unsafe %}
 <div class="table">
 <table id="table1" border="1" data-offset="{{ offset }}" data-limit="{{ limit }}"
        data-query='{{ query_json }}'>
@@ -143,32 +161,22 @@
     {%- for row in rows %}
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
-      {%- autoescape false %}
       {%- for col in row %}
-      {%- if col is none %}
-      <td><i class="inactive">null<i></td>
-      {%- else %}
-      <td>{{ col }}</td>
-      {%- endif %}
+      <td>
+      {{ dump_value_unsafe(col) }}
+      </td>
       {%- endfor %}
-      {%- endautoescape %}
     </tr>
     {%- endfor %}
 
-
     {%- if colspan and limit and filtered > offset + limit %}
     <tr>
-        <td class="a extendtable" colspan="{{ colspan+1 }}">
-          Показать ещё {{ limit }} |
-{%- if action %}
-          <a href="{{ action }}&all">Показать всё</a>
-{%- else %}
-          <a href="?all">Показать всё</a>
-{%- endif %}
-        </td>
+      <td colspan="{{ colspan+1 }}">
+        <span class="a extendtable">Показать ещё {{ limit }}</span> |
+        <span class="a show_all">Показать всё</span>
+      </td>
     </tr>
     {%- endif %}
-
 
     {%- endif %}
   </tbody>
@@ -176,10 +184,6 @@
 {%- if not rows %}
 <i>Нет данных</i>
 {%- endif %}
-</div>
-
-<div id="dialog" title="Dialog">
-  <div id="dialog_content"></div>
 </div>
 
 {%- endblock %}

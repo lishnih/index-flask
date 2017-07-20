@@ -61,6 +61,9 @@ if __name__ == '__main__':
         data_files = data_files,
 
         scripts = [
+            'index_flask-initialize_app.py',
+            'index_flask-standalone.py',
+            'index_flask-standalone_debug.py',
         ],
 
         install_requires = [
