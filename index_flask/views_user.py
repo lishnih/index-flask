@@ -155,6 +155,7 @@ def user_edit():
 @login_required
 def user_append_db():
     dbs_list = get_db_list(current_user.home)
+    dbs_list = sorted(dbs_list)
 
     return render_template('dump_list.html',
              obj = dbs_list,

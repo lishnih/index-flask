@@ -42,6 +42,9 @@ def render_format(tmpl_name, flash_t=None, **kargs):
             kargs['flash_cat'] = result
             kargs['flash_message'] = message
 
+        if 'rows' in kargs:
+            kargs['rows'] = [[i.decode('utf8', 'ignore') if isinstance(i, string_types) else i for i in row] for row in kargs['rows']]
+
         return jsonify(**kargs)
 
     else:

@@ -8,13 +8,15 @@
 
 
 {% macro dump_value(value) %}
+{%- autoescape false %}
 {%- if value is mapping %}
   {{ dump_dict(value) }}
 {%- elif value is none %}
   <i class="inactive">null</i>
 {%- else %}
-  {{ value }}
+  {{ value|nl2br }}
 {%- endif %}
+{%- endautoescape %}
 {%- endmacro %}
 
 

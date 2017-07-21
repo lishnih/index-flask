@@ -15,8 +15,8 @@ from flask_principal import ( Principal, RoleNeed, UserNeed,
 
 from jinja2 import evalcontextfilter, Markup, escape
 
-from .models import User
 from .core.backwardcompat import *
+from .models import User
 
 from .a import app
 
@@ -64,7 +64,12 @@ _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @app.template_filter()
 @evalcontextfilter
 def nl2br(eval_ctx, value):
-    result = '\n\n'.join('<p>%s</p>' % p.replace('\n', '<br />\n') \
+    if isinstance(value, string_types):
+        value = value.decode('utf8', 'ignore')
+    elif not isinstance(value, all_types):
+        value = "[ {0} ]".format(type(value))
+
+    result = '\n\n'.join('{0}'.format(p.replace('\n', '<br />\n')) \
         for p in _paragraph_re.split(escape(value)))
     if eval_ctx.autoescape:
         result = Markup(result)

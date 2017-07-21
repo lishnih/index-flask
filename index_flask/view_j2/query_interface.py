@@ -15,7 +15,7 @@ from ..core.db import get_primary_tables, get_relative_tables
 from ..app import require_ext
 
 
-def qi_columns_list(user, db, tables, fullnames_option = 1):
+def qi_columns_list(user, db, tables, fullnames_option=1):
     if isinstance(tables, basestring):
         tables = tables,
 
@@ -39,7 +39,7 @@ def qi_columns_list(user, db, tables, fullnames_option = 1):
     return columns_list
 
 
-def qi_columns_dict(user, db, tables, fullnames_option = 1):
+def qi_columns_dict(user, db, tables, fullnames_option=1):
     if isinstance(tables, basestring):
         tables = tables,
 

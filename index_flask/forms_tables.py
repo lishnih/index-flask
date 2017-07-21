@@ -51,10 +51,11 @@ class TableCondForm(Form):
     plain = SelectField('Plain')
 
 
-    def __init__(self, form, mtable=None, columns=None, templates_list=None, **kwargs):
+    def __init__(self, form, mtable=None, columns=None, templates_list=None, engine=None, **kwargs):
         super(TableCondForm, self).__init__(form, **kwargs)
 
         self.mtable = mtable
+        self.engine = engine
 
         if not columns:
             columns = [i for i in get_columns_names(mtable)]
@@ -197,7 +198,6 @@ class TableCondForm(Form):
                 clause = "{0} like '%{1}'".format(column, value)
                 mclause = mcolumn.like("%{0}".format(value)) if mt else clause
 
-
             elif condition == 'in':
                 values = value.split(',')
                 value = "','".join(values)
@@ -229,6 +229,9 @@ class TableCondForm(Form):
             elif condition == 'not is empty':
                 clause = "{0} != ''".format(column)
                 mclause = mcolumn != '' if mt else clause
+
+        if mt and self.engine:
+            clause = str(mclause.compile(self.engine, compile_kwargs={"literal_binds": True}))
 
         return mclause, clause
 

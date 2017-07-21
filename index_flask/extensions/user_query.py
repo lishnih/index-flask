@@ -51,6 +51,7 @@ db.create_all()
 
 def get_dbs_table(home, db=None):
     dbs_list = get_db_list(home)
+    dbs_list = sorted(dbs_list)
 
     names = ['Databases', 'Info']
     dbs_table = [['<a href="{0}"><b><i>{1}</i></b></a>'.format(url_for('views_query', db=dbname), dbname) if db == dbname else
@@ -193,6 +194,7 @@ def views_query(db=None):
             return render_template('p/empty.html')
 
         sqltemplates = SQLTemplate.query.all()
+        sqltemplates = sorted(sqltemplates, key=lambda row: row.id)
 
         table_names = ['SQL query', 'Description']
         table_rows = [['<a href="{0}">{1}</a>'.format(url_for('views_query_db_id', db=db, id=sqltemplate.id),

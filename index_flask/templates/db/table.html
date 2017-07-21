@@ -78,7 +78,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th class="output_params" colspan="2"><i>Вывод</i></th>
+        <th class="output_params" colspan="2"><i>Output</i></th>
       </tr>
       {{ render_tr(form.offset) }}
       {{ render_tr(form.limit) }}
@@ -92,9 +92,9 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th class="output_clause" colspan="3"><i>Фильтр</i>
+        <th class="output_clause" colspan="3"><i>Filters</i>
           {%- if total %}
-          <div class="right" style="font-weight: normal;"><i>Выведено {{ shown }} из {{ filtered }} (без фильтра {{ total }})</i></div>
+          <div class="right" style="font-weight: normal;"><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
           {%- endif %}
         </th>
       </tr>
@@ -107,7 +107,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th class="output_sorting" colspan="2"><i>Сортировка</i></th>
+        <th class="output_sorting" colspan="2"><i>Sorting</i></th>
       </tr>
       {{ render_tr_sorting(form.sorting1, form.sort_dir1) }}
       {{ render_tr_sorting(form.sorting2, form.sort_dir2) }}
@@ -119,7 +119,7 @@
   <div class="serial">
     <table border="1">
       <tr>
-        <th colspan="2"><i>Опции</i></th>
+        <th colspan="2"><i>Extras</i></th>
       </tr>
       {{ render_tr(form.template) }}
       {{ render_tr(form.unlim) }}
@@ -136,12 +136,12 @@
 </form>
 {%- else %}
 {%- if total %}
-<div><i>Выведено {{ shown }} из {{ filtered }} (без фильтра {{ total }})</i></div>
+<div><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
 {%- endif %}
 {%- endif %}
 
 
-{%- from "_debug.html" import dump_value_unsafe %}
+{%- from "_debug.html" import dump_value %}
 <div class="table">
 <table id="table1" border="1" data-offset="{{ offset }}" data-limit="{{ limit }}"
        data-query='{{ query_json }}'>
@@ -163,7 +163,7 @@
       <td><i class="inactive">{{ loop.index }}</i></td>
       {%- for col in row %}
       <td>
-      {{ dump_value_unsafe(col) }}
+      {{ dump_value(col) }}
       </td>
       {%- endfor %}
     </tr>
@@ -172,8 +172,8 @@
     {%- if colspan and limit and filtered > offset + limit %}
     <tr>
       <td colspan="{{ colspan+1 }}">
-        <span class="a extendtable">Показать ещё {{ limit }}</span> |
-        <span class="a show_all">Показать всё</span>
+        <span class="a extendtable">Show {{ limit }} more</span> |
+        <span class="a show_all">Show all</span>
       </td>
     </tr>
     {%- endif %}

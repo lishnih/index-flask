@@ -56,7 +56,7 @@ class EpochTime(TypeDecorator):
         return value
 
     def process_result_value(self, value, dialect):
-        return '<span title="{1}">{0}</span>'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(value)), value)
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(value))
 
 
 class RequestRecord(db.Model):  # Rev. 2016-07-21
@@ -127,7 +127,7 @@ def views_request_func():
 
 
     else:
-        form = TableCondForm(request.form, RequestRecord.__table__)
+        form = TableCondForm(request.form, RequestRecord.__table__, engine=db.engine)
         if form.offset.data is None or form.limit.data is None:
             form.sort_dir1.data = 'DESC'
             form.sorting1.data = 'start'
@@ -145,10 +145,6 @@ def views_request_func():
 #       offset = form.offset.data
 #       limit = form.limit.data
 #       template = form.template.data
-
-        criterion = []
-        for i in mcriterion:
-            criterion.append(str(i.compile(db.engine, compile_kwargs={"literal_binds": True})))
 
 
     if 'all' in request.args.keys():

@@ -32,6 +32,7 @@ limit_default = 15
 
 def get_dbs_table(home, db=None):
     dbs_list = get_db_list(home)
+    dbs_list = sorted(dbs_list)
 
     names = ['Databases', 'Info', 'Session', 'Metadata']
     dbs_table = [['<a href="{0}"><b><i>{1}</i></b></a>'.format(url_for('views_db', db=dbname), dbname) if db == dbname else
@@ -175,7 +176,7 @@ def views_db(db=None):
         table_names = ['Tables', 'w/options']
         table_rows = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table=table), table),
                        '<a href="{0}">{1}</a>'.format(url_for('views_db', db=db, tables=table), table)
-                     ] for table in metadata.tables.keys()]
+                     ] for table in sorted(metadata.tables.keys())]
 
         obj.append((table_names, table_rows, db))
 
