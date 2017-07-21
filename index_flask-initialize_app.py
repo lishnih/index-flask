@@ -5,7 +5,8 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-from index_flask.models import db, User, Group
+from index_flask.a import app, db
+from index_flask.models import User, Group
 
 
 def init_admin():

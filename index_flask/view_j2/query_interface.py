@@ -11,7 +11,8 @@ from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
 from ..core.db import get_primary_tables, get_relative_tables
-from .. import require_ext
+
+from ..app import require_ext
 
 
 def qi_columns_list(user, db, tables, fullnames_option = 1):

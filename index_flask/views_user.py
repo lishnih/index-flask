@@ -15,10 +15,11 @@ from flask_principal import Identity, AnonymousIdentity, identity_changed
 from .core.backwardcompat import *
 from .core.db import get_db_list
 # from .core.dump_html import html
-from .models import db, User
-from .forms import RegistrationForm, LoginForm
+from .models import User
+from .forms import RegistrationForm, LoginForm, ChangePasswordForm
 
-from . import app, get_next
+from .a import app, db
+from .app import get_next
 
 
 ### Routes ###
@@ -79,10 +80,27 @@ def user_login(user=None):
            )
 
 
+@app.route("/change_password", methods=['GET', 'POST'])
+@login_required
+def user_change_password():
+    form = ChangePasswordForm(request.form)
+    form.username.data = current_user.username
+    if request.method == 'POST' and form.validate():
+        form.user.change_password(form.password.data)
+        db.session.commit()
+
+        flash('Successfully changed password')
+        return redirect(get_next())
+
+    return render_template('user/change_password.html',
+             title = 'Change Password',
+             form = form,
+             next = request.args.get('next', '/profile'),
+           )
+
+
 @app.route("/confirm/<code>")
 def user_confirm(code=None):
-    # log request...
-
     user = User.query.filter_by(verified=code).first()
     if user:
         status = 'verified'
@@ -136,7 +154,6 @@ def user_edit():
 @app.route("/append_db")
 @login_required
 def user_append_db():
-    dbpath = os.path.expanduser("~/.config/index/{0}".format(current_user.username))
     dbs_list = get_db_list(current_user.home)
 
     return render_template('dump_list.html',

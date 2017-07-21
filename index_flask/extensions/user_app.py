@@ -20,9 +20,9 @@ from wtforms import Form, StringField, BooleanField, validators
 from ..core.backwardcompat import *
 # from ..core.dump_html import html
 from ..core.html_helpers import parse_input
-from ..models import db, User
+from ..models import User
 
-from .. import app, require_ext
+from ..a import app, db
 
 
 ##### Roles #####

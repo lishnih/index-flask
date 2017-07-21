@@ -14,10 +14,12 @@ from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
 from .core.html_helpers import parse_input, parse_span, dye_red, dye_green
-from .models import db, User, Group, Module
+from .models import User, Group, Module
 from .forms import RegistrationForm, AddGroupForm
+from .load_modules import is_loaded
 
-from . import app, get_next
+from .a import app, db
+from .app import get_next
 
 
 ##### Roles #####
@@ -291,11 +293,15 @@ def admin_modules():
         # On the disk
         fl = os.path.isfile(os.path.join(app.root_path, module.folder, "{0}.py".format(module.name)))
         row.append(dye_green('Yes') if fl else dye_red('No'))
+        # Is loaded
+        fl = is_loaded(module.name, module.folder)
+        row.append(dye_green('Yes') if fl else dye_red('No'))
 
         rows.append(row)
 
     names.append('Delete')
     names.append('On the disk')
+    names.append('Is loaded')
 
     return render_template('admin/modules.html',
              title = 'App modules',

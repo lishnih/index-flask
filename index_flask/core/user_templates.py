@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 import os
 
-from .. import app
+from ..a import app
 
 
 def get_user_templates(user):

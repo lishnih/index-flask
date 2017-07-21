@@ -13,7 +13,8 @@ from ..core.backwardcompat import *
 from ..core.dump_html import html
 from ..core.db import init_db, get_db_list
 
-from .. import app, get_next
+from ..a import app
+from ..app import get_next
 
 
 ##### Storage #####

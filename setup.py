@@ -18,13 +18,13 @@ else:
 
 here = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 try:
-    README = open(os.path.join(here, 'README.rst')).read()
+    README = open(os.path.join(here, 'README.md')).read()
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 except IOError:
     README = CHANGES = ''
 
 
-from index_flask.core.info import __pkgname__, __description__, __version__
+from index_flask import __pkgname__, __description__, __version__
 
 
 data_files = []
@@ -50,8 +50,7 @@ if __name__ == '__main__':
         author = 'Stan',
         author_email = 'lishnih@gmail.com',
         url = 'http://github.com/lishnih/index',
-        license = 'MIT',
-        platforms = 'any',
+        platforms = ['any'],
         keywords = ['Flask', 'indexing', 'reports', 'documents'],
 
         packages = find_packages(),
@@ -70,6 +69,7 @@ if __name__ == '__main__':
             'flask_sqlalchemy',
             'flask_login',
             'flask_principal',
+            'wtforms',
         ],
 
         classifiers = [

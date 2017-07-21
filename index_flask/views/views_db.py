@@ -20,7 +20,7 @@ from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
 from ..forms_tables import TableCondForm
 
-from .. import app
+from ..a import app
 
 
 ### Constants ###

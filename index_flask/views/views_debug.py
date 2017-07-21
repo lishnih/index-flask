@@ -17,7 +17,7 @@ from ..core.backwardcompat import *
 from ..core.fileman import list_files
 from ..core.dump_html import html
 
-from .. import app, get_next
+from ..a import app
 
 
 ##### Roles #####

@@ -18,9 +18,8 @@ from ..core.db import init_db, get_db_list, get_rows_plain
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..forms_tables import TableCondForm
-from ..models import db
 
-from .. import app
+from ..a import app, db
 
 
 ### Constants ###
@@ -44,6 +43,8 @@ class SQLTemplate(db.Model):  # Rev. 2017-07-16
         self.value = value
         self.description = description
         self.created = datetime.utcnow()
+
+db.create_all()
 
 
 ### Interface ###

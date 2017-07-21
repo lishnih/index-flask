@@ -11,7 +11,7 @@ from flask_principal import Permission, RoleNeed
 
 from ..core.backwardcompat import *
 
-from .. import app
+from ..a import app
 
 
 ##### Roles #####

@@ -8,7 +8,7 @@ from __future__ import ( division, absolute_import,
 import os, hashlib, random
 from datetime import datetime
 
-from . import db
+from .a import db
 
 
 relationship_user_group = db.Table('rs_user_group',
@@ -85,9 +85,12 @@ class User(db.Model):         # Rev. 2016-06-23
         rnd = random.randint(0, 100000000000000)
         return hashlib.sha1("{0}_{1}_{2}".format(email, password, rnd)).hexdigest()
 
+    def change_password(self, password):
+        self.password = self.get_password(password)
+        self.token = self.get_token(self.email, self.password)
+
     def init_env(self):
-        home = os.path.expanduser("~")
-        self.home = "{0}\\.config\\index\\{1}".format(home, self.username)
+        self.home = os.path.expanduser("~/.config/index/{0}".format(self.username))
         if not os.path.isdir(self.home):
             print(self.home)
             os.makedirs(self.home)

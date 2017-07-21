@@ -11,8 +11,9 @@ from flask_login import current_user
 from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
+from . import __pkgname__, __description__, __version__
 
-from . import app
+from .a import app
 
 
 ##### Roles #####
@@ -43,4 +44,18 @@ def p(page):
              p_admin = admin_permission.can(),
              p_debug = debug_permission.can(),
              p_statistics = statistics_permission.can(),
+           )
+
+
+@app.route("/about")
+def p_about():
+    return render_template('p/about.html',
+             name = None if current_user.is_anonymous else current_user.name,
+             p_admin = admin_permission.can(),
+             p_debug = debug_permission.can(),
+             p_statistics = statistics_permission.can(),
+
+             pkgname = __pkgname__,
+             description = __description__,
+             version = __version__,
            )

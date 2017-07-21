@@ -11,8 +11,9 @@ from datetime import datetime
 from flask import jsonify
 
 from .core.backwardcompat import *
-from .models import db, Module
-from . import app
+from .models import Module
+
+from .a import app, db
 
 
 def load_modules(folder):
@@ -59,3 +60,12 @@ def require_ext(ext_name, response=None):
         return msg
     if response == 'json':
         return jsonify(result="error", message=msg)
+
+
+def is_loaded(ext_name, folder):
+    base = app.name
+
+    name = '{0}.{1}.{2}'.format(base, folder, ext_name)
+    mod = sys.modules.get(name)
+    if mod:
+        return True

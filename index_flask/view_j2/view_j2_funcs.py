@@ -9,7 +9,9 @@ from .request_interface import *
 from .response_interface import *
 from .query_interface import *
 
-from ..models import db, Register, Favorite
+from ..models import Register, Favorite
+
+from ..a import db
 
 
 def set_default_db_action(user, request_items, response):

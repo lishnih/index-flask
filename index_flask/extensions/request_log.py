@@ -12,7 +12,7 @@ from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
 
 from sqlalchemy import desc, distinct, func, and_, or_, not_
-from sqlalchemy.types import TypeDecorator, Integer
+from sqlalchemy.types import TypeDecorator, Integer, Float
 # from sqlalchemy.sql import text
 from wtforms import Form, StringField, IntegerField, SelectField, validators
 
@@ -21,9 +21,8 @@ from ..core.db import get_rows_model
 from ..core.render_response import render_format
 from ..core.dump_html import html
 from ..forms_tables import TableCondForm
-from ..models import db
 
-from .. import app
+from ..a import app, db
 
 
 ### Constants ###
@@ -60,19 +59,19 @@ class EpochTime(TypeDecorator):
         return '<span title="{1}">{0}</span>'.format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(value)), value)
 
 
-class RequestRecord(db.Model):  # Rev. 2016-07-19
+class RequestRecord(db.Model):  # Rev. 2016-07-21
     __tablename__ = 'request_record'
 
     id = db.Column(db.Integer, primary_key=True)
-    remote_addr = db.Column(db.String, nullable=False)
-    url = db.Column(db.String, nullable=False)
-    method = db.Column(db.String, nullable=False)
-    endpoint = db.Column(db.String, nullable=False)
+    remote_addr = db.Column(db.String)  # request property
+    url = db.Column(db.String)          # request property
+    method = db.Column(db.String)       # request property
+    endpoint = db.Column(db.String)     # request property, sometimes is None
     user = db.Column(db.Integer, nullable=False)
     start = db.Column(EpochTime, nullable=False)
-    duration = db.Column(db.Integer, nullable=False, default=0)
-    status = db.Column(db.Integer)
-    values = db.Column(db.Text)
+    duration = db.Column(db.Float)
+    status = db.Column(db.Integer)      # response property
+    values = db.Column(db.Text, nullable=False)
 
     def __init__(self):
         self.remote_addr = request.remote_addr
@@ -91,7 +90,8 @@ db.create_all()
 
 @app.before_request
 def before_request():
-    if request.endpoint not in ['static', 'user_login']:
+    if request.endpoint not in ['static', 'user_register',
+            'user_login', 'user_change_password']:
         g.record = RequestRecord()
         db.session.add(g.record)
         db.session.commit()

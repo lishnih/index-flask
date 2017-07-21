@@ -11,7 +11,8 @@ from flask_login import login_required
 
 from ..core.backwardcompat import *
 
-from .. import app, view_j2
+from ..a import app
+from .. import view_j2
 
 
 ##### j2 wrapper for Flask #####

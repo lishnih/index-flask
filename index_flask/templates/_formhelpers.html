@@ -12,3 +12,17 @@
   </dd>
 </p>
 {%- endmacro %}
+
+{% macro render_hidden(field) %}
+<p>
+  <dd>{{ field(**kwargs)|safe }}
+  {%- if field.errors %}
+    <ul class=errors>
+    {%- for error in field.errors %}
+      <li>{{ error }}</li>
+    {%- endfor %}
+    </ul>
+  {%- endif %}
+  </dd>
+</p>
+{%- endmacro %}
