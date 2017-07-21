@@ -5,15 +5,13 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import re
-
 from flask import request
 
 from flask_login import LoginManager, current_user
 from flask_principal import ( Principal, RoleNeed, UserNeed,
                               Identity, identity_loaded )
 
-from jinja2 import evalcontextfilter, Markup, escape
+from jinja2 import evalcontextfilter
 
 from .core.backwardcompat import *
 from .models import User
@@ -59,21 +57,20 @@ def on_identity_loaded(sender, identity):
 
 ##### filters #####
 
-_paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
-
 @app.template_filter()
 @evalcontextfilter
-def nl2br(eval_ctx, value):
+def safe_str(eval_ctx, value):
     if isinstance(value, string_types):
-        value = value.decode('utf8', 'ignore')
-    elif not isinstance(value, all_types):
-        value = "[ {0} ]".format(type(value))
+        if not isinstance(value, unicode):
+            value = value.decode('utf8', 'ignore')
 
-    result = '\n\n'.join('{0}'.format(p.replace('\n', '<br />\n')) \
-        for p in _paragraph_re.split(escape(value)))
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
+    elif not isinstance(value, all_types) and value is not None:
+        try:
+            value = str(value).decode('utf8', 'ignore')
+        except:
+            value = "[ {0} ]".format(type(value))
+
+    return value
 
 
 ##### get_next function #####

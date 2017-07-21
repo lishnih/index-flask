@@ -11,6 +11,8 @@ from flask_principal import Permission, RoleNeed
 
 from ..core.backwardcompat import *
 
+from ..app import safe_str
+
 
 debug_permission = Permission(RoleNeed('debug'))
 
@@ -43,7 +45,7 @@ def render_format(tmpl_name, flash_t=None, **kargs):
             kargs['flash_message'] = message
 
         if 'rows' in kargs:
-            kargs['rows'] = [[i.decode('utf8', 'ignore') if isinstance(i, string_types) else i for i in row] for row in kargs['rows']]
+            kargs['rows'] = [[safe_str(None, i) for i in row] for row in kargs['rows']]
 
         return jsonify(**kargs)
 

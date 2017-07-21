@@ -14,7 +14,7 @@
 {%- elif value is none %}
   <i class="inactive">null</i>
 {%- else %}
-  {{ value|nl2br }}
+  {{ value|safe_str }}
 {%- endif %}
 {%- endautoescape %}
 {%- endmacro %}

@@ -4,4 +4,4 @@
 
 __pkgname__ = __name__
 __description__ = "Index System based on Flask"
-__version__ = "0.1.6"
+__version__ = "0.2"
