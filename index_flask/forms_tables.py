@@ -94,17 +94,17 @@ class TableCondForm(Form):
     def get_criterion(self):
         mcriterion = []
         criterion = []
-        if self.column1.data and self.column1.data <> 'None':
+        if self.column1.data and self.column1.data != 'None':
             mclause, clause = self.parse_clause(self.column1.data, [self.condition1.data, self.value1.data])
             if clause:
                 mcriterion.append(mclause)
                 criterion.append(clause)
-        if self.column2.data and self.column2.data <> 'None':
+        if self.column2.data and self.column2.data != 'None':
             mclause, clause = self.parse_clause(self.column2.data, [self.condition2.data, self.value2.data])
             if clause:
                 mcriterion.append(mclause)
                 criterion.append(clause)
-        if self.column3.data and self.column3.data <> 'None':
+        if self.column3.data and self.column3.data != 'None':
             mclause, clause = self.parse_clause(self.column3.data, [self.condition3.data, self.value3.data])
             if clause:
                 mcriterion.append(mclause)
@@ -116,17 +116,17 @@ class TableCondForm(Form):
     def get_order(self):
         morder = []
         order = []
-        if self.sorting1.data and self.sorting1.data <> 'None':
+        if self.sorting1.data and self.sorting1.data != 'None':
             mcolumn, sort_column = self.parse_order(self.sorting1.data, self.sort_dir1.data)
             if sort_column:
                 morder.append(mcolumn)
                 order.append(sort_column)
-        if self.sorting2.data and self.sorting2.data <> 'None':
+        if self.sorting2.data and self.sorting2.data != 'None':
             mcolumn, sort_column = self.parse_order(self.sorting2.data, self.sort_dir2.data)
             if sort_column:
                 morder.append(mcolumn)
                 order.append(sort_column)
-        if self.sorting3.data and self.sorting3.data <> 'None':
+        if self.sorting3.data and self.sorting3.data != 'None':
             mcolumn, sort_column = self.parse_order(self.sorting3.data, self.sort_dir3.data)
             if sort_column:
                 morder.append(mcolumn)

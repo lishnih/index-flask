@@ -104,7 +104,7 @@ def views_query_func(db, id):
         s = select('*').select_from(text("({0})".format(sql))).limit(1)
         try:
             res = session.execute(s)
-        except Exception, e:
+        except Exception as e:
             flash_t = "Ошибка при выполнении запроса: '{0}'".format(e.message), 'error'
             return render_format('p/empty.html', flash_t)
 
@@ -128,7 +128,7 @@ def views_query_func(db, id):
         template = form.template.data
 
 
-        if template and template <> 'None':
+        if template and template != 'None':
             template_name = 'custom/{0}.html'.format(template)
             if form.unlim.data == 'on':
                 limit = 0

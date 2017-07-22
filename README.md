@@ -3,7 +3,11 @@
 ### Installation
 
 ```sh
-$ setup.py install
+$ python -m easy_install index_flask-0.2-py2.7.egg
+```
+- or
+```sh
+$ py -3 -m easy_install index_flask-0.2-py3.4.egg
 ```
 
 ### After installation
@@ -36,6 +40,5 @@ http://localhost:5000/change_password
 
 License
 ----
-
 MIT
 LGPL v2+

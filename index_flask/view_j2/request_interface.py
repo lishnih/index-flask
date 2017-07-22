@@ -34,7 +34,7 @@ def ri_get_obj(request_items, name, default={}):
     try:
         atom_json = atom_json.replace("\\\\", "\\")
         return json.loads(atom_json)
-    except ValueError, e:
+    except ValueError as e:
         return default
 
 

@@ -37,7 +37,7 @@ def load_modules(folder):
                     __import__(name, globals(), locals(), [])
                     module.loaded = datetime.utcnow()
                     module.error = ''
-                except Exception, e:
+                except Exception as e:
                     tb_msg = traceback.format_exc()
                     message = "Error: ".format(e.message)
                     module.error = tb_msg

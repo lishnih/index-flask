@@ -102,7 +102,7 @@ def views_db_func(db, tables):
         template = form.template.data
 
 
-        if template and template <> 'None':
+        if template and template != 'None':
             template_name = 'custom/{0}.html'.format(template)
             if form.unlim.data == 'on':
                 limit = 0

@@ -18,7 +18,7 @@ else:
 
 here = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
 try:
-    README = open(os.path.join(here, 'README.md')).read()
+    README = open(os.path.join(here, 'README.rst')).read()
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 except IOError:
     README = CHANGES = ''
@@ -49,14 +49,17 @@ if __name__ == '__main__':
 
         author = 'Stan',
         author_email = 'lishnih@gmail.com',
-        url = 'http://github.com/lishnih/index',
+        url = 'https://github.com/lishnih/index-flask',
         platforms = ['any'],
         keywords = ['Flask', 'indexing', 'reports', 'documents'],
 
         packages = find_packages(),
+        # ['index_flask', 'index_flask.core', 'index_flask.extensions',
+        #  'index_flask.views', 'index_flask.view_j2']
 #       include_package_data=True,
-#       package_data = {__pkgname__: []},
+#       zip_safe=False,
 
+#       package_data = {__pkgname__: []},
         data_files = data_files,
 
         scripts = [
