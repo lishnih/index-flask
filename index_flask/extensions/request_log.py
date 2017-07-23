@@ -83,6 +83,7 @@ class RequestRecord(db.Model):  # Rev. 2016-07-21
         self.start = self._start
         self.values = json.dumps(dict(request.values.items()))
 
+
 db.create_all()
 
 

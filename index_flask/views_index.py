@@ -49,13 +49,30 @@ def p(page):
 
 @app.route("/about")
 def p_about():
+    p_admin = admin_permission.can()
+    additionals = {}
+    if p_admin:
+        import sys, sqlalchemy, flask, flask_principal, flask_sqlalchemy
+        from flask_login import __about__
+
+        additionals = dict(
+            py_version = sys.version,
+            flask_version = flask.__version__,
+            flask_principal_version = flask_principal.__version__,
+            flask_login_version = __about__.__version__,
+            sqlalchemy_version = sqlalchemy.__version__,
+            flask_sqlalchemy_version = flask_sqlalchemy.__version__,
+        )
+
     return render_template('p/about.html',
              name = None if current_user.is_anonymous else current_user.name,
-             p_admin = admin_permission.can(),
+             p_admin = p_admin,
              p_debug = debug_permission.can(),
              p_statistics = statistics_permission.can(),
 
              pkgname = __pkgname__,
              description = __description__,
              version = __version__,
+
+             **additionals
            )

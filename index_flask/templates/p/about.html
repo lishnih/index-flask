@@ -16,4 +16,25 @@
 <b>Version</b>: <i>{{ version }}</i>
 </p>
 
+{%- if py_version %}
+<p>
+<b>Python</b>: <i>{{ py_version }}</i>
+</p>
+<p>
+<b>Flask</b>: <i>{{ flask_version }}</i>
+</p>
+<p>
+<b>Flask Principal</b>: <i>{{ flask_principal_version }}</i>
+</p>
+<p>
+<b>Flask Login</b>: <i>{{ flask_login_version }}</i>
+</p>
+<p>
+<b>SQL Alchemy</b>: <i>{{ sqlalchemy_version }}</i>
+</p>
+<p>
+<b>Flask SQL Alchemy</b>: <i>{{ flask_sqlalchemy_version }}</i>
+</p>
+{%- endif %}
+
 {%- endblock %}

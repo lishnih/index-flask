@@ -83,6 +83,7 @@ class App(db.Model):          # Rev. 2016-07-12
         self.description = description
         self.created = datetime.utcnow()
 
+
 User.ext_apps = db.relationship('App', secondary=relationship_user_app,
                 backref=db.backref('user', lazy='dynamic'))
 
@@ -98,22 +99,20 @@ class AddAppForm(Form):
     description = StringField('Description')
 
     def validate(self):
-        validated = True
-
         rv = Form.validate(self)
         if not rv:
-            validated = False
+            return False
 
         if not re.match('^[A-Za-z][\w.]*$', self.name.data):
             self.name.errors.append('All characters in the string must be alphanumeric or dot with underline')
-            validated = False
+            return False
 
         app = App.query.filter_by(name=self.name.data).first()
         if app:
             self.name.errors.append('App with the same name already registered')
-            validated = False
+            return False
 
-        return validated
+        return True
 
 
 ##### Interface #####

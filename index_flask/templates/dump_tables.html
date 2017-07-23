@@ -9,10 +9,10 @@
 {%- from "_debug.html" import dump_table %}
 {%- for names, rows, description in obj %}
 
-  <i style="background-color: yellow">{{ description }}</i>
-  <br />
-  {{ dump_table(names, rows) }}
-  <hr />
+<i style="background-color: #efefcf">{{ description }}</i>
+<br />
+{{ dump_table(names, rows) }}
+<hr />
 
 {%- endfor %}
 

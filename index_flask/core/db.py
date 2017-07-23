@@ -82,7 +82,7 @@ def get_column(mtables, column_name):
 def get_primary_tables(metadata, tablename):
     mtable = metadata.tables.get(tablename)
     for key in mtable.foreign_keys:
-        yield key.column.table.name
+        yield key.parent, key.column.table
 
 
 def get_relative_tables(metadata, tablename):

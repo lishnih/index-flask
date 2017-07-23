@@ -6,12 +6,15 @@ from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
 import json
+from datetime import datetime
 
-from flask import request, render_template, jsonify, url_for, flash
+from flask import request, render_template, jsonify, redirect, url_for, flash
 
 from flask_login import login_required, current_user
+from flask_principal import Permission, RoleNeed
 
 from sqlalchemy.sql import select, text
+from wtforms import Form, StringField, TextAreaField, validators
 
 from ..core.backwardcompat import *
 from ..core.db import init_db, get_db_list, get_rows_plain
@@ -20,6 +23,7 @@ from ..core.user_templates import get_user_templates
 from ..forms_tables import TableCondForm
 
 from ..a import app, db
+from ..app import get_next
 
 
 ### Constants ###
@@ -27,24 +31,49 @@ from ..a import app, db
 limit_default = 15
 
 
+##### Roles #####
+
+admin_permission = Permission(RoleNeed('admin'))
+
+
 ##### Models #####
 
-class SQLTemplate(db.Model):  # Rev. 2017-07-16
+class SQLTemplate(db.Model):  # Rev. 2017-07-23
     __tablename__ = 'sqltemplate'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     value = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text)
+    description = db.Column(db.Text, nullable=False, default='')
     created = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, name, value=None, description=None):
+    def __init__(self, name, value=None, description=''):
         self.name = name
         self.value = value
         self.description = description
         self.created = datetime.utcnow()
 
+
 db.create_all()
+
+
+##### Forms #####
+
+class NewQueryForm(Form):
+    name = StringField('Name *', [
+        validators.Length(min=2),
+    ])
+    value = TextAreaField('Value *', [
+        validators.Required(),
+    ])
+    description = TextAreaField('Description')
+
+    def validate(self):
+        rv = Form.validate(self)
+        if not rv:
+            return False
+
+        return True
 
 
 ### Interface ###
@@ -203,7 +232,7 @@ def views_query(db=None):
                        sqltemplate.description if sqltemplate.description else '>')
                      ] for sqltemplate in sqltemplates]
 
-        obj.append((table_names, table_rows, db))
+        obj.append((table_names, table_rows, db, ''))
 
     return render_template('db/index.html',
              title = 'Databases',
@@ -230,3 +259,25 @@ def views_query_db_dump(db, id):
 @login_required
 def views_query_db_id(db, id):
     return views_query_func(db, id)
+
+
+@app.route('/query_new', methods=['GET', 'POST'])
+@login_required
+@admin_permission.require(403)
+def views_query_new():
+    form = NewQueryForm(request.form)
+    if request.method == 'POST' and form.validate():
+        sqltemplate = SQLTemplate(
+            name = form.name.data,
+            value = form.value.data,
+            description = form.description.data,
+        )
+        db.session.add(sqltemplate)
+        db.session.commit()
+
+        flash('Template added')
+        return redirect(get_next('/query/'))
+
+    return render_template('extensions/user_query/newquery.html',
+             form = form,
+    )

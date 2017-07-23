@@ -11,10 +11,12 @@ from flask import request, render_template, jsonify, url_for, flash
 
 from flask_login import login_required, current_user
 
+from sqlalchemy import not_, and_
 from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import init_db, get_db_list, get_rows_base, get_rows_ext
+from ..core.db import ( init_db, get_db_list, get_rows_base, get_rows_ext,
+                        get_primary_tables )
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
@@ -178,7 +180,7 @@ def views_db(db=None):
                        '<a href="{0}">{1}</a>'.format(url_for('views_db', db=db, tables=table), table)
                      ] for table in sorted(metadata.tables.keys())]
 
-        obj.append((table_names, table_rows, db))
+        obj.append((table_names, table_rows, db, ''))
 
     return render_template('db/index.html',
              title = 'Databases',
@@ -230,7 +232,7 @@ def views_db_info(db):
                                c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
 
         table = '<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=table), table)
-        obj.append((table_names, table_rows, table))
+        obj.append((table_names, table_rows, table, ''))
 
     return render_template('db/index.html',
              title = 'Database Info',
@@ -332,7 +334,26 @@ def views_db_table(db, table):
     names, rows, total, filtered, shown, page, pages, s = get_rows_base(session, mtable, offset, limit)
 
 
+    obj = []
+    for rel_key, mtable1 in get_primary_tables(metadata, table):
+        sub = select([text('id')]).select_from(mtable1)
+        s2 = select('*').select_from(mtable).where(and_(rel_key.isnot(None), not_(rel_key.in_(sub))))
+        res = session.execute(s2)
+        rows2 = [[j for j in i] for i in res.fetchall()]
+        if rows2:
+            obj.append((names, rows2,
+                "There are rows with the broken relationships to the table '{0}'".format(mtable1.name), ''))
+
+
     # Выводим
+    if obj:
+        return render_template('db/index.html',
+                 title = 'Table: {0}'.format(table),
+                 names = names,
+                 rows = rows,
+                 obj = obj,
+               )
+
     return render_format('db/table.html',
              title = 'Database: {0}'.format(db),
              db = db,

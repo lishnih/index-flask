@@ -8,7 +8,6 @@
 
 
 {% macro dump_value(value) %}
-{%- autoescape false %}
 {%- if value is mapping %}
   {{ dump_dict(value) }}
 {%- elif value is none %}
@@ -16,7 +15,6 @@
 {%- else %}
   {{ value|safe_str }}
 {%- endif %}
-{%- endautoescape %}
 {%- endmacro %}
 
 
@@ -27,7 +25,7 @@
 {%- elif value is none %}
   <i class="inactive">null</i>
 {%- else %}
-  {{ value }}
+  {{ value|safe_str }}
 {%- endif %}
 {%- endautoescape %}
 {%- endmacro %}

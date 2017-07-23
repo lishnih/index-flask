@@ -51,7 +51,7 @@ if __name__ == '__main__':
         author_email = 'lishnih@gmail.com',
         url = 'https://github.com/lishnih/index-flask',
         platforms = ['any'],
-        keywords = ['Flask', 'indexing', 'reports', 'documents'],
+        keywords = ['flask', 'indexing', 'reporting', 'documents'],
 
         packages = find_packages(),
         # ['index_flask', 'index_flask.core', 'index_flask.extensions',

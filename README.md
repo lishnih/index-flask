@@ -12,7 +12,7 @@ $ py -3 -m easy_install index_flask-0.2-py3.4.egg
 
 ### After installation
 
-- First change SECRET_KEY in the config file: ***index_flask/config.py***
+- First change SECRET_KEY in the config file: *index_flask/config.py*
 
 - Run to initialize first user:
 ```sh
@@ -40,5 +40,5 @@ http://localhost:5000/change_password
 
 License
 ----
-MIT
-LGPL v2+
+- MIT
+- LGPL v2+

@@ -23,7 +23,7 @@ class TableCondForm(Form):
     column3 = SelectField('Filter')
 
     conditions = [[i, i] for i in [
-        '', '=', '!=', '~', '!~', '>', '>=', '<', '<=',
+        '', '=', '!=', '=(int)', '!=(int)', '~', '!~', '>', '>=', '<', '<=',
         'consist', 'starts with', 'ends with',
         'in', 'not in', 'between', 'not between',
         'is None', 'not is None', 'is empty', 'not is empty',
@@ -155,8 +155,15 @@ class TableCondForm(Form):
             if value is None:
                 clause = "{0} is null".format(column)
                 mclause = mcolumn == None if mt else clause
-            elif isinstance(value, basestring) or isinstance(value, int):
-                clause = "{0} = '{1}'".format(column, value)
+            elif isinstance(value, basestring):
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} = {1}".format(column, value)
+                else:
+                    clause = "{0} = '{1}'".format(column, value)
+                mclause = mcolumn == value if mt else clause
+            elif isinstance(value, int):
+                clause = "{0} = {1}".format(column, value)
                 mclause = mcolumn == value if mt else clause
             elif isinstance(value, float):
                 clause = "{0} like '{1}'".format(column, value)
@@ -164,10 +171,18 @@ class TableCondForm(Form):
 
         else:
             if condition == '=' or condition == '==':
-                clause = "{0} = '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} = {1}".format(column, value)
+                else:
+                    clause = "{0} = '{1}'".format(column, value)
                 mclause = mcolumn == value if mt else clause
             elif condition == '!=':
-                clause = "{0} != '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} != {1}".format(column, value)
+                else:
+                    clause = "{0} != '{1}'".format(column, value)
                 mclause = mcolumn != value if mt else clause
             elif condition == '~':
                 clause = "{0} like '{1}'".format(column, value)
@@ -176,16 +191,32 @@ class TableCondForm(Form):
                 clause = "{0} not like '{1}'".format(column, value)
                 mclause = not_(mcolumn.like(value)) if mt else clause
             elif condition == '>':
-                clause = "{0} > '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} > {1}".format(column, value)
+                else:
+                    clause = "{0} > '{1}'".format(column, value)
                 mclause = mcolumn > value if mt else clause
             elif condition == '>=':
-                clause = "{0} >= '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} >= {1}".format(column, value)
+                else:
+                    clause = "{0} >= '{1}'".format(column, value)
                 mclause = mcolumn >= value if mt else clause
             elif condition == '<':
-                clause = "{0} < '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} < {1}".format(column, value)
+                else:
+                    clause = "{0} < '{1}'".format(column, value)
                 mclause = mcolumn < value if mt else clause
             elif condition == '<=':
-                clause = "{0} <= '{1}'".format(column, value)
+                if value.isdigit():
+                    value = int(value)
+                    clause = "{0} <= {1}".format(column, value)
+                else:
+                    clause = "{0} <= '{1}'".format(column, value)
                 mclause = mcolumn <= value if mt else clause
 
             elif condition == 'consist':
