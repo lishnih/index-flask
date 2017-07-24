@@ -136,7 +136,11 @@
 </form>
 {%- else %}
 {%- if total %}
+{%- if shown %}
 <div><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
+{%- else %}
+<div><i>Total: {{ total }}</i></div>
+{%- endif %}
 {%- endif %}
 {%- endif %}
 

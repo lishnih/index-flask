@@ -28,7 +28,7 @@ jQuery( function($) {
   				$( this ).dialog( "close" );
   			}
   		},
-  	]
+  	],
   });
 
 

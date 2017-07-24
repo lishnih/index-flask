@@ -1,13 +1,17 @@
 {% macro text_copyright() %}
-  <div>
+  <p>
     ©2006-2017 Stan Ovchinnikov,
-    <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html">GNU Lesser General Public License, version 2.1</a>
-  </div>
+    <a href="/tos.html">Terms of service</a>
+  </p>
 {%- endmacro %}
 
 
 {% macro text_dialog() %}
 <div id="dialog" title="Dialog">
+  <div id="dialog_content"></div>
+</div>
+
+<div id="custom_dialog" title="Dialog">
   <div id="dialog_content"></div>
 </div>
 {%- endmacro %}

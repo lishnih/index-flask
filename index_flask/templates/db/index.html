@@ -3,7 +3,11 @@
 {%- block body %}
 
 {%- if total %}
-<i>Всего: {{ total }}</i><br />
+{%- if shown %}
+<div><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
+{%- else %}
+<div><i>Total: {{ total }}</i></div>
+{%- endif %}
 {%- endif %}
 
 {%- from "_debug.html" import dump_table_unsafe %}

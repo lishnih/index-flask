@@ -351,6 +351,9 @@ def views_db_table(db, table):
                  title = 'Table: {0}'.format(table),
                  names = names,
                  rows = rows,
+                 total = total,
+                 filtered = filtered,
+                 shown = shown,
                  obj = obj,
                )
 
