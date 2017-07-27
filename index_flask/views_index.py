@@ -50,6 +50,9 @@ def p(page):
 @app.route("/about")
 def p_about():
     p_admin = admin_permission.can()
+    p_debug = debug_permission.can()
+    p_statistics = statistics_permission.can()
+
     additionals = {}
     if p_admin:
         import sys, sqlalchemy, flask, flask_principal, flask_sqlalchemy
@@ -62,13 +65,16 @@ def p_about():
             flask_login_version = __about__.__version__,
             sqlalchemy_version = sqlalchemy.__version__,
             flask_sqlalchemy_version = flask_sqlalchemy.__version__,
+            is_admin = p_admin,
+            is_debug = p_debug,
+            is_statistics = p_statistics,
         )
 
     return render_template('p/about.html',
              name = None if current_user.is_anonymous else current_user.name,
              p_admin = p_admin,
-             p_debug = debug_permission.can(),
-             p_statistics = statistics_permission.can(),
+             p_debug = p_debug,
+             p_statistics = p_statistics,
 
              pkgname = __pkgname__,
              description = __description__,

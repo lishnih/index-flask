@@ -15,6 +15,20 @@
 {{ dump_table_unsafe(names, rows) }}
 {%- endif %}
 
+
+{%- if html %}
+{%- autoescape false %}
+{{ html }}
+{%- endautoescape %}
+{%- endif %}
+
+{%- if text %}
+<pre>
+{{ text }}
+</pre>
+{%- endif %}
+
+
 {%- for names, rows, description, after in obj %}
 
 {%- autoescape false %}

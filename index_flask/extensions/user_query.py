@@ -45,13 +45,12 @@ class SQLTemplate(db.Model):  # Rev. 2017-07-23
     name = db.Column(db.String, nullable=False)
     value = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False, default='')
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, name, value=None, description=''):
         self.name = name
         self.value = value
         self.description = description
-        self.created = datetime.utcnow()
 
 
 db.create_all()

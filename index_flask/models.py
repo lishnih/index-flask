@@ -28,7 +28,7 @@ class User(db.Model):         # Rev. 2016-06-23
     company = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     token = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     verified = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
 #   db.Index('email', email, unique=True)
@@ -64,7 +64,6 @@ class User(db.Model):         # Rev. 2016-06-23
         self.company = company
         self.password = self.get_password(password)
         self.token = self.get_token(email, self.password)
-        self.created = datetime.utcnow()
 
         self.init_env()
         self.run_verification()
@@ -123,12 +122,11 @@ class Group(db.Model):        # Rev. 2017-07-16
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, name, description=''):
         self.name = name.lower()
         self.description = description
-        self.created = datetime.utcnow()
 
 
 class Database(db.Model):     # Rev. 2016-07-12
@@ -139,13 +137,12 @@ class Database(db.Model):     # Rev. 2016-07-12
     _group_id = db.Column(db.Integer, db.ForeignKey('group.id'))
     name = db.Column(db.String, nullable=False)
     url = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, name, url, user):
         self._user_id = user.id
         self.name = name
         self.url = url
-        self.created = datetime.utcnow()
 
 
 class Module(db.Model):       # Rev. 2016-07-12
@@ -155,8 +152,8 @@ class Module(db.Model):       # Rev. 2016-07-12
     name = db.Column(db.String, nullable=False)
     folder = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean, nullable=False, default=True)
-    created = db.Column(db.DateTime, nullable=False)
-    loaded = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    loaded = db.Column(db.DateTime, nullable=False, default=datetime(2000, 1, 1))
     error = db.Column(db.String, nullable=False, default='')
 
     db.Index('ext', name, folder, unique=True)
@@ -164,8 +161,6 @@ class Module(db.Model):       # Rev. 2016-07-12
     def __init__(self, name, folder='extensions'):
         self.name = name
         self.folder = folder
-        self.created = datetime.utcnow()
-        self.loaded = datetime(2000, 1, 1)
 
 
 class Register(db.Model):     # Rev. 2017-07-16
@@ -178,7 +173,7 @@ class Register(db.Model):     # Rev. 2017-07-16
     dir = db.Column(db.String)
     name = db.Column(db.String, nullable=False)
     value = db.Column(db.Text, nullable=False)
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, section, name, value, user=None, group=None):
         self._user_id = user.id
@@ -186,7 +181,6 @@ class Register(db.Model):     # Rev. 2017-07-16
         self.section = section
         self.name = name
         self.value = value
-        self.created = datetime.utcnow()
 
 
 class Favorite(db.Model):     # Rev. 2017-07-16
@@ -196,13 +190,12 @@ class Favorite(db.Model):     # Rev. 2017-07-16
     _user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String)
     url = db.Column(db.String)
-    created = db.Column(db.DateTime, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, title, url, user=None):
         self._user_id = user.id
         self.title = title
         self.url = url
-        self.created = datetime.utcnow()
 
 
 db.create_all()

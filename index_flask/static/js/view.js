@@ -66,7 +66,7 @@ jQuery( function($) {
   } );
 
 
-  $("select.page").click( function(event) {
+  $("select.page").change( function(event) {
     select = $(this);
     form = select.closest("form");
 

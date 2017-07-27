@@ -49,10 +49,9 @@ class RS_App(db.Model):       # Rev. 2016-07-23
     token = db.Column(db.String, nullable=False, default='')
     sticked = db.Column(db.Boolean, nullable=False, default=True)
     options = db.Column(db.PickleType, nullable=False, default={})
-    attached = db.Column(db.DateTime)
+    attached = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self):
-        self.attached = datetime.utcnow()
         self.token = self.suit_code(self._user_id, self._app_id)
 
     def get_token(self, user, app):
@@ -75,13 +74,12 @@ class App(db.Model):          # Rev. 2016-07-12
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, id, name, description=''):
         self.id = id
         self.name = name.lower()
         self.description = description
-        self.created = datetime.utcnow()
 
 
 User.ext_apps = db.relationship('App', secondary=relationship_user_app,
@@ -119,7 +117,6 @@ class AddAppForm(Form):
 
 def init_rs_user_app(user, app):
     s = relationship_user_app.update(values=dict(
-          attached = datetime.utcnow(),
           token = suit_code(user.id, app.id),
         )).where(
           and_(relationship_user_app.c._user_id == user.id,

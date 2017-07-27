@@ -1,6 +1,6 @@
 {% macro render_field(field) %}
 <p>
-  <dt>{{ field.label }}</dt>
+  <dt>{{ field.label(id=field.id) }}</dt>
   <dd>{{ field(**kwargs)|safe }}
   {%- if field.errors %}
     <ul class=errors>
