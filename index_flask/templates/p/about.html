@@ -6,44 +6,30 @@
 
 {%- block pbody %}
 
-<p>
-<b>Package</b>: <i>{{ pkgname }}</i>
-</p>
-<p>
-<b>Description</b>: <i>{{ description }}</i>
-</p>
-<p>
-<b>Version</b>: <i>{{ version }}</i>
-</p>
+<p><b>Package</b>: <i>{{ pkgname }}</i></p>
+<p><b>Description</b>: <i>{{ description }}</i></p>
+<p><b>Version</b>: <i>{{ version }}</i></p>
 
 {%- if py_version %}
+<p><b>Python</b>: <i>{{ py_version }}</i></p>
 <p>
-<b>Python</b>: <i>{{ py_version }}</i>
+  <b>Flask</b>: <i>{{ flask_version }}</i><br />
+  <b>Werkzeug</b>: <i>{{ werkzeug_version }}</i><br />
+  <b>Jinja2</b>: <i>{{ jinja2_version }}</i><br />
 </p>
 <p>
-<b>Flask</b>: <i>{{ flask_version }}</i>
+  <b>Flask Principal</b>: <i>{{ flask_principal_version }}</i><br />
+  <b>Flask Login</b>: <i>{{ flask_login_version }}</i><br />
 </p>
 <p>
-<b>Flask Principal</b>: <i>{{ flask_principal_version }}</i>
-</p>
-<p>
-<b>Flask Login</b>: <i>{{ flask_login_version }}</i>
-</p>
-<p>
-<b>SQL Alchemy</b>: <i>{{ sqlalchemy_version }}</i>
-</p>
-<p>
-<b>Flask SQL Alchemy</b>: <i>{{ flask_sqlalchemy_version }}</i>
+  <b>SQL Alchemy</b>: <i>{{ sqlalchemy_version }}</i><br />
+  <b>Flask SQL Alchemy</b>: <i>{{ flask_sqlalchemy_version }}</i><br />
 </p>
 
 <p>
-<b>Admin</b>: <i>{{ is_admin }}</i>
-</p>
-<p>
-<b>Debug</b>: <i>{{ is_debug }}</i>
-</p>
-<p>
-<b>Statistics</b>: <i>{{ is_statistics }}</i>
+  <b>Admin</b>: <i>{{ is_admin }}</i><br />
+  <b>Debug</b>: <i>{{ is_debug }}</i><br />
+  <b>Statistics</b>: <i>{{ is_statistics }}</i><br />
 </p>
 {%- endif %}
 

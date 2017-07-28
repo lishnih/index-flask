@@ -8,6 +8,7 @@ from __future__ import ( division, absolute_import,
 import json
 
 from flask import request, render_template, jsonify, url_for, flash
+from jinja2 import Markup, escape
 
 from flask_login import login_required, current_user
 
@@ -176,8 +177,8 @@ def views_db(db=None):
 
 
         table_names = ['Tables', 'w/options']
-        table_rows = [['<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=db, table=table), table),
-                       '<a href="{0}">{1}</a>'.format(url_for('views_db', db=db, tables=table), table)
+        table_rows = [[Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=escape(db), table=escape(table)), escape((table)))),
+                       Markup('<a href="{0}">{1}</a>'.format(url_for('views_db', db=escape(db), tables=escape(table)), escape(table)))
                      ] for table in sorted(metadata.tables.keys())]
 
         obj.append((table_names, table_rows, db, ''))
@@ -227,8 +228,8 @@ def views_db_info(db):
     for table, mtable in metadata.tables.items():
         table_rows = []
         for c in mtable.c:
-            table_rows.append(['<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=db, table=table, column=c.name), c.name),
-                               '<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=db, table=table, column=c.name), repr(c.type)),
+            table_rows.append([Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=escape(db), table=escape(table), column=escape(c.name)), escape(c.name))),
+                               Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=escape(db), table=escape(table), column=escape(c.name)), repr(c.type))),
                                c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
 
         table = '<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=table), table)

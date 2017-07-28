@@ -9,6 +9,7 @@ import re, hashlib, random
 from datetime import datetime
 
 from flask import request, render_template, jsonify, redirect, url_for, flash
+from jinja2 import Markup, escape
 
 from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
@@ -249,13 +250,13 @@ def ext_user_app_apps():
         row = []
         for i in names:
             if i == 'name':
-                row.append('<a href="/app{0}">{1}</a>'.format(app.id, app.name))
+                row.append(Markup('<a href="/app{0}">{1}</a>'.format(app.id, escape(app.name))))
             else:
                 row.append(app.__dict__.get(i))
 
         rows.append(row)
 
-    return render_template('admin/users.html',
+    return render_template('dump_table.html',
              title = 'Apps',
              names = names,
              rows = rows,
@@ -299,6 +300,7 @@ def ext_user_app_users():
 
     users = User.query.all()
     apps = App.query.all()
+    total = len(users)
 
     names = ['id', 'email']
     for app in apps:
@@ -306,7 +308,7 @@ def ext_user_app_users():
 
     rows = []
     for user in users:
-        row = [user.id, user.email]
+        row = [user.id, escape(user.email)]
 
         for app in apps:
             row.append(parse_input('', app in user.ext_apps, 'toggle_record',
@@ -316,8 +318,9 @@ def ext_user_app_users():
 
         rows.append(row)
 
-    return render_template('admin/users.html',
+    return render_template('admin/table_unsafe.html',
              title = 'User apps',
              names = names,
              rows = rows,
+             total = total,
            )

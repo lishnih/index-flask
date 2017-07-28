@@ -99,6 +99,18 @@ div.table td:hover {
   color: blue;
 }
 
+
+span.truncated {
+  font-style: italic;
+}
+
+span.quoted {
+  font-weight: bold;
+}
+
+
+/*** Menu ***/
+
 div.menu {
   display: inline-block;
   padding: 0em .7em;

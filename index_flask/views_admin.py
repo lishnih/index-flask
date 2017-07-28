@@ -8,6 +8,7 @@ from __future__ import ( division, absolute_import,
 import os
 
 from flask import request, render_template, jsonify, redirect, flash
+from jinja2 import Markup, escape
 
 from flask_login import login_required
 from flask_principal import Permission, RoleNeed
@@ -52,13 +53,13 @@ def admin_users():
         row = []
         for i in names:
             if i == 'username':
-                row.append('<a href="user/{0}">{0}</a>'.format(user.username))
+                row.append(Markup('<a href="user/{0}">{0}</a>'.format(escape(user.username))))
             else:
                 row.append(user.__dict__.get(i))
 
         rows.append(row)
 
-    return render_template('admin/users.html',
+    return render_template('dump_table.html',
              title = 'Users',
              names = names,
              rows = rows,
@@ -75,7 +76,7 @@ def admin_user(username):
     names = [i.name for i in User.__table__.c]
     rows = [[user.__dict__.get(i) for i in names]]
 
-    return render_template('admin/users.html',
+    return render_template('dump_table.html',
              title = 'User',
              names = names,
              rows = rows,
@@ -96,13 +97,13 @@ def admin_groups():
         row = []
         for i in names:
             if i == 'name':
-                row.append('<a href="group/{0}">{0}</a>'.format(group.name))
+                row.append(Markup('<a href="group/{0}">{0}</a>'.format(escape(group.name))))
             else:
                 row.append(group.__dict__.get(i))
 
         rows.append(row)
 
-    return render_template('admin/users.html',
+    return render_template('dump_table.html',
              title = 'Groups',
              names = names,
              rows = rows,
@@ -119,7 +120,7 @@ def admin_group(name):
     names = [i.name for i in Group.__table__.c]
     rows = [[group.__dict__.get(i) for i in names]]
 
-    return render_template('admin/users.html',
+    return render_template('dump_table.html',
              title = 'Group',
              names = names,
              rows = rows,
@@ -162,6 +163,7 @@ def admin_user_groups():
 
     users = User.query.all()
     groups = Group.query.all()
+    total = len(users)
 
     names = ['id', 'email']
     for group in groups:
@@ -169,7 +171,7 @@ def admin_user_groups():
 
     rows = []
     for user in users:
-        row = [user.id, user.email]
+        row = [user.id, escape(user.email)]
 
         for group in groups:
             row.append(parse_input('', group in user.groups, 'toggle_record',
@@ -179,10 +181,11 @@ def admin_user_groups():
 
         rows.append(row)
 
-    return render_template('admin/users.html',
+    return render_template('admin/table_unsafe.html',
              title = 'User groups',
              names = names,
              rows = rows,
+             total = total,
            )
 
 
@@ -284,7 +287,7 @@ def admin_modules():
                     id = module.id,
                 ))
             else:
-                row.append(module.__dict__.get(i))
+                row.append(escape(module.__dict__.get(i)))
 
         # Delete
         row.append(parse_span('', '[ x ]', 'delete_record',
@@ -303,7 +306,7 @@ def admin_modules():
     names.append('On the disk')
     names.append('Is loaded')
 
-    return render_template('admin/modules.html',
+    return render_template('admin/table_unsafe.html',
              title = 'App modules',
              names = names,
              rows = rows,

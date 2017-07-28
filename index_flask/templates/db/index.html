@@ -10,7 +10,7 @@
 {%- endif %}
 {%- endif %}
 
-{%- from "_debug.html" import dump_table_unsafe %}
+{%- from "_debug.html" import dump_table, dump_table_unsafe %}
 {%- if rows %}
 {{ dump_table_unsafe(names, rows) }}
 {%- endif %}
@@ -35,7 +35,7 @@
 <b><i style="background-color: #efefcf">{{ description }}</i></b>
 {%- endautoescape %}
 <br />
-{{ dump_table_unsafe(names, rows) }}
+{{ dump_table(names, rows) }}
 {%- autoescape false %}
 {{ after }}
 {%- endautoescape %}

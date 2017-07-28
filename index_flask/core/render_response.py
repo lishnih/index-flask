@@ -6,6 +6,7 @@ from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
 from flask import request, render_template, jsonify, flash
+from jinja2 import Markup, escape
 
 from flask_principal import Permission, RoleNeed
 
@@ -17,15 +18,14 @@ from ..app import safe_str
 debug_permission = Permission(RoleNeed('debug'))
 
 
-def render_template_custom(tmpl_name, **kargs):
-    custom = request.values.get('custom')
+def swap(s, limit=60):
+    if isinstance(s, basestring):
+        s = escape(s)
+        if len(s) > limit:
+            s = Markup("""<span class="truncated">{0}</span>
+<span class="quoted" title="{1}">[...]</span>""".format(s[0:limit-20], s))
 
-    if not custom:
-        flash("На этой странице Вы можете задать шаблон")
-        custom_name = tmpl_name
-    else:
-        custom_name = 'custom/{0}.html'.format(custom)
-    return render_template(custom_name, **kargs)
+    return s
 
 
 def render_format(tmpl_name, flash_t=None, **kargs):
@@ -46,10 +46,15 @@ def render_format(tmpl_name, flash_t=None, **kargs):
 
         if 'rows' in kargs:
             kargs['rows'] = [[safe_str(None, i) for i in row] for row in kargs['rows']]
+            kargs['rows'] = [[swap(i) for i in row] for row in kargs['rows']]
 
         return jsonify(**kargs)
 
     else:
         if flash_t:
             flash(*flash_t)
+
+        if 'rows' in kargs:
+            kargs['rows'] = [[swap(i) for i in row] for row in kargs['rows']]
+
         return render_template(tmpl_name, **kargs)

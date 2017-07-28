@@ -9,6 +9,7 @@ import json, time
 from datetime import datetime
 
 from flask import request, render_template, jsonify, redirect, url_for, flash
+from jinja2 import Markup, escape
 
 from flask_login import login_required, current_user
 
@@ -388,7 +389,8 @@ def get_objects(session, metadata, db, user_id):
     obj.append(
         [
           ['Name', 'Description'],
-          [['<a href="{0}">{1}</a>'.format(url_for('ext_user_data_obj', db=db, id=i.id), i.name), i.description] for i in res.fetchall()],
+          [[Markup('<a href="{0}">{1}</a>'.format(url_for('ext_user_data_obj', db=escape(db), id=i.id),
+              escape(i.name))), i.description] for i in res.fetchall()],
           'Objects',
           '<a href="{0}">Add</a>'.format(url_for('ext_user_data_add', db=db, type='obj'))
         ]
@@ -400,7 +402,8 @@ def get_objects(session, metadata, db, user_id):
     obj.append(
         [
           ['Name', 'Description'],
-          [['<a href="{0}">{1}</a>'.format(url_for('ext_user_data_sheet', db=db, id=i.id), i.name), i.description] for i in res.fetchall()],
+          [[Markup('<a href="{0}">{1}</a>'.format(url_for('ext_user_data_sheet', db=escape(db), id=i.id),
+              escape(i.name))), i.description] for i in res.fetchall()],
           'Sheets',
           '<a href="{0}">Add</a>'.format(url_for('ext_user_data_add', db=db, type='sheet'))
         ]
@@ -412,7 +415,8 @@ def get_objects(session, metadata, db, user_id):
     obj.append(
         [
           ['Name', 'Description'],
-          [['<a href="{0}">{1}</a>'.format(url_for('ext_user_data_list', db=db, id=i.id), i.name), i.description] for i in res.fetchall()],
+          [[Markup('<a href="{0}">{1}</a>'.format(url_for('ext_user_data_list', db=escape(db), id=i.id),
+              escape(i.name))), i.description] for i in res.fetchall()],
           'Lists',
           '<a href="{0}">Add</a>'.format(url_for('ext_user_data_add', db=db, type='list'))
         ]
@@ -424,7 +428,8 @@ def get_objects(session, metadata, db, user_id):
     obj.append(
         [
           ['Name', 'Description'],
-          [['<a href="{0}">{1}</a>'.format(url_for('ext_user_data_dict', db=db, id=i.id), i.name), i.description] for i in res.fetchall()],
+          [[Markup('<a href="{0}">{1}</a>'.format(url_for('ext_user_data_dict', db=escape(db), id=i.id),
+              escape(i.name))), i.description] for i in res.fetchall()],
           'Dicts',
           '<a href="{0}">Add</a>'.format(url_for('ext_user_data_add', db=db, type='dict'))
         ]
@@ -516,7 +521,6 @@ def ext_user_data(db=None):
 def ext_user_data_drop(db):
     names, dbs_table = get_dbs_table(current_user.home, db)
     html = ''
-    obj = []
 
     if db:
         db_uri, session, metadata = init_db(current_user.home, db)
@@ -541,7 +545,6 @@ def ext_user_data_drop(db):
              names = names,
              rows = dbs_table,
              html = html,
-             obj = obj,
            )
 
 

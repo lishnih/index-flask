@@ -9,6 +9,7 @@ import json
 from datetime import datetime
 
 from flask import request, render_template, jsonify, redirect, url_for, flash
+from jinja2 import Markup, escape
 
 from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
@@ -225,10 +226,10 @@ def views_query(db=None):
         sqltemplates = sorted(sqltemplates, key=lambda row: row.id)
 
         table_names = ['SQL query', 'Description']
-        table_rows = [['<a href="{0}">{1}</a>'.format(url_for('views_query_db_id', db=db, id=sqltemplate.id),
-                       sqltemplate.name if sqltemplate.name else "<{0}>".format(sqltemplate.id)),
-                       '<a href="{0}">{1}</a>'.format(url_for('views_query_db_dump', db=db, id=sqltemplate.id),
-                       sqltemplate.description if sqltemplate.description else '>')
+        table_rows = [[Markup('<a href="{0}">{1}</a>'.format(url_for('views_query_db_id', db=escape(db), id=sqltemplate.id),
+                       escape(sqltemplate.name) if sqltemplate.name else "<{0}>".format(sqltemplate.id))),
+                       Markup('<a href="{0}">{1}</a>'.format(url_for('views_query_db_dump', db=escape(db), id=sqltemplate.id),
+                       escape(sqltemplate.description) if sqltemplate.description else '>'))
                      ] for sqltemplate in sqltemplates]
 
         obj.append((table_names, table_rows, db, ''))

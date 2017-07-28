@@ -11,6 +11,7 @@ from flask_login import current_user
 from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
+from .core.fileman import list_files
 from . import __pkgname__, __description__, __version__
 
 from .a import app
@@ -54,13 +55,15 @@ def p_about():
     p_statistics = statistics_permission.can()
 
     additionals = {}
-    if p_admin:
-        import sys, sqlalchemy, flask, flask_principal, flask_sqlalchemy
+    if p_admin or p_debug:
+        import sys, flask, werkzeug, jinja2, flask_principal, sqlalchemy, flask_sqlalchemy
         from flask_login import __about__
 
         additionals = dict(
             py_version = sys.version,
             flask_version = flask.__version__,
+            werkzeug_version = werkzeug.__version__,
+            jinja2_version = jinja2.__version__,
             flask_principal_version = flask_principal.__version__,
             flask_login_version = __about__.__version__,
             sqlalchemy_version = sqlalchemy.__version__,
@@ -81,4 +84,17 @@ def p_about():
              version = __version__,
 
              **additionals
+           )
+
+
+@app.route('/utils/')
+def utils():
+    utils_path = '/static/utils/'
+    dirlist, filelist = list_files(utils_path, app.root_path, '/utils/')
+
+    return render_template('views/views_debug/test.html',
+             title = 'Testing directory',
+             path = utils_path,
+             dirlist = dirlist,
+             filelist = filelist,
            )

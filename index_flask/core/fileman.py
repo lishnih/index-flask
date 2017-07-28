@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os
+import os, logging
 
 
 def list_files(path, root, override_url=None):
@@ -17,10 +17,13 @@ def list_files(path, root, override_url=None):
 
     dirlist = []
     filelist = []
+
     try:
         ldir = os.listdir(fullpath)
-    except OSError:
-        pass
+
+    except OSError as e:
+        logging.warning("OSError '{0}'".format(e.message))
+
     else:
         for name in ldir:
             fullname = os.path.join(fullpath, name)
@@ -29,4 +32,5 @@ def list_files(path, root, override_url=None):
                 dirlist.append([name, url])
             else:
                 filelist.append([name, url])
+
     return dirlist, filelist

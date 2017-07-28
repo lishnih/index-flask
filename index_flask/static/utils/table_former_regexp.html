@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="python web application" />
+  <meta name="description" content="flask web application" />
+  <link href="/favicon.ico" type="image/ico" rel="shortcut icon" />
+  <title>Table former (regexp)</title>
+
+  <link href="/external/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+  <script src="/external/jquery-ui/external/jquery/jquery.js"></script>
+  <script src="/external/jquery-ui/jquery-ui.min.js"></script>
+
+  <link href="/external/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="/external/bootstrap/js/bootstrap.min.js"></script>
+
+  <link href="/external/jquery.tablesorter/default.css" rel="stylesheet" />
+  <script src="/external/jquery.tablesorter/jquery.tablesorter.min.js"></script>
+
+  <link href="/external/highlight/highlight.css" rel="stylesheet" />
+  <script src="/external/highlight/highlight.js"></script>
+
+  <script src="/external/string.format-1.0.packed.js"></script>
+  <script src="/external/jquery.json-2.3.min.js"></script>
+
+  <link href="/debug/default.css" rel="stylesheet" />
+  <script src="/debug/debug.js"></script>
+  <script src="/debug/jquery-debug.js"></script>
+
+  <link href="/css/default.css" rel="stylesheet" />
+  <script src="/js/view.js"></script>
+
+  <style>
+
+    .blue_frame {
+      border: 1px solid #00f;
+      padding: 5px;
+      overflow: auto;
+    }
+
+    .green_frame {
+      border: 1px solid #0f0;
+      padding: 5px;
+      overflow: auto;
+    }
+
+    .ok {
+      background-color: #ddffdd;
+    }
+
+    .warning {
+      background-color: #ffffdd;
+    }
+
+    .error {
+      background-color: #ffdddd;
+    }
+
+  </style>
+
+
+  <script type="text/javascript">
+
+
+    function build_row( list, include, after ) {
+      var buffer = '';
+
+      if (list) {
+        cols = include ? list.length : list.length-1;
+
+        for (var i=1; i<list.length; i++) {
+          if (i == 1) {
+            var td1 = '<td rowspan="' + cols + '"><span title="' + list[0].length + '">' + list[0] + '</td>';
+            var td2 = '<td><span title="' + list[i].length + '">' + list[i] + '</td>';
+            buffer += '<tr>' + td1 + td2 + '</tr>';
+          } else {
+            var td2 = '<td><span title="' + list[i].length + '">' + list[i] + '</td>';
+            buffer += '<tr>' + td2 + '</tr>';
+          } // if
+        } // for
+
+        if (include) {
+          var td2 = '<td><span title="' + after.length + '">' + after + '</td>';
+          buffer += '<tr>' + td2 + '</tr>';
+        } else
+          if (after)
+            buffer += '<tr><td class="warning">' + after + '</td><td class="warning"></td></tr>';
+      } // if
+
+      return buffer;
+    } // function
+
+
+    function match_iter( str, regexp, global ) {
+      try {
+        var list = str.match(new RegExp(regexp, 'm'));
+        var error = false;
+      } catch (e) {
+        var list = null;
+        var error = true;
+      }
+
+      if (list) {
+        if (!global)
+          $('textarea#regexp').addClass('ok');
+
+        var prev = str.slice(0, list.index);
+        var left = str.slice(list.index + list[0].length);
+
+      } else {
+        if (!global) {
+          if (error)
+            $('textarea#regexp').addClass('error');
+          else
+            $('textarea#regexp').addClass('warning');
+        } // if
+
+        var prev = str;
+        var left = '';
+      }
+
+      return [list, prev, left];
+    } // function
+
+
+    function create_table( str, regexp, global, include ) {
+      str = str.replace(/(\r\n|\r)/gm, '\n');
+      var buffer = '';
+
+      $('textarea#regexp').removeClass('ok');
+      $('textarea#regexp').removeClass('warning');
+      $('textarea#regexp').removeClass('error');
+
+      if (!regexp)
+        return buffer;
+
+      if (global) {
+        var mlist = [];
+        var lastiter = null;
+        var left = str;
+        do {
+          var res = match_iter(left, regexp, global);
+          list = res[0];
+          prev = res[1];
+          left = res[2];
+
+          if (lastiter) {
+            mlist.push([lastiter, prev]);
+          } // if
+
+          lastiter = list;
+        } while (list);
+
+        for (var i=0; i<mlist.length; i++) {
+          list = mlist[i][0];
+          after =  mlist[i][1];
+
+          buffer += build_row(list, include, after);
+        } // for
+
+      } else {
+        var res = match_iter(str, regexp, global);
+        var list = res[0];
+        var prev = res[1];
+
+        if (!list)
+          return buffer;
+
+        if (prev)
+          buffer += '<tr><td class="warning">' + prev + '</td><td class="warning"></td></tr>';
+
+        buffer += build_row(list, '', '');
+      }
+
+      return buffer;
+    } // function
+
+
+    jQuery( function($) {
+
+
+      var table1 = $('table#table1');
+
+
+      $("label#regexp").click( function(event) {
+        $("textarea#regexp")
+          .val('')
+          .focus();
+        table1.text('');
+      } );
+
+
+      $("label#input_data").click( function(event) {
+        $("textarea#input_data")
+          .val('')
+          .focus();
+        table1.text('');
+      } );
+
+
+      $( "#save_sheet_dialog" ).dialog({
+      	autoOpen: false,
+      	width: 400,
+      	buttons: [
+      		{
+      			text: "Ok",
+      			click: function() {
+      				$( this ).dialog( "close" );
+              save_sheet(table1);
+      			}
+      		},
+      		{
+      			text: "Cancel",
+      			click: function() {
+      				$( this ).dialog( "close" );
+      			}
+      		},
+      	],
+      });
+
+
+      $("#save_result").click( function(event) {
+        var str = $('textarea#input_data').val();
+
+        if (str) {
+        	$("#save_sheet_dialog").dialog("open");
+        	event.preventDefault();
+        } else {
+          $( "#dialog #dialog_content" ).text("No table to save!");
+        	$( "#dialog" ).dialog( "open" );
+        	event.preventDefault();
+        }
+
+      } );
+
+
+      var f = function() {
+        var str = $('textarea#input_data').val();
+        var regexp = $('textarea#regexp').val();
+        var global = $('input#global').prop('checked');
+        var include = $('input#include').prop('checked');
+
+        var buffer = create_table(str, regexp, global, include);
+        table1.html(buffer);
+
+      } // function
+
+
+      $('textarea#regexp').bind('input propertychange', f);
+      $('textarea#input_data').bind('input propertychange', f);
+      $('input#global').change(f);
+      $('input#include').change(f);
+
+
+    } );
+
+
+  </script>
+
+</head>
+<body>
+
+  <div>
+    <label for="regexp" id="regexp">Regexp:</label><br />
+    <textarea id="regexp" class="blue_frame" style="width: 40%;"></textarea>
+  </div>
+
+  <div>
+    <label for="input_data" id="input_data">Text:</label><br />
+    <textarea id="input_data" class="blue_frame" style="width: 80%;"></textarea>
+  </div>
+
+  <input id="global" type="checkbox" />
+  <label for="global">Применить рекурсивно</label>
+  <br />
+
+  <input id="include" type="checkbox" />
+  <label for="include">Добавлять остаточные строки к результату</label>
+  <br />
+  <br />
+
+  <div class="table">
+    <label for="table1">Result:</label>
+    <span class="a" id="save_result">Сохранить результат</span>
+    <br />
+    <table id="table1" border="1" class="green_frame" style="width: 100%;">
+    </table>
+  </div>
+
+
+
+  <div id="dialog" title="Dialog">
+    <div id="dialog_content"></div>
+  </div>
+
+  <div id="custom_dialog" title="Dialog">
+    <div id="dialog_content"></div>
+  </div>
+
+
+  <div id="save_sheet_dialog" title="Dialog">
+    <div id="dialog_content">
+      Choose name of sheet to save into<br />
+<select id="sheet" name="sheet">
+  <option selected value="sheet 1">sheet 1</option>
+  <option value="sheet 2">sheet 2</option>
+  <option value="sheet 3">sheet 3</option>
+  <option value="sheet 4">sheet 4</option>
+</select><br />
+      or enter manually:<br />
+      <input id="name" name="name" type="text" value="default">
+    </div>
+  </div>
+
+</body>
+</html>

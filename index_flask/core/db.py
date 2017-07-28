@@ -169,8 +169,8 @@ def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=N
     total = session.execute(s_count).scalar()
 
     if criterion:
-        s = s.where(*criterion)
-        s_count = s_count.where(*criterion)
+        s = s.where(and_(*criterion))
+        s_count = s_count.where(and_(*criterion))
         filtered = session.execute(s_count).scalar()
     else:
         filtered = total
