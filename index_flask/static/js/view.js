@@ -6,7 +6,7 @@ jQuery( function($) {
 
   /*** Startup ***/
 
-  $(document).ready( function() {
+  $( document ).ready( function() {
     if (window.location.hash) {
       var hash = window.location.hash;
       window.location.hash = "";
@@ -19,16 +19,16 @@ jQuery( function($) {
 
   // Common dialog
   $( "#dialog" ).dialog({
-  	autoOpen: false,
-  	width: 400,
-  	buttons: [
-  		{
-  			text: "Ok",
-  			click: function() {
-  				$( this ).dialog( "close" );
-  			}
-  		},
-  	],
+    autoOpen: false,
+    width: 400,
+    buttons: [
+      {
+        text: "Ok",
+        click: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+    ],
   });
 
 
@@ -36,7 +36,7 @@ jQuery( function($) {
 
   /* Navigation */
 
-  $("span.navigator").click( function(event) {
+  $( "span.navigator" ).click( function(event) {
     span = $(this);
     form = span.closest("form");
 
@@ -50,23 +50,23 @@ jQuery( function($) {
     var max = to_int(filtered/limit) * limit;
 
     if (span.hasClass('frw'))
-        Offset.attr('value', 0);
+      Offset.attr('value', 0);
     else if (span.hasClass('rew')) {
-        offset -= limit;
-        if (offset<0) offset = 0;
-        Offset.attr('value', offset);
+      offset -= limit;
+      if (offset<0) offset = 0;
+      Offset.attr('value', offset);
     } else if (span.hasClass('fwd')) {
-        offset += limit;
-        if (offset>max) offset = max;
-        Offset.attr('value', offset);
+      offset += limit;
+      if (offset>max) offset = max;
+      Offset.attr('value', offset);
     } else if (span.hasClass('ffwd'))
-        Offset.attr('value', max);
+      Offset.attr('value', max);
 
 //  doFormSubmit(form);
   } );
 
 
-  $("select.page").change( function(event) {
+  $( "select.page" ).change( function(event) {
     select = $(this);
     form = select.closest("form");
 
@@ -84,7 +84,7 @@ jQuery( function($) {
 
   /* Extend table */
 
-  $(".extendtable").click( function(event) {
+  $( ".extendtable" ).click( function(event) {
     span = $(this);
     td = span.closest("td");
 
@@ -92,7 +92,7 @@ jQuery( function($) {
   } );
 
 
-  $(".show_all").click( function(event) {
+  $( ".show_all" ).click( function(event) {
     span = $(this);
     td = span.closest("td");
 
@@ -102,12 +102,119 @@ jQuery( function($) {
 
   /* Remove flash */
 
-  $("li.flashes").click( function(event) {
+  $( "li.flashes" ).click( function(event) {
     li = $(this);
     ul = li.closest("ul");
 
     li.remove();
     ul.remove();
+  } );
+
+
+  /* Show hidden text */
+
+  $( "span.hidden_text" ).click( function(event) {
+    show_info(utility.unescapeQuotes(this.title), event);
+  } );
+
+
+  /* Interaction */
+
+  $("span.interactive").click( function(event) {
+    span = $(this);
+
+    $.ajax({
+      type: "POST",
+      dataType: "json",
+      url: this.baseURI,
+      data: span.data(),
+      success: function(data) {
+        if (data.result == 'error')
+          show_info(data.message);
+      },
+      error: function(data) {
+        debug(data.responseText);
+        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+      },
+    });
+  } );
+
+
+  $("span.ia_delete").click( function(event) {
+    span = $(this);
+    data = span.data();
+
+    options = {
+      type: "POST",
+      dataType: "json",
+      url: this.baseURI,
+      data: data,
+      success: function(data) {
+        if (data.result == 'error')
+          show_info(data.message);
+        else {
+          tr = span.closest("tr");
+          tr.remove();
+        }
+      },
+      error: function(data) {
+        debug(data.responseText);
+        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+      },
+    };
+
+    $.ajax(options);
+  } );
+
+
+  $("span.ia_delete_conf").click( function(event) {
+    span = $(this);
+    data = span.data();
+
+    options = {
+      type: "POST",
+      dataType: "json",
+      url: this.baseURI,
+      data: data,
+      success: function(data) {
+        if (data.result == 'error')
+          show_info(data.message);
+        else {
+          tr = span.closest("tr");
+          tr.remove();
+        }
+      },
+      error: function(data) {
+        debug(data.responseText);
+        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+      },
+    };
+
+
+    $( "#custom_dialog" ).dialog({
+      autoOpen: false,
+      width: 400,
+      buttons: [
+        {
+          text: "Ok",
+          click: function() {
+            $( this ).dialog( "close" );
+            $.ajax(options);
+          }
+        },
+        {
+          text: "Cancel",
+          click: function() {
+            $( this ).dialog( "close" );
+          }
+        },
+      ],
+    });
+
+    text = "Are you sure?"
+    $( "#custom_dialog #dialog_content" ).html(text);
+    $( "#custom_dialog" ).dialog("open");
+    event.preventDefault();
   } );
 
 
@@ -125,6 +232,16 @@ function round_to_int(i) {
 function to_int(i) {
   return i | 0;
 } // to_int
+
+
+var utility = {
+    escapeQuotes: function(string) {
+      return string.replace(/"/g, '\\"');
+    },
+    unescapeQuotes: function(string) {
+      return string.replace(/\\"/g, '"');
+    }
+};
 
 
 function doFormSubmit(form) {
@@ -149,10 +266,10 @@ function get_rows(td, unlim) {
   var query = table.data("query");
 
   data = {
-    "offset": offset + limit,
-    "limit": unlim ? 0 : limit,
-    "query_json": $.toJSON(query),
-    "format": "json",
+    'offset': offset + limit,
+    'limit':  unlim ? 0 : limit,
+    'format': 'json',
+    'query_json': $.toJSON(query),
   };
 
   $.ajax({
@@ -199,38 +316,106 @@ function append_rows(tr, rows) {
 } // append_rows
 
 
-function save_sheet(table1) {
+function show_info(text, event) {
+  $( "#dialog #dialog_content" ).html(text);
+  $( "#dialog" ).attr( "title", "info" );
+  $( "#dialog" ).dialog( "open" );
 
+  if (typeof event != "undefined")
+    event.preventDefault();
+} // show_info
+
+
+function show_error(text, event) {
+  $( "#dialog #dialog_content" ).html(text);
+  $( "#dialog" ).attr( "title", "error" );
+  $( "#dialog" ).dialog( "open" );
+
+  if (typeof event != "undefined")
+    event.preventDefault();
+} // show_info
+
+
+/*** user_data.js ***/
+
+var user_data_url = '/user_data/'
+
+
+function ud_request(data, f1, f2) {
+  if (typeof f1 == "undefined")
+    f1 = null;
+  if (typeof f2 == "undefined")
+    f2 = null;
+
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    url: user_data_url,
+    data: data,
+//  async: false,
+    success: function(data) {
+      if (data.result == 'error') {
+        show_info(data.message);
+        if (f2)
+          f2(data);
+      } else
+        if (f1)
+          f1(data);
+    },
+    error: function(data) {
+      debug(data.responseText);
+      show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+      if (f2)
+        f2();
+    },
+  });
+} // ud_request
+
+
+function udr_dbs_list(f1, f2) {
+  data = {
+    'action': 'dbs_list',
+  };
+
+  ud_request(data, f1, f2);
+} // udr_names_list
+
+
+function udr_names_list(db, type, f1, f2) {
+  data = {
+    'action': 'names_list',
+    'db':     db,
+    'type':   type,
+  };
+
+  ud_request(data, f1, f2)
+} // udr_names_list
+
+
+function udr_save(db, type, name, rows, mode, f1, f2) {
+  data = {
+    'action': 'save',
+    'db':     db,
+    'type':   type,
+    'name':   name,
+    'mode':   mode,
+    'data_json': $.toJSON(rows),
+  };
+
+  ud_request(data, f1, f2)
+} // udr_save
+
+
+function ud_save_sheet(db, name, table1, mode, f1, f2) {
   var rows = [];
-  $('tr', table1).each(function() {
+  $("tr", table1).each(function() {
     tr = $(this);
     row = []
-    $('td', tr).each(function() {
+    $("td", tr).each(function() {
       row.push(this.innerText);
     });
     rows.push(row);
   });
 
-  data = {
-    "db":   'xls0p3_reports_12V0304_2016',
-    "name": 'default',
-    "type": 'sheet',
-    "input_data": $.toJSON(rows),
-  };
-
-  $.ajax({
-    type: "POST",
-    dataType: "json",
-    url: '/user_data/',
-    data: data,
-//  async: false,
-    success: function(data) {
-      $( "#dialog #dialog_content" ).text("Data saved!");
-    	$( "#dialog" ).dialog( "open" );
-    },
-    error: function(data, content) {
-      debug(content);
-    },
-  });
-
-} // save_sheet
+  udr_save(db, 'sheet', name, rows, mode, f1, f2);
+} // ud_save_sheet

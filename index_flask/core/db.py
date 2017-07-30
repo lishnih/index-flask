@@ -33,7 +33,7 @@ def init_db(home, dbname, create=False):
     return None, None, None
 
 
-def get_db_list(home):
+def get_dbs_list(home):
     try:
         ldir = os.listdir(home)
     except OSError:

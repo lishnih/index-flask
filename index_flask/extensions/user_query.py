@@ -18,7 +18,7 @@ from sqlalchemy.sql import select, text
 from wtforms import Form, StringField, TextAreaField, validators
 
 from ..core.backwardcompat import *
-from ..core.db import init_db, get_db_list, get_rows_plain
+from ..core.db import init_db, get_dbs_list, get_rows_plain
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..forms_tables import TableCondForm
@@ -79,7 +79,7 @@ class NewQueryForm(Form):
 ### Interface ###
 
 def get_dbs_table(home, db=None):
-    dbs_list = get_db_list(home)
+    dbs_list = get_dbs_list(home)
     dbs_list = sorted(dbs_list)
 
     names = ['Databases', 'Info']

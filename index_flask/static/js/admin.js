@@ -28,7 +28,7 @@ jQuery( function($) {
     input = $(this);
 
     data = input.data();
-    data["checked"] = input.prop('checked')
+    data["checked"] = input.prop('checked');
 
     $.post(this.baseURI, input.data(), function(data) {
         debug(data);

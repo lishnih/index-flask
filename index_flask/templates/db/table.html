@@ -16,10 +16,7 @@
         var limit = table.data("limit");
         var query = table.data("query");
 
-        $( "#dialog #dialog_content" ).html("offset: {0}<br />limit: {1}<br />{2}".format(offset, limit, var_dump1(query)));
-      	$( "#dialog" ).attr( "title", "info" );
-      	$( "#dialog" ).dialog( "open" );
-      	event.preventDefault();
+        show_info("offset: {0}<br />limit: {1}<br />{2}".format(offset, limit, var_dump1(query)), event);
       });
 
 

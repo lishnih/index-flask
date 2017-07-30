@@ -32,8 +32,6 @@
   <link href="/css/default.css" rel="stylesheet" />
   <script src="/js/view.js"></script>
 
-  <script src="/j2/j2.js"></script>
-
   <style>
 
     .blue_frame {
@@ -115,6 +113,112 @@
       } );
 
 
+      $( "#save_sheet_dialog" ).dialog({
+        autoOpen: false,
+        width: 400,
+        buttons: [
+          {
+            text: "Ok",
+            click: function(event) {
+              select = $("select#dbs_list");
+              var db = $("option:selected", select).val();
+              select = $("select#sheets_list");
+              var name = $("option:selected", select).val();
+              select = $("select#modes_list");
+              var mode = $("option:selected", select).val();
+
+              if (!name)
+                name = $("input#name").val();
+
+              if (db)
+                ud_save_sheet(db, name, table1, mode,
+                  function(data) {
+                    $("#save_sheet_dialog").dialog( "close" );
+                    show_info("Data saved!", event);
+                  }
+                );
+              else
+                show_info("Choose a database!", event);
+            }
+          },
+          {
+            text: "Cancel",
+            click: function() {
+              $( this ).dialog( "close" );
+            }
+          },
+        ],
+      });
+
+
+      $("#save_result").click( function(event) {
+        var str = $('textarea#input_data').val();
+
+        if (str) {
+          select = $( "select#dbs_list" );
+          if (select.prop("disabled")) {
+            select.prop("disabled", false);
+            renew_dbs_list(select);
+          } else {
+            var db = $("option:selected", select).val();
+            var type = 'sheet';
+
+            select = $( "select#sheets_list" );
+            renew_sheets_list(select, db, type);
+          }
+
+          $("#save_sheet_dialog").dialog("open");
+          event.preventDefault();
+        } else
+          show_info("No table to save!", event);
+      } );
+
+
+      $('select#dbs_list').bind('input propertychange',
+        function(data) {
+          select = $( "select#dbs_list" );
+          var db = $("option:selected", select).val();
+          var type = 'sheet';
+
+          select = $( "select#sheets_list" );
+          renew_sheets_list(select, db, type);
+        }
+      );
+
+
+      var renew_dbs_list = function(select) {
+        udr_dbs_list(
+          function(data) {
+            $( "option", select ).remove();
+            select.append('<option value=""></option>');
+            data.rows.forEach(function(entry) {
+              select.append('<option value="{0}">{0}</option>'.format(entry));
+            });
+          }
+        );
+      } // function
+
+
+      var renew_sheets_list = function(select, db, type) {
+          udr_names_list(db, type,
+            function(data) {
+              $( "option", select ).remove();
+              if (data.rows.length) {
+                select.append('<option value=""></option>');
+                data.rows.forEach(function(entry) {
+                  select.append('<option value="{0}">{0}</option>'.format(entry));
+                });
+              } else
+                select.append('<option value=""><i>No tables created yet</i></option>');
+            },
+            function(data) {
+              $( "option", select ).remove();
+              select.append('<option value="">Choose a db...</option>');
+            },
+          );
+      } // function
+
+
       var f = function() {
         var str = $('textarea#input_data').val();
         if (str.length) {
@@ -169,10 +273,48 @@
   <br />
 
   <div class="table">
-    <label for="table1">Result:</label><br />
+    <label for="table1">Result:</label>
+    <span class="a" id="save_result">Сохранить результат</span>
+    <br />
     <table id="table1" border="1" class="green_frame" style="width: 100%;">
     </table>
   </div>
+
+
+  <div id="dialog" title="Dialog">
+    <div id="dialog_content"></div>
+  </div>
+
+  <div id="custom_dialog" title="Dialog">
+    <div id="dialog_content"></div>
+  </div>
+
+
+  <div id="save_sheet_dialog" title="Dialog">
+    <div id="dialog_content">
+      <label for="db">Choose a db</label><br />
+      <select id="dbs_list" name="db" disabled>
+        <option selected value="">Updating...</option>
+      </select><br />
+
+      <label for="sheet">Choose the name of the sheet to save into</label><br />
+      <select id="sheets_list" name="sheet">
+        <option selected value="">Choose a db...</option>
+      </select><br />
+
+      <label for="name">or enter new one:</label><br />
+      <input id="name" name="name" type="text" value="default"><br />
+      <br />
+
+      <label for="mode">If sheet exists</label>
+      <select id="modes_list" name="mode">
+        <option selected value="new">Create new sheet</option>
+        <option value="rewrite">Rewrite data</option>
+        <option value="append">Append data</option>
+      </select><br />
+    </div>
+  </div>
+
 
 </body>
 </html>

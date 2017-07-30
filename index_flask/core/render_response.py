@@ -20,10 +20,10 @@ debug_permission = Permission(RoleNeed('debug'))
 
 def swap(s, limit=60):
     if isinstance(s, basestring):
-        s = escape(s)
+        s = escape(s)   # не требуется при render_template
         if len(s) > limit:
             s = Markup("""<span class="truncated">{0}</span>
-<span class="quoted" title="{1}">[...]</span>""".format(s[0:limit-20], s))
+<span class="hidden_text" title="{1}">[...]</span>""".format(s[0:limit-20], s))
 
     return s
 

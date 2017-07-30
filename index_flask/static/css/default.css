@@ -104,8 +104,10 @@ span.truncated {
   font-style: italic;
 }
 
-span.quoted {
+span.hidden_text {
   font-weight: bold;
+  cursor: pointer;
+  cursor: hand;
 }
 
 

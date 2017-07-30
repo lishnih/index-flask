@@ -13,7 +13,7 @@ from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from .core.backwardcompat import *
-from .core.db import get_db_list
+from .core.db import get_dbs_list
 # from .core.dump_html import html
 from .models import User
 from .forms import RegistrationForm, LoginForm, ChangePasswordForm
@@ -45,7 +45,7 @@ def user_register():
         db.session.add(user)
         db.session.commit()
 
-        flash('Thanks for registering')
+        flash('Thank you for registering!')
         return redirect(get_next('/login'))
 
     return render_template('user/register.html',
@@ -154,7 +154,7 @@ def user_edit():
 @app.route("/append_db")
 @login_required
 def user_append_db():
-    dbs_list = get_db_list(current_user.home)
+    dbs_list = get_dbs_list(current_user.home)
     dbs_list = sorted(dbs_list)
 
     return render_template('dump_list.html',

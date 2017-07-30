@@ -16,7 +16,7 @@ from sqlalchemy import not_, and_
 from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import ( init_db, get_db_list, get_rows_base, get_rows_ext,
+from ..core.db import ( init_db, get_dbs_list, get_rows_base, get_rows_ext,
                         get_primary_tables )
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
@@ -34,7 +34,7 @@ limit_default = 15
 ### Interface ###
 
 def get_dbs_table(home, db=None):
-    dbs_list = get_db_list(home)
+    dbs_list = get_dbs_list(home)
     dbs_list = sorted(dbs_list)
 
     names = ['Databases', 'Info', 'Session', 'Metadata']

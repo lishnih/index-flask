@@ -7,7 +7,7 @@ from __future__ import ( division, absolute_import,
 
 from flask import render_template
 
-from flask_login import current_user
+from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
 
 from .core.backwardcompat import *
@@ -88,6 +88,7 @@ def p_about():
 
 
 @app.route('/utils/')
+@login_required
 def utils():
     utils_path = '/static/utils/'
     dirlist, filelist = list_files(utils_path, app.root_path, '/utils/')
