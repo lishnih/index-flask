@@ -201,23 +201,55 @@
 
 
       $( "#save_sheet_dialog" ).dialog({
-      	autoOpen: false,
-      	width: 400,
-      	buttons: [
-      		{
-      			text: "Ok",
-      			click: function() {
-      				$( this ).dialog( "close" );
-              save_sheet(table1);
-      			}
-      		},
-      		{
-      			text: "Cancel",
-      			click: function() {
-      				$( this ).dialog( "close" );
-      			}
-      		},
-      	],
+        autoOpen: false,
+        width: 400,
+        buttons: [
+          {
+            text: "Ok",
+            click: function(event) {
+              select = $("select#dbs_list");
+              var db = $("option:selected", select).val();
+              select = $("select#sheets_list");
+              var name = $("option:selected", select).val();
+              select = $("select#modes_list");
+              var mode = $("option:selected", select).val();
+
+              if (!name)
+                name = $("input#name").val();
+
+              if (db) {
+
+                var rows = [];
+                var row = [];
+                $("tr", table1).each(function() {
+                  tr = $(this);
+                  if ($("td", tr).length == 2) {
+                    if (row.length)
+                      rows.push(row);
+
+                    row = [ $("td", tr)[1].innerText ];
+                  } else
+                    row.push($("td", tr)[0].innerText);
+                });
+
+                udr_save(db, 'sheet', name, rows, mode,
+                  function(data) {
+                    $("#save_sheet_dialog").dialog( "close" );
+                    show_info("Data saved!", event);
+                  }
+                );
+
+              } else
+                show_info("Choose a database!", event);
+            }
+          },
+          {
+            text: "Cancel",
+            click: function() {
+              $( this ).dialog( "close" );
+            }
+          }
+        ],
       });
 
 
@@ -225,15 +257,68 @@
         var str = $('textarea#input_data').val();
 
         if (str) {
-        	$("#save_sheet_dialog").dialog("open");
-        	event.preventDefault();
-        } else {
-          $( "#dialog #dialog_content" ).text("No table to save!");
-        	$( "#dialog" ).dialog( "open" );
-        	event.preventDefault();
-        }
+          select = $( "select#dbs_list" );
+          if (select.prop("disabled")) {
+            select.prop("disabled", false);
+            renew_dbs_list(select);
+          } else {
+            var db = $("option:selected", select).val();
+            var type = 'sheet';
 
+            select = $( "select#sheets_list" );
+            renew_sheets_list(select, db, type);
+          }
+
+          $("#save_sheet_dialog").dialog("open");
+          event.preventDefault();
+        } else
+          show_info("No table to save!", event);
       } );
+
+
+      $('select#dbs_list').bind('input propertychange',
+        function(data) {
+          select = $( "select#dbs_list" );
+          var db = $("option:selected", select).val();
+          var type = 'sheet';
+
+          select = $( "select#sheets_list" );
+          renew_sheets_list(select, db, type);
+        }
+      );
+
+
+      var renew_dbs_list = function(select) {
+        udr_dbs_list(
+          function(data) {
+            $( "option", select ).remove();
+            select.append('<option value=""></option>');
+            data.rows.forEach(function(entry) {
+              select.append('<option value="{0}">{0}</option>'.format(entry));
+            });
+          }
+        );
+      } // function
+
+
+      var renew_sheets_list = function(select, db, type) {
+        udr_names_list(db, type,
+          function(data) {
+            $( "option", select ).remove();
+            if (data.rows.length) {
+              select.append('<option value=""></option>');
+              data.rows.forEach(function(entry) {
+                select.append('<option value="{0}">{0}</option>'.format(entry));
+              });
+            } else
+              select.append('<option value=""><i>No tables created yet</i></option>');
+          },
+          function(data) {
+            $( "option", select ).remove();
+            select.append('<option value="">Choose a db...</option>');
+          }
+        );
+      } // function
 
 
       var f = function() {
@@ -290,7 +375,6 @@
   </div>
 
 
-
   <div id="dialog" title="Dialog">
     <div id="dialog_content"></div>
   </div>
@@ -302,17 +386,29 @@
 
   <div id="save_sheet_dialog" title="Dialog">
     <div id="dialog_content">
-      Choose name of sheet to save into<br />
-<select id="sheet" name="sheet">
-  <option selected value="sheet 1">sheet 1</option>
-  <option value="sheet 2">sheet 2</option>
-  <option value="sheet 3">sheet 3</option>
-  <option value="sheet 4">sheet 4</option>
-</select><br />
-      or enter manually:<br />
-      <input id="name" name="name" type="text" value="default">
+      <label for="db">Choose a db</label><br />
+      <select id="dbs_list" name="db" disabled>
+        <option selected value="">Updating...</option>
+      </select><br />
+
+      <label for="sheet">Choose the name of the sheet to save into</label><br />
+      <select id="sheets_list" name="sheet">
+        <option selected value="">Choose a db...</option>
+      </select><br />
+
+      <label for="name">or enter new one:</label><br />
+      <input id="name" name="name" type="text" value="default"><br />
+      <br />
+
+      <label for="mode">If sheet exists</label>
+      <select id="modes_list" name="mode">
+        <option selected value="new">Create new sheet</option>
+        <option value="rewrite">Rewrite data</option>
+        <option value="append">Append data</option>
+      </select><br />
     </div>
   </div>
+
 
 </body>
 </html>

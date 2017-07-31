@@ -4,19 +4,21 @@
 
 <div class="table">
 <table border="1">
-    <tr>
-        <th>Url</th>
-        <th>Function</th>
-        <th>Methods</th>
-        <th>Lead handler</th>
-    </tr>
-  {%- for endpoint, methods, url, loc in urls %}
-    <tr>
-        <td><a href="{{ url }}">{{ url }}</a></td>
-        <td>{{ endpoint }}</td>
-        <td>{{ methods }}</td>
-        <td>{{ loc }}</td>
-    </tr>
+  <tr>
+    <th>Url</th>
+    <th>Args</th>
+    <th>Methods</th>
+    <th>Function</th>
+    <th>Module</th>
+  </tr>
+  {%- for url, args, methods, endpoint, loc in urls %}
+  <tr>
+    <td><a href="{{ url }}">{{ url }}</a></td>
+    <td>{{ args }}</td>
+    <td>{{ methods }}</td>
+    <td>{{ endpoint }}</td>
+    <td>{{ loc }}</td>
+  </tr>
   {%- endfor %}
 </table>
 </div>

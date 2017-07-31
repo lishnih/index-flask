@@ -8,6 +8,8 @@ from __future__ import ( division, absolute_import,
 import os, hashlib, random
 from datetime import datetime
 
+from .core.backwardcompat import *
+
 from .a import db
 
 
@@ -78,11 +80,13 @@ class User(db.Model):         # Rev. 2016-06-23
         return self.token
 
     def get_password(self, password):
-        return hashlib.sha1(password).hexdigest()
+        key = b(password)
+        return hashlib.sha1(key).hexdigest()
 
     def get_token(self, email, password):
         rnd = random.randint(0, 100000000000000)
-        return hashlib.sha1("{0}_{1}_{2}".format(email, password, rnd)).hexdigest()
+        key = b("{0}_{1}_{2}".format(email, password, rnd))
+        return hashlib.sha1(key).hexdigest()
 
     def change_password(self, password):
         self.password = self.get_password(password)
@@ -113,7 +117,8 @@ class User(db.Model):         # Rev. 2016-06-23
     def get_verification(self, email):
     #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
         rnd = random.randint(0, 100000000000000)
-        return hashlib.md5("{0}_{1}".format(email, rnd)).hexdigest()
+        key = b("{0}_{1}".format(email, rnd))
+        return hashlib.md5(key).hexdigest()
 
 
 class Group(db.Model):        # Rev. 2017-07-16

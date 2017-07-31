@@ -410,7 +410,7 @@ function ud_save_sheet(db, name, table1, mode, f1, f2) {
   var rows = [];
   $("tr", table1).each(function() {
     tr = $(this);
-    row = []
+    var row = [];
     $("td", tr).each(function() {
       row.push(this.innerText);
     });

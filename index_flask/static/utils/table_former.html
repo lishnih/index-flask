@@ -146,7 +146,7 @@
             click: function() {
               $( this ).dialog( "close" );
             }
-          },
+          }
         ],
       });
 
@@ -200,22 +200,22 @@
 
 
       var renew_sheets_list = function(select, db, type) {
-          udr_names_list(db, type,
-            function(data) {
-              $( "option", select ).remove();
-              if (data.rows.length) {
-                select.append('<option value=""></option>');
-                data.rows.forEach(function(entry) {
-                  select.append('<option value="{0}">{0}</option>'.format(entry));
-                });
-              } else
-                select.append('<option value=""><i>No tables created yet</i></option>');
-            },
-            function(data) {
-              $( "option", select ).remove();
-              select.append('<option value="">Choose a db...</option>');
-            },
-          );
+        udr_names_list(db, type,
+          function(data) {
+            $( "option", select ).remove();
+            if (data.rows.length) {
+              select.append('<option value=""></option>');
+              data.rows.forEach(function(entry) {
+                select.append('<option value="{0}">{0}</option>'.format(entry));
+              });
+            } else
+              select.append('<option value=""><i>No tables created yet</i></option>');
+          },
+          function(data) {
+            $( "option", select ).remove();
+            select.append('<option value="">Choose a db...</option>');
+          }
+        );
       } // function
 
 

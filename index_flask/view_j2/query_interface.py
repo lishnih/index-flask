@@ -16,7 +16,7 @@ from ..app import require_ext
 
 
 def qi_columns_list(user, db, tables, fullnames_option=1):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
 
     user_db = require_ext('user_db')
@@ -40,7 +40,7 @@ def qi_columns_list(user, db, tables, fullnames_option=1):
 
 
 def qi_columns_dict(user, db, tables, fullnames_option=1):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
 
     user_db = require_ext('user_db')
@@ -68,7 +68,7 @@ def qi_query_filter(query, filter, columns_dict):
         if key in columns_dict:
             if value == None:
                 query = query.filter(columns_dict[key] == None)
-            elif isinstance(value, basestring) or isinstance(value, int):
+            elif isinstance(value, string_types) or isinstance(value, int):
                 query = query.filter(columns_dict[key] == value)
             elif isinstance(value, float):
                 query = query.filter(columns_dict[key].like(value))
@@ -98,7 +98,7 @@ def qi_where(s, filter, columns_dict):
         if key in columns_dict:
             if value is None:
                 s = s.where(columns_dict[key] == None)
-            elif isinstance(value, basestring) or isinstance(value, int):
+            elif isinstance(value, string_types) or isinstance(value, int):
                 s = s.where(columns_dict[key] == value)
             elif isinstance(value, float):
                 s = s.where(columns_dict[key].like(value))
@@ -124,7 +124,7 @@ def qi_where(s, filter, columns_dict):
 
 
 def qi_query_count(user, db, tables, search=None, filter={}):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
 
     user_db = require_ext('user_db')
@@ -173,7 +173,7 @@ def qi_query_count(user, db, tables, search=None, filter={}):
 
 
 def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
 
     user_db = require_ext('user_db')
@@ -224,7 +224,7 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
 
 
 def qi_query_sum(user, db, tables, column, search=None, filter={}):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
 
     user_db = require_ext('user_db')
@@ -272,13 +272,13 @@ def qi_query_sum(user, db, tables, column, search=None, filter={}):
 
 def qi_query(user, db, tables, search=None, filter={}, sorting=[],
              offset=0, limit=0, columns=[], distinct_columns=[], plain=1):
-    if isinstance(tables, basestring):
+    if isinstance(tables, string_types):
         tables = tables,
-    if isinstance(sorting, basestring):
+    if isinstance(sorting, string_types):
         sorting = sorting,
-    if isinstance(columns, basestring):
+    if isinstance(columns, string_types):
         columns = columns,
-    if isinstance(distinct_columns, basestring):
+    if isinstance(distinct_columns, string_types):
         distinct_columns = distinct_columns,
 
     tables = [i for i in tables if i]
@@ -428,7 +428,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
     # Сортировка
     for column in sorting:
-        if isinstance(column, basestring):
+        if isinstance(column, string_types):
             if column not in names:
                 column = "{0}.{1}".format(table1, column)
 

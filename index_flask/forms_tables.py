@@ -155,7 +155,7 @@ class TableCondForm(Form):
             if value is None:
                 clause = "{0} is null".format(column)
                 mclause = mcolumn == None if mt else clause
-            elif isinstance(value, basestring):
+            elif isinstance(value, string_types):
                 if value.isdigit():
                     value = int(value)
                     clause = "{0} = {1}".format(column, value)

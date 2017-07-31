@@ -5,7 +5,7 @@
 from __future__ import ( division, absolute_import,
                          print_function, unicode_literals )
 
-import os
+import sys, os
 
 from flask import ( g, request, render_template, url_for, session,
                     send_from_directory, abort, __version__ )
@@ -34,21 +34,24 @@ def debug():
 
     output = []
     for rule in app.url_map.iter_rules():
-        options = {}
+        options, options_str = {}, {}
         for seq, arg in enumerate(rule.arguments, 1):
-#           options[arg] = "<{0}>".format(arg)
             options[arg] = seq
+            options_str[arg] = "<{0}>".format(arg)
 
-        methods = ','.join(rule.methods)
         url = url_for(rule.endpoint, **options)
+        args = rule.arguments if rule.arguments else ''
+        methods = ','.join(rule.methods)
         f = app.view_functions.get(rule.endpoint)
-        loc = f.func_code.co_filename if f else None
-        output.append([rule.endpoint, methods, url, loc])
+#       loc = f.__code__.co_filename if f else ''   # f.func_code.co_filename
+        m = sys.modules.get(f.__module__)
+        loc = m.__file__ if m else ''
+        output.append([url, args, methods, rule.endpoint, loc])
 
     return render_template('views/views_debug/index.html',
              title = 'Url mapping',
 #            urls = sorted(output),
-             urls = sorted(output, key=lambda url: url[2])
+             urls = sorted(output, key=lambda url: url[0])
            )
 
 

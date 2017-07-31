@@ -64,7 +64,7 @@ class Obj(Base, aStr):        # Rev. 2016-07-30
         self.obj = data
 
     def append(self, data):
-        raise Exception, 'Inapplicable'
+        raise Exception('Inapplicable')
 
     def get(self):
         return self.obj
@@ -294,7 +294,7 @@ def get_names(session, current_user, type):
         s = s.filter(Dict._user_id==Dict.id)
 
     else:
-        raise Exception, 'Wrong type {0}'.type(type)
+        raise Exception('Wrong type {0}'.type(type))
 
     rows = [i.name for i in s.all()]
 
@@ -338,7 +338,7 @@ def get(session, current_user, type, id=None, name='default'):
         row = s.first()
 
     else:
-        raise Exception, 'Wrong type {0}'.type(type)
+        raise Exception('Wrong type {0}'.type(type))
 
     return row
 
@@ -361,7 +361,7 @@ def save(session, current_user, type, data, name='default', mode='new'):
             return obj, 'data appended'
 
         else:
-            raise Exception, 'Unknown mode {0}'.type(mode)
+            raise Exception('Unknown mode {0}'.type(mode))
 
     if type == 'obj':
         obj = Obj(current_user.id, name, data)
@@ -376,7 +376,7 @@ def save(session, current_user, type, data, name='default', mode='new'):
         obj = Dict(current_user.id, name, data)
 
     else:
-        raise Exception, 'Wrong type {0}'.type(type)
+        raise Exception('Wrong type {0}'.type(type))
 
     session.add(obj)
 

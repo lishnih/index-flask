@@ -19,7 +19,7 @@ debug_permission = Permission(RoleNeed('debug'))
 
 
 def swap(s, limit=60):
-    if isinstance(s, basestring):
+    if isinstance(s, string_types):
         s = escape(s)   # не требуется при render_template
         if len(s) > limit:
             s = Markup("""<span class="truncated">{0}</span>
