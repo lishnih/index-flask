@@ -1,23 +1,34 @@
 *************
-index-flask
+index_flask
 *************
 
 **Installation**
 
-    $ python -m easy_install index_flask-0.2-py2.7.egg
+::
 
-    $ py -3 -m easy_install index_flask-0.2-py3.4.egg
+  $ python -m easy_install <package.egg>
+  $ py -3 -m easy_install <package.egg>
 
 **After installation**
 
 - First change SECRET_KEY in the config file: *index_flask/config.py*
 - Run to initialize first user:
-    $ index_flask-initialize_app.py
+
+::
+
+  $ index_flask-initialize_app.py
 
 - Now you can run the package:
-    $ index_flask-standalone.py
+
+::
+
+  $ index_flask-standalone.py
+
 - or (for debugging mode):
-    $ index_flask-standalone_debug.py
+
+::
+
+  $ index_flask-standalone_debug.py
 
 - And open in your preferred browser next link:
     http://localhost:5000/

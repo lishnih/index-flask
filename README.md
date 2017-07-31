@@ -1,13 +1,13 @@
-# index-flask
+# index_flask
 
 ### Installation
 
 ```sh
-$ python -m easy_install index_flask-0.2-py2.7.egg
+$ python -m easy_install <package.egg>
 ```
 - or
 ```sh
-$ py -3 -m easy_install index_flask-0.2-py3.4.egg
+$ py -3 -m easy_install <package.egg>
 ```
 
 ### After installation
