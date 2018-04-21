@@ -9,6 +9,7 @@ from .request_interface import *
 from .response_interface import *
 from .query_interface import *
 
+from ..core.db import init_db, get_dbs_list
 from ..models import Register, Favorite
 
 from ..a import db
@@ -40,7 +41,7 @@ def dbs_list_action(user, request_items, response):
     if not user_db:
         return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
 
-    response['rows'] = [i for i in user_db.get_dbs_list(user)]
+    response['rows'] = [i for i in user_db.get_dbs_list(user.home)]
 
 
 def tables_list_action(user, request_items, response):
@@ -358,7 +359,7 @@ def search_action(user, request_items, response):
         return response_with_message(response, "Не загружен модуль 'user_db'!", 'error')
 
     search = ri_get_str(request_items, 'search')
-    dbs_list = user_db.get_dbs_list(user)
+    dbs_list = user_db.get_dbs_list(user.home)
 
     rows = []
     drows = {}

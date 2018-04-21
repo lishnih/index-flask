@@ -23,7 +23,7 @@ from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
 from ..forms_tables import TableCondForm
 
-from ..a import app
+from ..app import app, debug_query
 
 
 ### Constants ###
@@ -151,7 +151,7 @@ def views_db_func(db, tables):
              limit = limit,
              templates_list = templates_list,
              query_json = query_json,
-             debug = str(s),
+             debug = debug_query(s),
            )
 
 

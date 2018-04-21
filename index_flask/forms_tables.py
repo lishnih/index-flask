@@ -51,8 +51,8 @@ class TableCondForm(Form):
     plain = SelectField('Plain')
 
 
-    def __init__(self, form, mtable=None, columns=None, templates_list=None, engine=None, **kwargs):
-        super(TableCondForm, self).__init__(form, **kwargs)
+    def __init__(self, form, mtable=None, columns=None, templates_list=None, engine=None, **kargs):
+        super(TableCondForm, self).__init__(form, **kargs)
 
         self.mtable = mtable
         self.engine = engine

@@ -36,14 +36,6 @@ def get_data(user):
     return user_db
 
 
-def get_dbs_list(user):
-    user_db = get_data(user)
-    if not user_db:
-        return {}
-
-    return user_db.get('dbs_list', {})
-
-
 def set_default_db(user, dbname):
     user_db = get_data(user)
     if not user_db:

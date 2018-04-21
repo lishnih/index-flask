@@ -43,7 +43,7 @@ else:
 # String = String(length=255)
 
 
-class Obj(Base, aStr):        # Rev. 2016-07-30
+class Obj(Base, aStr):        # Rev. 2017-07-30
     __tablename__ = 'data_obj'
 
     id = Column(Integer, primary_key=True)
@@ -70,7 +70,7 @@ class Obj(Base, aStr):        # Rev. 2016-07-30
         return self.obj
 
 
-class Sheet(Base, aStr):      # Rev. 2016-07-30
+class Sheet(Base, aStr):      # Rev. 2017-07-30
     __tablename__ = 'data_sheet'
     __table_args__ = {'mysql_engine': 'MyISAM', 'mysql_charset': 'utf8'}
 
@@ -131,7 +131,7 @@ class Sheet(Base, aStr):      # Rev. 2016-07-30
         return sheet
 
 
-class List(Base, aStr):       # Rev. 2016-07-30
+class List(Base, aStr):       # Rev. 2017-07-30
     __tablename__ = 'data_list'
     __table_args__ = {'mysql_engine': 'MyISAM', 'mysql_charset': 'utf8'}
 
@@ -187,7 +187,7 @@ class List(Base, aStr):       # Rev. 2016-07-30
         return list
 
 
-class Cell(Base, aStr):       # Rev. 2016-07-26
+class Cell(Base, aStr):       # Rev. 2017-07-26
     __tablename__ = 'data_cell'
     __table_args__ = {'mysql_engine': 'MyISAM', 'mysql_charset': 'utf8'}
 
@@ -207,7 +207,7 @@ class Cell(Base, aStr):       # Rev. 2016-07-26
         self.value = value
 
 
-class Dict(Base, aStr):       # Rev. 2016-07-30
+class Dict(Base, aStr):       # Rev. 2017-07-30
     __tablename__ = 'data_dict'
     __table_args__ = {'mysql_engine': 'MyISAM', 'mysql_charset': 'utf8'}
 
@@ -255,7 +255,7 @@ class Dict(Base, aStr):       # Rev. 2016-07-30
         return dict
 
 
-class KCell(Base, aStr):      # Rev. 2016-07-26
+class KCell(Base, aStr):      # Rev. 2017-07-26
     __tablename__ = 'data_kcell'
     __table_args__ = {'mysql_engine': 'MyISAM', 'mysql_charset': 'utf8'}
 
