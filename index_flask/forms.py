@@ -2,11 +2,11 @@
 # coding=utf-8
 # Stan 2016-06-19
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-from wtforms import ( Form, StringField, PasswordField, HiddenField,
-                      BooleanField, validators )
+from wtforms import (Form, StringField, PasswordField, HiddenField,
+                     BooleanField, validators)
 
 from .core.backwardcompat import *
 from .models import User, Group

@@ -2,10 +2,11 @@
 # coding=utf-8
 # Stan 2016-07-13
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import time, json
+import time
+import json
 
 from flask import g, request, render_template, g
 from flask_login import login_required, current_user
@@ -25,18 +26,18 @@ from ..forms_tables import TableCondForm
 from ..a import app, db
 
 
-### Constants ###
+# ===== Constants =====
 
 limit_default = 15
 
 
-##### Roles #####
+# ===== Roles =====
 
 debug_permission = Permission(RoleNeed('debug'))
 statistics_permission = Permission(RoleNeed('statistics'))
 
 
-##### Models #####
+# ===== Models =====
 
 class EpochTime(TypeDecorator):
     impl = Integer
@@ -87,7 +88,7 @@ class RequestRecord(db.Model):  # Rev. 2016-07-21
 db.create_all()
 
 
-##### Interface #####
+# ===== Interface =====
 
 @app.before_request
 def before_request():
@@ -118,14 +119,12 @@ def views_request_func():
     limit = int(limit) if limit.isdigit() else limit_default
     query_json = request.values.get('query_json')
 
-
     if query_json:
         query = json.loads(query_json)
         criterion = query.get('criterion')
         mcriterion = criterion
         order = query.get('order')
         morder = order
-
 
     else:
         form = TableCondForm(request.form, RequestRecord.__table__, engine=db.engine)
@@ -136,10 +135,8 @@ def views_request_func():
         form.offset.data = offset
         form.limit.data = limit
 
-
         if request.method == 'POST':
             form.validate()
-
 
         mcriterion, criterion = form.get_criterion()
         morder, order = form.get_order()
@@ -147,15 +144,12 @@ def views_request_func():
 #       limit = form.limit.data
 #       template = form.template.data
 
-
     if 'all' in request.args.keys():
         offset = 0
         limit = 0
 
-
     names, rows, total, filtered, shown, page, pages, s = get_rows_model(
         RequestRecord, offset, limit, mcriterion, morder)
-
 
     request_url = request.full_path
     query_json = json.dumps(dict(
@@ -164,7 +158,6 @@ def views_request_func():
                    criterion = criterion,
                    order = order,
                  ))
-
 
     # Выводим
     return render_format('db/table.html',
@@ -187,7 +180,7 @@ def views_request_func():
            )
 
 
-##### Routes #####
+# ===== Routes =====
 
 @app.route('/debug/request_log')
 def debug_request_log():

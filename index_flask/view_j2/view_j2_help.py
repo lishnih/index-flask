@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2012-02-29
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from .request_interface import *
 from .response_interface import *

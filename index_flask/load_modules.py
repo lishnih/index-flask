@@ -2,10 +2,11 @@
 # coding=utf-8
 # Stan 2016-07-11
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import os, traceback
+import os
+import traceback
 from datetime import datetime
 
 from flask import jsonify

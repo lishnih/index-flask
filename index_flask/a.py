@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-06-07
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 import os
 
@@ -15,13 +15,13 @@ from .core.backwardcompat import *
 from . import __pkgname__, config
 
 
-##### App #####
+# ===== App =====
 
 app = Flask(__pkgname__, static_url_path='')
 app.config.from_object(config)
 # app.config.from_pyfile('app.cfg')
 
 
-##### App's DB #####
+# ===== App's DB =====
 
 db = SQLAlchemy(app)

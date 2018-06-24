@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-06-20
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from index_flask.a import app, db
 from index_flask.models import User, Group
@@ -15,10 +15,10 @@ def init_admin():
     user = User.query.filter_by(id=user_id).first()
     if not user:
         user = User(
-            email    = 'root@localhost',
+            email = 'root@localhost',
             username = 'root',
-            name     = 'root',
-            company  = '',
+            name = 'root',
+            company = '',
             password = '1234',
         )
         db.session.add(user)

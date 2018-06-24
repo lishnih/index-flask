@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2012-02-25
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 # from collections import OrderedDict
 
@@ -66,7 +66,7 @@ def qi_columns_dict(user, db, tables, fullnames_option=1):
 def qi_query_filter(query, filter, columns_dict):
     for key, value in filter.items():
         if key in columns_dict:
-            if value == None:
+            if value is None:
                 query = query.filter(columns_dict[key] == None)
             elif isinstance(value, string_types) or isinstance(value, int):
                 query = query.filter(columns_dict[key] == value)
@@ -140,15 +140,12 @@ def qi_query_count(user, db, tables, search=None, filter={}):
     if None in mtables:
         return {}, "Некоторые таблицы недоступны: {0!r}".format(tables)
 
-
     query = session.query(*mtables)
-#     full_rows_count = query.count()
-
+#   full_rows_count = query.count()
 
     s_count = select(mtables, use_labels=True)
     mtable = mtables[0]
     full_rows_count = session.execute(s_count.select_from(mtable).count()).scalar()
-
 
     columns_dict = qi_columns_dict(user, db, tables)
     if columns_dict is None:
@@ -198,7 +195,7 @@ def qi_query_column(user, db, tables, column, operand, search=None, filter={}):
     if column not in columns_dict:
         return {}, "Заданной колонки не существует: {0}".format(column)
 
-    if   operand == 'sum':
+    if operand == 'sum':
         query = session.query(func.sum(columns_dict[column]).label('sum'))
     elif operand == 'max':
         query = session.query(func.max(columns_dict[column]).label('max'))
@@ -286,7 +283,6 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     columns = [i for i in columns if i]
     distinct_columns = [i for i in distinct_columns if i]
 
-
     links = {}
     for i in range(len(tables)):
         table = tables[i]
@@ -295,7 +291,6 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
             tables[i] = table
             links[link] = table
 
-
     user_db = require_ext('user_db')
     if not user_db:
         return None
@@ -303,7 +298,6 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
     db_uri, session, metadata = user_db.get_db(user, db)
     if not db_uri:
         return {}, [], "Нет такой БД: {0}".format(db)
-
 
     # Список таблиц
     mtables = [metadata.tables.get(i) for i in tables]
@@ -349,7 +343,6 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         for i in mtables:
             mcolumns.extend(j for j in i.c if not j.foreign_keys and not j.primary_key and j.name[0] != '_')
 
-
     # Join для таблиц
     for i in range(len(tables) - 1):
         first, second = tables[i], tables[i+1]
@@ -358,7 +351,7 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
                 if j.column.table == mtables[i+1]:
                     # j.parent - ссылка на другую таблицу
                     # j.column - первичный ключ
-                    mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
+                    mtable1 = mtable1.join(mtables[i+1], j.parent == j.column)
                     break
 
             else:
@@ -369,12 +362,11 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
                 if j.column.table == mtables[i]:
                     # j.parent - ссылка на другую таблицу
                     # j.column - первичный ключ
-                    mtable1 = mtable1.join(mtables[i+1], j.parent==j.column)
+                    mtable1 = mtable1.join(mtables[i+1], j.parent == j.column)
                     break
 
             else:
                 return {}, [], "Таблицы не связаны: {0!r} {1!r}".format(first, second)
-
 
     # Дополнительные таблицы
     primary_tables = []
@@ -384,13 +376,10 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
     primary_tables = [i for i in set(primary_tables) if i not in tables]
 
-
     relative_tables = get_relative_tables(metadata, table1)
     relative_tables = [i for i in set(relative_tables) if i not in tables]
 
-
     s = select(mcolumns, use_labels=True).select_from(mtable1)
-
 
     # Получаем кол-во всех записей
     if not distinct_columns:   # !!!
@@ -418,13 +407,11 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
 
         s = qi_where(s, filter, columns_dict)
 
-
     # Получаем кол-во записей после фильтрации
     if not distinct_columns:   # !!!
         filtered_rows_count = session.execute(s.count()).scalar()
     else:
         filtered_rows_count = -1
-
 
     # Сортировка
     for column in sorting:
@@ -445,19 +432,16 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
             else:
                 s = s.order_by(columns_dict[column])
 
-
     # Выборка
     s = s.offset(offset)
     if limit:
         s = s.limit(limit)
-
 
     # Получаем кол-во записей в выборке
     if not distinct_columns:   # !!!
         rows_count = session.execute(s.count()).first()
     else:
         rows_count = -1
-
 
     # Получаем записи и поля
     if distinct_columns:     # !!!
@@ -466,14 +450,12 @@ def qi_query(user, db, tables, search=None, filter={}, sorting=[],
         names = ["{0}.{1}".format(column.table.name, column.name) for name, column in s._columns_plus_names]
     result = session.execute(s)
 
-
     # Преобразуем в требуемый формат
     if plain:
         rows = [[j for j in i] for i in result.fetchall()]
     else:
         rows = [dict(i.items()) for i in result.fetchall()]
 #       rows = [OrderedDict(i.items()) for i in result.fetchall()]
-
 
     return dict(
         full_rows_count = full_rows_count,

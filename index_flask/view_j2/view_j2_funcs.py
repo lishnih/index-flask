@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2012-02-06
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from .request_interface import *
 from .response_interface import *
@@ -68,7 +68,7 @@ def columns_list_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -91,7 +91,7 @@ def table_count_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -127,7 +127,7 @@ def table_view_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -136,7 +136,7 @@ def table_view_action(user, request_items, response):
     offset = ri_get_int(request_items, 'offset')      # Требуемый первый ряд
     limit  = ri_get_int(request_items, 'limit', 100)  # Требуемое кол-во рядов
     search = ri_get_str(request_items, 'search')      # Строка для поиска
-    search = ri_get_str(request_items, 'sSearch', search) # Строка для поиска
+    search = ri_get_str(request_items, 'sSearch', search)   # Строка для поиска
     plain  = ri_get_int(request_items, 'plain', 1)    # Тип возвращаемых данных (записей)
 
     columns_tuple = ri_get_tuple(request_items, 'columns')
@@ -194,7 +194,7 @@ def column_func_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -242,7 +242,7 @@ def column_sum_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -284,7 +284,7 @@ def column_district_action(user, request_items, response):
     tables = ri_get_tuple(request_items, 'tables', tables)
 
     if not db:
-#         return response_with_message(response, "База данных не задана!", 'error')
+#       return response_with_message(response, "База данных не задана!", 'error')
         return response_redirect(response)
 
     if not tables[0]:
@@ -298,7 +298,7 @@ def column_district_action(user, request_items, response):
     offset = ri_get_int(request_items, 'offset')      # Требуемый первый ряд
     limit  = ri_get_int(request_items, 'limit', 100)  # Требуемое кол-во рядов
     search = ri_get_str(request_items, 'search')      # Строка для поиска
-    search = ri_get_str(request_items, 'sSearch', search) # Строка для поиска
+    search = ri_get_str(request_items, 'sSearch', search)   # Строка для поиска
 
     filter_dict  = ri_get_obj(request_items, 'filter_json')
     sorting_dict = ri_get_obj(request_items, 'sorting_json')
@@ -342,7 +342,7 @@ def collect_columns(mtable, root=None):
         if c.foreign_keys and not foreign_key:
             foreign_key = True
             first, = c.foreign_keys
-            root = root.join(first.column.table, first.parent==first.column)
+            root = root.join(first.column.table, first.parent == first.column)
             mcolumns2, root = collect_columns(first.column.table, root)
         elif c.name != 'id':
             mcolumns.append(c)
@@ -411,7 +411,6 @@ def search_action(user, request_items, response):
             drow['__tables__'] = drow.keys()
             drows[db] = drow
 
-
     response['rows'] = rows
     response['drows'] = drows
 
@@ -461,5 +460,5 @@ def get_favorites_action(user, request_items, response):
     favorites = Favorite.query.filter_by(_user_id=user.id).all()
     rows = []
     for f in favorites:
-        rows.append({a: b for a, b in f.__dict__.items() if a[0] !="_"})
+        rows.append({a: b for a, b in f.__dict__.items() if a[0] != "_"})
     response['rows'] = rows

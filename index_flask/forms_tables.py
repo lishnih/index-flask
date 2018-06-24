@@ -2,10 +2,11 @@
 # coding=utf-8
 # Stan 2016-07-21
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import time, math
+import time
+import math
 
 from sqlalchemy import desc, not_
 from wtforms import Form, StringField, IntegerField, SelectField, validators
@@ -49,7 +50,7 @@ class TableCondForm(Form):
     template = SelectField('Template')
     unlim = SelectField('Unlimited')
     plain = SelectField('Plain')
-
+    truncate = SelectField('Truncate')
 
     def __init__(self, form, mtable=None, columns=None, templates_list=None, engine=None, **kargs):
         super(TableCondForm, self).__init__(form, **kargs)
@@ -81,7 +82,7 @@ class TableCondForm(Form):
 
         self.unlim.choices = [['off', 'Off'], ['on', 'On']]
         self.plain.choices = [['on', 'On'], ['off', 'Off']]
-
+        self.truncate.choices = [['80', '80'], ['160', '160'], ['320', '320'], ['off', 'Off']]
 
     def validate(self):
         rv = Form.validate(self)
@@ -89,7 +90,6 @@ class TableCondForm(Form):
             return False
 
         return True
-
 
     def get_criterion(self):
         mcriterion = []
@@ -112,7 +112,6 @@ class TableCondForm(Form):
 
         return mcriterion, criterion
 
-
     def get_order(self):
         morder = []
         order = []
@@ -133,7 +132,6 @@ class TableCondForm(Form):
                 order.append(sort_column)
 
         return morder, order
-
 
     def parse_clause(self, column, value):
         mt = False
@@ -265,7 +263,6 @@ class TableCondForm(Form):
             clause = str(mclause.compile(self.engine, compile_kwargs={"literal_binds": True}))
 
         return mclause, clause
-
 
     def parse_order(self, column, cond):
         sort_column = "{0} desc".format(column) if cond == 'DESC' else column

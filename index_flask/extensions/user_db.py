@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-06-21
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from flask import request, redirect
 
@@ -17,12 +17,12 @@ from ..a import app
 from ..app import get_next
 
 
-##### Storage #####
+# ===== Storage =====
 
 storage = {}
 
 
-##### Interface #####
+# ===== Interface =====
 
 def get_data(user):
     if user.is_anonymous:
@@ -83,7 +83,7 @@ def get_metadata(user, dbname):
     return metadata
 
 
-##### Routes #####
+# ===== Routes =====
 
 @app.route('/user_db/')
 @login_required

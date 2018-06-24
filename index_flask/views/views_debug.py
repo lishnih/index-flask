@@ -2,13 +2,14 @@
 # coding=utf-8
 # Stan 2016-04-24
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import sys, os
+import sys
+import os
 
-from flask import ( g, request, render_template, url_for, session,
-                    send_from_directory, abort, __version__ )
+from flask import (g, request, render_template, url_for, session,
+                   send_from_directory, abort, __version__)
 
 from flask_login import current_user
 from flask_principal import Permission, RoleNeed
@@ -20,12 +21,12 @@ from ..core.dump_html import html
 from ..a import app
 
 
-##### Roles #####
+# ===== Roles =====
 
 debug_permission = Permission(RoleNeed('debug'))
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route('/debug/')
 def debug():

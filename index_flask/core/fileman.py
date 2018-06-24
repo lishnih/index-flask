@@ -2,10 +2,11 @@
 # coding=utf-8
 # Stan 2016-05-22
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import os, logging
+import os
+import logging
 
 
 def list_files(path, root, override_url=None):

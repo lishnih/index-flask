@@ -2,10 +2,12 @@
 # coding=utf-8
 # Stan 2012-03-10
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import os, re, math
+import os
+import re
+import math
 
 from sqlalchemy import create_engine, MetaData, func, join, and_
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -125,7 +127,8 @@ def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=Non
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
-    if page > pages: page = 0
+    if page > pages:
+        page = 0
 
     return names, rows, total, filtered, shown, page, pages, s
 
@@ -158,7 +161,8 @@ def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plai
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
-    if page > pages: page = 0
+    if page > pages:
+        page = 0
 
     return names, rows, total, filtered, shown, page, pages, s
 
@@ -193,7 +197,8 @@ def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=N
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
-    if page > pages: page = 0
+    if page > pages:
+        page = 0
 
     return names, rows, total, filtered, shown, page, pages, s
 
@@ -202,7 +207,7 @@ def get_rows_ext(session, mtables, offset=0, limit=None, criterion=None, order=N
     query = session.query(*mtables)
 
     for i in mtables:
-        clauses = [key.column==key.parent for key in i.foreign_keys if key.column.table in mtables]
+        clauses = [key.column == key.parent for key in i.foreign_keys if key.column.table in mtables]
         l = len(clauses)
         if l == 1:
             query = query.join(i, *clauses)
@@ -235,6 +240,7 @@ def get_rows_ext(session, mtables, offset=0, limit=None, criterion=None, order=N
 
     pages = int(math.ceil(filtered / limit)) if limit else 0
     page = int(math.floor(offset / limit)) + 1 if limit else 0
-    if page > pages: page = 0
+    if page > pages:
+        page = 0
 
     return names, rows, total, filtered, shown, page, pages, query

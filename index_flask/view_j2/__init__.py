@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2012-04-11, 2016-06-05
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 import time
 
@@ -26,7 +26,7 @@ def view_j2(request):
 
 # view_j2_help
 
-    if   action == 'actions_list':
+    if action == 'actions_list':
         actions_list_action(request_items, response)
 
     elif action == 'action_params_list':

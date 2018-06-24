@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2017-07-11
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from flask import request, render_template, jsonify, flash
 from jinja2 import Markup, escape
@@ -18,10 +18,10 @@ from ..app import safe_str
 debug_permission = Permission(RoleNeed('debug'))
 
 
-def swap(s, limit=60):
+def swap(s, limit=0):
     if isinstance(s, string_types):
         s = escape(s)   # не требуется при render_template
-        if len(s) > limit:
+        if limit and len(s) > limit:
             s = Markup("""<span class="truncated">{0}</span>
 <span class="hidden_text" title="{1}">[...]</span>""".format(s[0:limit-20], s))
 
@@ -33,6 +33,8 @@ def render_format(tmpl_name, flash_t=None, **kargs):
 
     if not debug_permission.can():
         kargs.pop('debug')
+
+    truncate = kargs.pop('truncate', None)
 
     if format == 'json':
         for key, val in kargs.items():
@@ -46,7 +48,7 @@ def render_format(tmpl_name, flash_t=None, **kargs):
 
         if 'rows' in kargs:
             kargs['rows'] = [[safe_str(None, i) for i in row] for row in kargs['rows']]
-            kargs['rows'] = [[swap(i) for i in row] for row in kargs['rows']]
+            kargs['rows'] = [[swap(i, truncate) for i in row] for row in kargs['rows']]
 
         return jsonify(**kargs)
 
@@ -55,6 +57,6 @@ def render_format(tmpl_name, flash_t=None, **kargs):
             flash(*flash_t)
 
         if 'rows' in kargs:
-            kargs['rows'] = [[swap(i) for i in row] for row in kargs['rows']]
+            kargs['rows'] = [[swap(i, truncate) for i in row] for row in kargs['rows']]
 
         return render_template(tmpl_name, **kargs)

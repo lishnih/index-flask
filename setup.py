@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # coding=utf-8
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import sys, os
+from index_flask import __pkgname__, __description__, __version__
+
+import sys
+import os
 from setuptools import setup, find_packages
 
 py_version = sys.version_info[:2]
@@ -24,7 +27,6 @@ except IOError:
     README = CHANGES = ''
 
 
-from index_flask import __pkgname__, __description__, __version__
 
 
 data_files = []
@@ -42,40 +44,40 @@ for root, dirs, files in os.walk(start_point):
 
 if __name__ == '__main__':
     setup(
-        name = __pkgname__,
-        description = __description__,
-        version = __version__,
-        long_description = README,
+        name=__pkgname__,
+        description=__description__,
+        version=__version__,
+        long_description=README,
 
-        author = 'Stan',
-        author_email = 'lishnih@gmail.com',
-        url = 'https://github.com/lishnih/index-flask',
-        platforms = ['any'],
-        keywords = ['flask', 'indexing', 'reporting', 'documents'],
+        author='Stan',
+        author_email='lishnih@gmail.com',
+        url='https://github.com/lishnih/index-flask',
+        platforms=['any'],
+        keywords=['flask', 'indexing', 'reporting', 'documents'],
 
-        packages = find_packages(),
+        packages=find_packages(),
         # ['index_flask', 'index_flask.core', 'index_flask.extensions',
         #  'index_flask.views', 'index_flask.view_j2']
 #       include_package_data=True,
 #       zip_safe=False,
 
-#       package_data = {__pkgname__: []},
-        data_files = data_files,
+#       package_data={__pkgname__: []},
+        data_files=data_files,
 
-        scripts = [
+        scripts=[
             'index_flask-initialize_app.py',
             'index_flask-standalone.py',
             'index_flask-standalone_debug.py',
         ],
 
-        install_requires = [
+        install_requires=[
             'flask_sqlalchemy',
             'flask_login',
             'flask_principal',
             'wtforms',
         ],
 
-        classifiers = [
+        classifiers=[
             'Development Status :: 4 - Beta',
             'Environment :: Web Environment',
             'Framework :: Flask',
@@ -85,8 +87,8 @@ if __name__ == '__main__':
             'Natural Language :: Russian',
             'Operating System :: OS Independent',
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
+            'Programming Language :: Python :: 2.6',
+            'Programming Language :: Python :: 3.3',
             'Topic :: Database',
             'Topic :: Utilities',
         ],

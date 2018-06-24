@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-06-26
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 import json
 
@@ -16,8 +16,8 @@ from sqlalchemy import not_, and_
 from sqlalchemy.sql import select, text
 
 from ..core.backwardcompat import *
-from ..core.db import ( init_db, get_dbs_list, get_rows_base, get_rows_ext,
-                        get_primary_tables )
+from ..core.db import (init_db, get_dbs_list, get_rows_base, get_rows_ext,
+                       get_primary_tables)
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
 from ..core.dump_html import html
@@ -26,12 +26,12 @@ from ..forms_tables import TableCondForm
 from ..app import app, debug_query
 
 
-### Constants ###
+# ===== Constants =====
 
 limit_default = 15
 
 
-### Interface ###
+# ===== Interface =====
 
 def get_dbs_table(home, db=None):
     dbs_list = get_dbs_list(home)
@@ -54,12 +54,10 @@ def views_db_func(db, tables):
     form = None
     plain = 1
 
-
     db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
         return render_format('p/empty.html', flash_t)
-
 
     mtables = [metadata.tables.get(i) for i in tables.split('|')]
     mtables = [i for i in mtables if i is not None]
@@ -68,13 +66,11 @@ def views_db_func(db, tables):
         flash_t("Проверьте таблицы: {0}".format(tables), 'error')
         return render_format('p/empty.html', flash_t)
 
-
     offset = request.values.get('offset', '')
     offset = int(offset) if offset.isdigit() else 0
     limit = request.values.get('limit', '')
     limit = int(limit) if limit.isdigit() else limit_default
     query_json = request.values.get('query_json')
-
 
     if query_json:
         query = json.loads(query_json)
@@ -85,7 +81,6 @@ def views_db_func(db, tables):
         order = query.get('order')
         morder = order
 
-
     else:
         templates_list = [i for i in get_user_templates(current_user)]
 
@@ -93,17 +88,14 @@ def views_db_func(db, tables):
         form.offset.data = str(offset)
         form.limit.data = str(limit_default)
 
-
         if request.method == 'POST':
             form.validate()
-
 
         mcriterion, criterion = form.get_criterion()
         morder, order = form.get_order()
 #       offset = form.offset.data
 #       limit = form.limit.data
         template = form.template.data
-
 
         if template and template != 'None':
             template_name = 'custom/{0}.html'.format(template)
@@ -112,15 +104,12 @@ def views_db_func(db, tables):
             if form.plain.data == 'off':
                 plain = 0
 
-
     if 'all' in request.args.keys():
         offset = 0
         limit = 0
 
-
     names, rows, total, filtered, shown, page, pages, s = get_rows_ext(
         session, mtables, offset, limit, mcriterion, morder)
-
 
     request_url = request.full_path
     query_json = json.dumps(dict(
@@ -131,7 +120,6 @@ def views_db_func(db, tables):
                    criterion = criterion,
                    order = order,
                  ))
-
 
     # Выводим
     return render_format(template_name,
@@ -155,7 +143,7 @@ def views_db_func(db, tables):
            )
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route('/db/')
 @app.route('/db/<db>/', methods=["GET", "POST"])
@@ -169,16 +157,16 @@ def views_db(db=None):
         if tables:
             return views_db_func(db, tables)
 
-
         db_uri, session, metadata = init_db(current_user.home, db)
         if not db_uri:
             flash("База данных не существует: {0}".format(db), 'error')
             return render_template('p/empty.html')
 
-
         table_names = ['Tables', 'w/options']
-        table_rows = [[Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table', db=escape(db), table=escape(table)), escape((table)))),
-                       Markup('<a href="{0}">{1}</a>'.format(url_for('views_db', db=escape(db), tables=escape(table)), escape(table)))
+        table_rows = [[Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table',
+                         db=escape(db), table=escape(table)), escape((table)))),
+                       Markup('<a href="{0}">{1}</a>'.format(url_for('views_db',
+                         db=escape(db), tables=escape(table)), escape(table)))
                      ] for table in sorted(metadata.tables.keys())]
 
         obj.append((table_names, table_rows, db, ''))
@@ -224,13 +212,17 @@ def views_db_info(db):
         flash("База данных не существует: {0}".format(db), 'error')
         return render_template('p/empty.html')
 
-    table_names = ['Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement', 'unique', 'default', 'foreign_keys', 'onupdate']
+    table_names = ['Column', 'type', 'primary_key', 'nullable', 'index', 'autoincrement',
+                   'unique', 'default', 'foreign_keys', 'onupdate']
     for table, mtable in metadata.tables.items():
         table_rows = []
         for c in mtable.c:
-            table_rows.append([Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct', db=escape(db), table=escape(table), column=escape(c.name)), escape(c.name))),
-                               Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info', db=escape(db), table=escape(table), column=escape(c.name)), repr(c.type))),
-                               c.primary_key, c.nullable, c.index, c.autoincrement, c.unique, c.default, c.foreign_keys, c.onupdate])
+            table_rows.append([Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_distinct',
+                                 db=escape(db), table=escape(table), column=escape(c.name)), escape(c.name))),
+                               Markup('<a href="{0}">{1}</a>'.format(url_for('views_db_table_column_info',
+                                 db=escape(db), table=escape(table), column=escape(c.name)), repr(c.type))),
+                               c.primary_key, c.nullable, c.index, c.autoincrement,
+                               c.unique, c.default, c.foreign_keys, c.onupdate])
 
         table = '<a href="{0}">{1}</a>'.format(url_for('views_db_table_info', db=db, table=table), table)
         obj.append((table_names, table_rows, table, ''))
@@ -323,7 +315,6 @@ def views_db_table(db, table):
         flash_t = "Таблица не существует: {0}".format(table), 'error'
         return render_format('p/empty.html', format, flash_t)
 
-
     offset = int(request.values.get('offset', 0))
     limit = int(request.values.get('limit', limit_default))
 
@@ -331,9 +322,7 @@ def views_db_table(db, table):
         offset = 0
         limit = 0
 
-
     names, rows, total, filtered, shown, page, pages, s = get_rows_base(session, mtable, offset, limit)
-
 
     obj = []
     for rel_key, mtable1 in get_primary_tables(metadata, table):
@@ -344,7 +333,6 @@ def views_db_table(db, table):
         if rows2:
             obj.append((names, rows2,
                 "There are rows with the broken relationships to the table '{0}'".format(mtable1.name), ''))
-
 
     # Выводим
     if obj:

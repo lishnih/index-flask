@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-04-24
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from flask import render_template
 
@@ -17,14 +17,14 @@ from . import __pkgname__, __description__, __version__
 from .a import app
 
 
-##### Roles #####
+# ===== Roles =====
 
 admin_permission = Permission(RoleNeed('admin'))
 debug_permission = Permission(RoleNeed('debug'))
 statistics_permission = Permission(RoleNeed('statistics'))
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route("/")
 def index():
@@ -56,7 +56,13 @@ def p_about():
 
     additionals = {}
     if p_admin or p_debug:
-        import sys, flask, werkzeug, jinja2, flask_principal, sqlalchemy, flask_sqlalchemy
+        import sys
+        import flask
+        import werkzeug
+        import jinja2
+        import flask_principal
+        import sqlalchemy
+        import flask_sqlalchemy
         from flask_login import __about__
 
         additionals = dict(

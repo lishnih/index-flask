@@ -2,10 +2,12 @@
 # coding=utf-8
 # Stan 2016-07-12
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import re, hashlib, random
+import re
+import hashlib
+import random
 from datetime import datetime
 
 from flask import request, render_template, jsonify, redirect, url_for, flash
@@ -26,12 +28,12 @@ from ..models import User
 from ..a import app, db
 
 
-##### Roles #####
+# ===== Roles =====
 
 admin_permission = Permission(RoleNeed('admin'))
 
 
-##### Models #####
+# ===== Models =====
 
 relationship_user_app = db.Table('rs_user_app',
     db.Column('_user_id', db.Integer, db.ForeignKey('user.id'), nullable=False),
@@ -89,7 +91,7 @@ User.ext_apps = db.relationship('App', secondary=relationship_user_app,
 db.create_all()
 
 
-##### Forms #####
+# ===== Forms =====
 
 class AddAppForm(Form):
     name = StringField('Name *', [
@@ -114,7 +116,7 @@ class AddAppForm(Form):
         return True
 
 
-##### Interface #####
+# ===== Interface =====
 
 def init_rs_user_app(user, app):
     s = relationship_user_app.update(values=dict(
@@ -126,6 +128,7 @@ def init_rs_user_app(user, app):
     res = db.session.execute(s)
     db.session.commit()
 
+
 def update_token(user, app):
     s = relationship_user_app.update(values=dict(
           token = suit_code(user.id, app.id),
@@ -136,10 +139,12 @@ def update_token(user, app):
     res = db.session.execute(s)
     db.session.commit()
 
+
 def get_token(user, app):
 #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
     rnd = random.randint(0, 100000000000000)
     return hashlib.md5("{0}_{1}_{2}".format(rnd, user, app)).hexdigest()
+
 
 def suit_code(user, app):
     double = True
@@ -148,7 +153,7 @@ def suit_code(user, app):
 #       double = RS_App.query.filter_by(token=token).first()
 
         s = select('*').select_from(relationship_user_app).\
-              where(relationship_user_app.c.token==token)
+              where(relationship_user_app.c.token == token)
         res = db.session.execute(s)
         double = res.first()
 
@@ -158,7 +163,7 @@ def suit_code(user, app):
 def get_user(app_id, token):
     s = select([relationship_user_app.c._user_id,
                relationship_user_app.c._app_id]).select_from(relationship_user_app).\
-          where(relationship_user_app.c.token==token)
+          where(relationship_user_app.c.token == token)
     res = db.session.execute(s)
     row = res.first()
     if row:
@@ -168,7 +173,7 @@ def get_user(app_id, token):
             return user
 
 
-##### Routes #####
+# ===== Routes =====
 
 @app.route('/app<int:id>', methods=['GET', 'POST'])
 @login_required

@@ -2,10 +2,11 @@
 # coding=utf-8
 # Stan 2016-07-02, 2017-07-23
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
-import json, time
+import json
+import time
 from datetime import datetime
 
 from flask import request, render_template, jsonify, redirect, url_for, flash
@@ -27,7 +28,7 @@ from ..core.dump_html import html
 from ..a import app
 
 
-##### Models #####
+# ===== Models =====
 
 Base = declarative_base()
 if sys.version_info >= (3,):
@@ -103,7 +104,7 @@ class Sheet(Base, aStr):      # Rev. 2017-07-30
         session = self._sa_instance_state.session
 
         s = select([text('max(y)')]).select_from(Cell)
-        s = s.where(Cell._sheet_id==self.id)
+        s = s.where(Cell._sheet_id == self.id)
         res = session.execute(s)
         y = res.scalar()
 
@@ -117,7 +118,7 @@ class Sheet(Base, aStr):      # Rev. 2017-07-30
         session = self._sa_instance_state.session
 
         s = select([text('max(x)'), text('max(y)')]).select_from(Cell)
-        s = s.where(Cell._sheet_id==self.id)
+        s = s.where(Cell._sheet_id == self.id)
         res = session.execute(s)
         x, y = res.fetchone()
 
@@ -163,11 +164,11 @@ class List(Base, aStr):       # Rev. 2017-07-30
         session = self._sa_instance_state.session
 
         s = select([text('max(y)')]).select_from(Cell)
-        s = s.where(Cell._list_id==self.id)
+        s = s.where(Cell._list_id == self.id)
         res = session.execute(s)
         y = res.scalar()
 
-        for y, value in enumerate(data, y + 1):
+        for y, value in enumerate(data, y+1):
             if value is not None:
                 cell = Cell(0, y, value)
                 self.data_cell.append(cell)
@@ -176,7 +177,7 @@ class List(Base, aStr):       # Rev. 2017-07-30
         session = self._sa_instance_state.session
 
         s = select([text('max(y)')]).select_from(Cell)
-        s = s.where(Cell._list_id==self.id)
+        s = s.where(Cell._list_id == self.id)
         res = session.execute(s)
         y = res.scalar()
         list = [None for i in range(y)]
@@ -239,7 +240,7 @@ class Dict(Base, aStr):       # Rev. 2017-07-30
 
         for key, value in data.items():
             s = session.query(KCell)
-            s = s.filter(KCell._dict_id==self.id, KCell.key==key)
+            s = s.filter(KCell._dict_id == self.id, KCell.key == key)
             res = s.all()
             for i in res:
                 session.delete(i)
@@ -271,7 +272,7 @@ class KCell(Base, aStr):      # Rev. 2017-07-26
         self.value = value
 
 
-##### Interface #####
+# ===== Interface =====
 
 def get_names(session, current_user, type):
     if current_user.is_anonymous:
@@ -279,19 +280,19 @@ def get_names(session, current_user, type):
 
     if type == 'obj':
         s = session.query(Obj.name)
-        s = s.filter(Obj._user_id==current_user.id)
+        s = s.filter(Obj._user_id == current_user.id)
 
     elif type == 'sheet':
         s = session.query(Sheet.name)
-        s = s.filter(Sheet._user_id==current_user.id)
+        s = s.filter(Sheet._user_id == current_user.id)
 
     elif type == 'list':
         s = session.query(List.name)
-        s = s.filter(List._user_id==List.id)
+        s = s.filter(List._user_id == List.id)
 
     elif type == 'dict':
         s = session.query(Dict.name)
-        s = s.filter(Dict._user_id==Dict.id)
+        s = s.filter(Dict._user_id == Dict.id)
 
     else:
         raise Exception('Wrong type {0}'.type(type))
@@ -308,33 +309,33 @@ def get(session, current_user, type, id=None, name='default'):
     if type == 'obj':
         s = session.query(Obj)
         if id:
-            s = s.filter(Obj._user_id==current_user.id, Obj.id==id)
+            s = s.filter(Obj._user_id == current_user.id, Obj.id == id)
         else:
-            s = s.filter(Obj._user_id==current_user.id, Obj.name==name)
+            s = s.filter(Obj._user_id == current_user.id, Obj.name == name)
         row = s.first()
 
     elif type == 'sheet':
         s = session.query(Sheet)
         if id:
-            s = s.filter(Sheet._user_id==current_user.id, Sheet.id==id)
+            s = s.filter(Sheet._user_id == current_user.id, Sheet.id == id)
         else:
-            s = s.filter(Sheet._user_id==current_user.id, Sheet.name==name)
+            s = s.filter(Sheet._user_id == current_user.id, Sheet.name == name)
         row = s.first()
 
     elif type == 'list':
         s = session.query(List)
         if id:
-            s = s.filter(List._user_id==current_user.id, List.id==id)
+            s = s.filter(List._user_id == current_user.id, List.id == id)
         else:
-            s = s.filter(List._user_id==current_user.id, List.name==name)
+            s = s.filter(List._user_id == current_user.id, List.name == name)
         row = s.first()
 
     elif type == 'dict':
         s = session.query(Dict)
         if id:
-            s = s.filter(Dict._user_id==current_user.id, Dict.id==id)
+            s = s.filter(Dict._user_id == current_user.id, Dict.id == id)
         else:
-            s = s.filter(Dict._user_id==current_user.id, Dict.name==name)
+            s = s.filter(Dict._user_id == current_user.id, Dict.name == name)
         row = s.first()
 
     else:
@@ -383,7 +384,7 @@ def save(session, current_user, type, data, name='default', mode='new'):
     return obj, 'obj created'
 
 
-##### Forms #####
+# ===== Forms =====
 
 class DataForm(Form):
     db = HiddenField()
@@ -407,7 +408,7 @@ class DataForm(Form):
     name = StringField('Name')
 
 
-##### Views interface #####
+# ===== Views interface =====
 
 def get_dbs_table(home, db=None):
     dbs_list = get_dbs_list(home)
@@ -426,7 +427,7 @@ def get_objects(session, metadata, db, user_id):
     obj = []
 
     mtable = metadata.tables.get('data_obj')
-    s = select('*').select_from(mtable).where(mtable.c._user_id==user_id)
+    s = select('*').select_from(mtable).where(mtable.c._user_id == user_id)
     res = session.execute(s)
     obj.append(
         [
@@ -443,7 +444,7 @@ def get_objects(session, metadata, db, user_id):
     )
 
     mtable = metadata.tables.get('data_sheet')
-    s = select('*').select_from(mtable).where(mtable.c._user_id==user_id)
+    s = select('*').select_from(mtable).where(mtable.c._user_id == user_id)
     res = session.execute(s)
     obj.append(
         [
@@ -460,7 +461,7 @@ def get_objects(session, metadata, db, user_id):
     )
 
     mtable = metadata.tables.get('data_list')
-    s = select('*').select_from(mtable).where(mtable.c._user_id==user_id)
+    s = select('*').select_from(mtable).where(mtable.c._user_id == user_id)
     res = session.execute(s)
     obj.append(
         [
@@ -477,7 +478,7 @@ def get_objects(session, metadata, db, user_id):
     )
 
     mtable = metadata.tables.get('data_dict')
-    s = select('*').select_from(mtable).where(mtable.c._user_id==user_id)
+    s = select('*').select_from(mtable).where(mtable.c._user_id == user_id)
     res = session.execute(s)
     obj.append(
         [
@@ -496,7 +497,7 @@ def get_objects(session, metadata, db, user_id):
     return obj
 
 
-##### Routes #####
+# ===== Routes =====
 
 @app.route("/user_data/", methods=["GET", "POST"])
 @app.route("/user_data/<db>/", methods=["GET", "POST"])
@@ -715,9 +716,9 @@ def ext_user_data_set_test(db):
 
     data = dict(
         a = [
-              [None, 12,   13, 14, 15, None],
-              [  21, 22, None, 24, 25, None],
-              [  31, 32,   33, 34, 35, None],
+              [None, 12, 13,   14, 15, None],
+              [21,   22, None, 24, 25, None],
+              [31,   32, 33,   34, 35, None],
             ],
         b = 10,
     )
@@ -728,9 +729,9 @@ def ext_user_data_set_test(db):
     session.add(dobj)
 
     dsheet = [
-               [None, 12,   13, 14, 15, None],
-               [  21, 22, None, 24, 25, None],
-               [  31, 32,   33, 34, 35, None],
+               [None, 12, 13,   14, 15, None],
+               [21,   22, None, 24, 25, None],
+               [31,   32, 33,   34, 35, None],
              ]
     dsheet = Sheet(current_user.id, 'name', dsheet)
     session.add(dsheet)

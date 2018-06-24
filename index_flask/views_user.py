@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-06-07
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 import os
 
@@ -22,7 +22,7 @@ from .a import app, db
 from .app import get_next
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route('/register', methods=['GET', 'POST'])
 def user_register():

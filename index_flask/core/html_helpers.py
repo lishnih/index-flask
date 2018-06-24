@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2016-07-17
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 
 def parse_input(sid, checked, action, **kargs):

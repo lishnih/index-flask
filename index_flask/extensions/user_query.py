@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2017-07-11
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 import json
 from datetime import datetime
@@ -27,17 +27,17 @@ from ..a import app, db
 from ..app import get_next
 
 
-### Constants ###
+# ===== Constants =====
 
 limit_default = 15
 
 
-##### Roles #####
+# ===== Roles =====
 
 admin_permission = Permission(RoleNeed('admin'))
 
 
-##### Models #####
+# ===== Models =====
 
 class SQLTemplate(db.Model):  # Rev. 2017-07-23
     __tablename__ = 'sqltemplate'
@@ -57,7 +57,7 @@ class SQLTemplate(db.Model):  # Rev. 2017-07-23
 db.create_all()
 
 
-##### Forms #####
+# ===== Forms =====
 
 class NewQueryForm(Form):
     name = StringField('Name *', [
@@ -76,7 +76,7 @@ class NewQueryForm(Form):
         return True
 
 
-### Interface ###
+# ===== Interface =====
 
 def get_dbs_table(home, db=None):
     dbs_list = get_dbs_list(home)
@@ -96,13 +96,12 @@ def views_query_func(db, id):
     templates_list = None
     form = None
     plain = 1
-
+    truncate = 60
 
     db_uri, session, metadata = init_db(current_user.home, db)
     if not db_uri:
         flash_t = "База данных не существует: {0}".format(db), 'error'
         return render_format('p/empty.html', flash_t)
-
 
     sqltemplate = SQLTemplate.query.filter_by(id=id).first()
     if not sqltemplate:
@@ -111,13 +110,11 @@ def views_query_func(db, id):
 
     sql = sqltemplate.value
 
-
     offset = request.values.get('offset', '')
     offset = int(offset) if offset.isdigit() else 0
     limit = request.values.get('limit', '')
     limit = int(limit) if limit.isdigit() else limit_default
     query_json = request.values.get('query_json')
-
 
     if query_json:
         query = json.loads(query_json)
@@ -128,7 +125,6 @@ def views_query_func(db, id):
         order = query.get('order')
         morder = order
 
-
     else:
         s = select('*').select_from(text("({0})".format(sql))).limit(1)
         try:
@@ -137,7 +133,6 @@ def views_query_func(db, id):
             flash_t = "Ошибка при выполнении запроса: '{0}'".format(e.message), 'error'
             return render_format('p/empty.html', flash_t)
 
-
         names = res.keys()
         templates_list = [i for i in get_user_templates(current_user)]
 
@@ -145,17 +140,14 @@ def views_query_func(db, id):
         form.offset.data = str(offset)
         form.limit.data = str(limit_default)
 
-
         if request.method == 'POST':
             form.validate()
-
 
         mcriterion, criterion = form.get_criterion()
         morder, order = form.get_order()
 #       offset = form.offset.data
 #       limit = form.limit.data
         template = form.template.data
-
 
         if template and template != 'None':
             template_name = 'custom/{0}.html'.format(template)
@@ -164,15 +156,14 @@ def views_query_func(db, id):
             if form.plain.data == 'off':
                 plain = 0
 
+        truncate = int(form.truncate.data) if form.truncate.data.isdigit() else None
 
     if 'all' in request.args.keys():
         offset = 0
         limit = 0
 
-
     names, rows, total, filtered, shown, page, pages, s = get_rows_plain(
         session, sql, offset, limit, mcriterion, morder, plain)
-
 
     request_url = request.full_path
     query_json = json.dumps(dict(
@@ -183,7 +174,6 @@ def views_query_func(db, id):
                    criterion = criterion,
                    order = order,
                  ))
-
 
     # Выводим
     return render_format(template_name,
@@ -202,12 +192,13 @@ def views_query_func(db, id):
              offset = offset,
              limit = limit,
              templates_list = templates_list,
+             truncate = truncate,
              query_json = query_json,
              debug = str(s),
            )
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route('/query/')
 @app.route('/query/<db>/')

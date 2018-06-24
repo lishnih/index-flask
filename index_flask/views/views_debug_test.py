@@ -2,8 +2,8 @@
 # coding=utf-8
 # Stan 2017-07-15
 
-from __future__ import ( division, absolute_import,
-                         print_function, unicode_literals )
+from __future__ import (division, absolute_import,
+                        print_function, unicode_literals)
 
 from flask import request, render_template, abort
 
@@ -14,12 +14,12 @@ from ..core.backwardcompat import *
 from ..a import app
 
 
-##### Roles #####
+# ===== Roles =====
 
 debug_permission = Permission(RoleNeed('debug'))
 
 
-### Routes ###
+# ===== Routes =====
 
 @app.route('/debug/tests/')
 def debug_tests():
