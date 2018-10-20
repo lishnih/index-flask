@@ -248,7 +248,7 @@ function doFormSubmit(form) {
   var url = form.attr("action");
   var formData = $(form).serializeArray();
   $.post(url, formData).done(function (data) {
-      alert(data);
+    alert(data);
   });
   return true;
 } // doFormSubmit
@@ -333,7 +333,7 @@ function show_error(text, event) {
 
   if (typeof event != "undefined")
     event.preventDefault();
-} // show_info
+} // show_error
 
 
 /*** user_data.js ***/
@@ -378,7 +378,7 @@ function udr_dbs_list(f1, f2) {
   };
 
   ud_request(data, f1, f2);
-} // udr_names_list
+} // udr_dbs_list
 
 
 function udr_names_list(db, type, f1, f2) {
