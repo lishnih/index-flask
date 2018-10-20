@@ -1,0 +1,33 @@
+{% macro user_page_list(pages) %}
+
+<h1>Pages:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>List of user pages</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Created</th>
+      <th scope="col">Updated</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{%- for page in pages %}
+    <tr>
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      <td>{{ page.name }}</td>
+      <td>{{ page.created }}</td>
+      <td>{{ page.updated }}</td>
+      <td><a href="{{ url_for('user_page_v1', uid=page.uid) }}">Open</a></td>
+      <td><a href="{{ url_for('user_page_v1_edit', uid=page.uid) }}">Edit</a></td>
+      <td><a href="{{ url_for('user_page_v1_delete', uid=page.uid) }}">Delete</a></td>
+    </tr>
+{%- endfor %}
+  </tbody>
+</table>
+
+{%- endmacro %}

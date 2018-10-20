@@ -2,11 +2,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="keywords" content="python web application" />
-  <meta name="description" content="flask web application" />
-  <link href="/favicon.ico" type="image/ico" rel="shortcut icon" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="python flask">
+  <meta name="description" content="index">
+  <meta name="author" content="">
+  <meta name="google" value="notranslate">
+  <base target="_self">
+  <link rel="shortcut icon" href="{{ app_root }}/favicon.ico">
 
   {%- if title %}
   <title>{{ title }}</title>
@@ -15,30 +18,40 @@
   {%- endblock %}
   {%- endif %}
 
-  <link href="/external/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
 
-  <link href="/css/default.css" rel="stylesheet" />
+  <!-- Site-specified styles -->
+  <link href="{{ app_root }}/css/default.css" rel="stylesheet">
 </head>
 
 <body>
 
-{%- with messages = get_flashed_messages(with_categories=true) %}
-  {%- if messages %}
-    <ul class=flashes>
-    {%- for category, message in messages %}
-      <li class="flashes {{ category }}">{{ message }}</li>
-    {%- endfor %}
-    </ul>
-  {%- endif %}
-{%- endwith %}
+
 
 <div id="content">
 {%- block body %}
 {%- endblock %}
 </div>
 
-{%- from "_debug.html" import debug_footer with context %}
-{{ debug_footer() }}
+
+
+{%- with messages = get_flashed_messages(with_categories=true) %}
+{%- if messages %}
+    <ul class=flashes>
+{%- for category, message in messages %}
+      <li class="flashes {{ category }}">{{ message }}</li>
+{%- endfor %}
+    </ul>
+{%- endif %}
+{%- endwith %}
+
+
+
+{%- from "_common.html" import text_debug %}
+{{ text_debug() }}
 
 </body>
 </html>

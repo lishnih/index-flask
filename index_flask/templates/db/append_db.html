@@ -4,20 +4,16 @@
 
 {%- block body %}
 
-<h1>Add new group</h1>
+<h1>Append new database</h1>
 
 <form method="post">
   <dl>
     {{ render_field(form.name, size=40) }}
-    {{ render_field(form.description, size=80) }}
+    {{ render_field(form.uri, size=80) }}
   </dl>
   <p>
     <input type=submit value="Append">
   </p>
 </form>
-
-<ul class="hll">
-<li><a href="{{ app_root }}/">Home</a></li>
-</ul>
 
 {%- endblock %}

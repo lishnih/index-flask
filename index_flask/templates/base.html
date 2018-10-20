@@ -1,0 +1,51 @@
+{%- if not modal %}{% extends "_layout.html" %}
+{%- else %}{% extends "_modal.html" %}
+{%- endif %}
+
+
+{%- block body_base %}
+
+{%- if html %}
+{%- autoescape false %}
+{{ html }}
+{%- endautoescape %}
+{%- endif %}
+
+
+{%- if text %}
+<pre>
+{{ text }}
+</pre>
+{%- endif %}
+
+
+{%- if total %}
+{%- if shown %}
+<div><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
+{%- else %}
+<div><i>Total: {{ total }}</i></div>
+{%- endif %}
+{%- endif %}
+
+{%- from "_debug.html" import dump_table %}
+{%- if rows %}
+{{ dump_table(names, rows) }}
+{%- endif %}
+
+
+{%- for names, rows, description, postscript in tables_wdest %}
+{%- autoescape false %}
+<p>
+  <b><i style="background-color: Khaki">{{ description }}</i></b>
+</p>
+{%- endautoescape %}
+{{ dump_table(names, rows) }}
+{%- autoescape false %}
+<p>
+  <span style="background-color: Burlywood">{{ postscript }}</span>
+</p>
+{%- endautoescape %}
+<hr />
+{%- endfor %}
+
+{%- endblock %}

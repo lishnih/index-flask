@@ -1,32 +1,12 @@
-{% extends "_p.html" %}
+{% extends "_layout.html" %}
 
 {%- block title %}
   <title>Ver</title>
 {%- endblock %}
 
-{%- block head %}
+{%- block body %}
 
-  <script>
-
-    $(document).ready( function() {
-
-        $("#jquery").text($.fn.jquery);
-
-        $("#jqueryui").text($.ui.version);
-
-        //$("#bootstrap").text($.fn.jquery);
-
-        //$("#jtable").text($.fn.jquery);
-
-    } );
-
-  </script>
-
-{%- endblock %}
-
-{%- block pbody %}
-
-  <table border="1">
+  <table class="table table-bordered table-hover table-sm table-responsive">
     <tr>
       <th>
         Package
@@ -50,11 +30,28 @@
       <td>Bootstrap</td>
       <td id="bootstrap"></td>
     </tr>
-
-    <tr>
-      <td>jTable</td>
-      <td id="jtable"></td>
-    </tr>
   </table>
+
+{%- endblock %}
+
+{%- block script %}
+
+  <script>
+
+    $(document).ready( function() {
+
+        $("#jquery").text($.fn.jquery);
+
+//      $("#jqueryui").text($.ui.version);
+
+        $("#bootstrap").text($.fn.tooltip.Constructor.VERSION);
+
+        //$("#jtable").text();
+
+        //$("#dataTable").text($.fn.dataTable.version);
+
+    } );
+
+  </script>
 
 {%- endblock %}

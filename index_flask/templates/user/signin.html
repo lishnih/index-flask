@@ -3,13 +3,10 @@
 {%- from "_formhelpers.html" import render_field %}
 
 {%- block body %}
-<h1>Login</h1>
 
-{%- if next %}
-<form method=post action="/login?next={{ next }}">
-{%- else %}
-<form method=post action="/login">
-{%- endif %}
+<h1>Sign in</h1>
+
+<form method="post" action="?next={{ next }}">
   <dl>
     {{ render_field(form.email, size=40) }}
     {{ render_field(form.password, size=40) }}
@@ -21,9 +18,7 @@
 </form>
 
 <p>
-  If you not registered yet you can <a href="/register">Register</a>
+  If you not registered yet you can <a href="{{ url_for('user_signup') }}">Sign up</a>
 </p>
-<p>
-  Go to <a href="/">Main page</a>
-</p>
+
 {%- endblock %}

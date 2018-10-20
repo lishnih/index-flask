@@ -1,17 +1,386 @@
-{% macro text_copyright() %}
-  <p>
-    ©2006-2017 Stan Ovchinnikov,
-    <a href="/tos.html">Terms of service</a>
-  </p>
+{%- macro text_copyright() %}
+<p>
+  <i>Stanislav Ovchinnikov</i>
+</p>
 {%- endmacro %}
 
 
-{% macro text_dialog() %}
-<div id="dialog" title="Dialog">
-  <div id="dialog_content"></div>
+{%- macro text_debug() %}
+{%- if app_debug %}
+<pre id="debug">
+{{ debug }}</pre>
+<div id="jdebug">
 </div>
+{%- endif %}
+{%- endmacro %}
 
-<div id="custom_dialog" title="Dialog">
-  <div id="dialog_content"></div>
+
+{%- macro text_flashes() %}
+{%- with messages = get_flashed_messages(with_categories=true) %}
+{%- if messages %}
+<div class="flashes">
+{%- for category, message in messages %}
+  <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+{%- endfor %}
 </div>
+{%- endif %}
+{%- endwith %}
+{%- endmacro %}
+
+
+{%- macro text_status() %}
+<!-- Loading status -->
+<div id="loading" class="alert alert-info" role="alert" style="position: fixed; z-index: 1000; bottom: 20px; right: 20px; display: none;">
+  Loading...
+</div>
+{%- endmacro %}
+
+
+{%- macro text_ia_modal() %}
+<!-- Interactive modal -->
+<div class="modal fade" id="iaModal" tabindex="-1" role="dialog" aria-labelledby="iaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"><i class="fa fa-close"></i></span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+      </div>
+
+    </div>
+  </div>
+</div>
+{%- endmacro %}
+
+
+{%- macro text_info_modal() %}
+<!-- Info modal -->
+<div class="modal fade" id="InfoModal" tabindex="-1" role="dialog" aria-labelledby="InfoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal_title"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"><i class="fa fa-close"></i></span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p id="modal_message"></p>
+{%- if app_debug %}
+        <p id="modal_debug"></p>
+{%- endif %}
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+{%- endmacro %}
+
+
+{%- macro text_navbar() %}
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <!--a class="navbar-brand" href="{{ url_for('index') }}">
+      <img src="{{ app_root }}/favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
+      <span class="menu-collapsed">Index</span>
+    </a-->
+
+    <ul class="navbar-nav mr-auto">
+      <!-- This menu is hidden in bigger devices with d-sm-none.
+           The sidebar isn't proper for smaller screens imo, so this dropdown menu can keep all the useful sidebar items exclusively for smaller screens
+      -->
+      <li class="nav-item dropdown d-sm-block d-md-none">
+        <a class="nav-link dropdown-toggle" href="{{ app_root }}/mobile" id="smallerscreenmenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Menu
+        </a>
+        <div class="dropdown-menu" aria-labelledby="smallerscreenmenu">
+          <a class="dropdown-item" href="{{ app_root }}/">Home</a>
+          <a class="dropdown-item" href="{{ app_root }}/db/">Db</a>
+          <a class="dropdown-item" href="{{ app_root }}/profile">Profile</a>
+          <a class="dropdown-item" href="{{ app_root }}/search">Search</a>
+        </div>
+      </li>
+      <!-- Smaller devices menu END -->
+
+{%- if without_sidebar and request.referrer %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ request.referrer }}">< Back</a>
+      </li>
+{%- else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{{ app_root }}/">Home</a>
+      </li>
+{%- endif %}
+
+      <li class="nav-item">
+        <a class="nav-link" href="{{ app_root }}/pages">Pages</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="favorites" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Favorites
+        </a>
+        <div class="dropdown-menu" aria-labelledby="dropdown01">
+          <a class="dropdown-item" href="addpage">Add current page</a>
+        </div>
+      </li>
+    </ul>
+
+    <form class="form-inline my-2 my-lg-0" action="search" method="post" id="search">
+      <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0 mr-sm-4" type="submit">Search</button>
+    </form>
+  </div>
+
+{%- if name %}
+  <div class="dropdown" id="user_section">
+    <a class="nav-link dropdown-toggle" href="profile" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <b>{{ name }}</b>
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdown02">
+      <a class="dropdown-item" href="profile" id="{{ app_root }}/profile">Profile</a>
+      <a class="dropdown-item" href="logout" id="{{ app_root }}/logout">Log out</a>
+    </div>
+  </div>
+{%- else %}
+  <div class="row" id="anonymous_section">
+    <a class="nav-link" href="signin">
+      Sign in
+    </a>
+    <a class="nav-link pl-0" href="signup">
+      Sign up
+    </a>
+  </div>
+{%- endif %}
+</nav>
+{%- endmacro %}
+
+
+{%- macro text_sidebar() %}
+  <div id="sidebar-container" class="sidebar-expanded d-none d-md-block col-2">
+    <!-- d-* hiddens the Sidebar in smaller devices. Its items can be kept on the Navbar 'Menu' -->
+    <!-- Bootstrap List Group -->
+    <ul class="list-group sticky-top sticky-offset">
+
+      <!-- Separator with title -->
+      <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+        <small>MAIN MENU</small>
+      </li>
+      <!-- /END Separator -->
+
+      <!-- Menu with submenu -->
+      <a href="#submenu1" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-database fa-fw mr-3"></span>
+          <span class="menu-collapsed">Databases</span>
+          <span class="submenu-icon ml-auto"></span>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu1" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/db/" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">View</span>
+        </a>
+        <a href="{{ app_root }}/db_info/" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Info</span>
+        </a>
+        <a href="{{ app_root }}/query/" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Queries</span>
+        </a>
+      </div>
+
+      <!-- Menu with submenu -->
+      <a href="#submenu2" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-cloud-download fa-fw mr-3"></span>
+          <span class="menu-collapsed">Sources</span>
+          <span class="submenu-icon ml-auto"></span>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu2" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/sources" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Sources</span>
+        </a>
+        <a href="{{ app_root }}/handlers" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Handlers</span>
+        </a>
+        <a href="{{ app_root }}/source/schedule" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Tasks</span>
+        </a>
+        <a href="{{ app_root }}/accounts" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Accounts</span>
+        </a>
+      </div>
+
+      <!-- Menu with submenu -->
+      <a href="#submenu3" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-user fa-fw mr-3"></span>
+          <span class="menu-collapsed">Profile</span>
+          <span class="submenu-icon ml-auto"></span>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu3" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/profile" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Profile</span>
+        </a>
+        <!--a href="{{ app_root }}/settings" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Settings</span>
+        </a-->
+        <a href="{{ app_root }}/change_password" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Password</span>
+        </a>
+      </div>
+
+{%- if p_admin %}
+      <!-- Menu with submenu -->
+      <a href="#submenu4" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-puzzle-piece fa-fw mr-3"></span>
+          <span class="menu-collapsed">Admin</span>
+          <span class="submenu-icon ml-auto"></span>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu4" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/admin/users" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Users</span>
+        </a>
+        <a href="{{ app_root }}/admin/groups" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Groups</span>
+        </a>
+        <a href="{{ app_root }}/admin/modules" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Modules</span>
+        </a>
+      </div>
+{%- endif %}
+
+{%- if p_debug %}
+      <!-- Menu with submenu -->
+      <a href="#submenu5" data-toggle="collapse" aria-expanded="false" class="bg-dark list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-bug fa-fw mr-3"></span>
+          <span class="menu-collapsed">Debug</span>
+          <span class="submenu-icon ml-auto"></span>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu5" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/debug/" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Debug</span>
+        </a>
+        <a href="{{ app_root }}/test/" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">/test/</span>
+        </a>
+        <a href="{{ app_root }}/test_dump" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Test dump</span>
+        </a>
+        <a href="{{ app_root }}/test_base" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Test base</span>
+        </a>
+        <a href="{{ app_root }}/test_injected" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Test injected</span>
+        </a>
+        <a href="{{ app_root }}/test_layout2" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Test layout2</span>
+        </a>
+        <a href="{{ app_root }}/p/ver" class="list-group-item list-group-item-action bg-dark text-white">
+          <span class="menu-collapsed">Libraries version</span>
+        </a>
+      </div>
+{%- endif %}
+
+{%- if p_statistics %}
+      <!-- Menu -->
+      <a href="{{ app_root }}/requests" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-tasks fa-fw mr-3"></span>
+          <span class="menu-collapsed">Statistics</span>
+        </div>
+      </a>
+{%- endif %}
+
+{%- if events %}
+      <!-- Separator with title -->
+      <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+        <small>EVENTS</small>
+      </li>
+      <!-- /END Separator -->
+
+      <!-- Menu -->
+      <a href="#" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-calendar fa-fw mr-3"></span>
+          <span class="menu-collapsed">Calendar</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="#" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-envelope-o fa-fw mr-3"></span>
+          <span class="menu-collapsed">
+            Messages
+            <span class="badge badge-pill badge-primary ml-2">5</span>
+          </span>
+        </div>
+      </a>
+{%- endif %}
+
+      <!-- Separator without title -->
+      <li class="list-group-item sidebar-separator menu-collapsed"></li>
+      <!-- /END Separator -->
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/p/help" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-question fa-fw mr-3"></span>
+          <span class="menu-collapsed">Help</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/p/tos" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-book fa-fw mr-3"></span>
+          <span class="menu-collapsed">Terms of service</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/p/contacts" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-at fa-fw mr-3"></span>
+          <span class="menu-collapsed">Contacts</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/about" class="bg-dark list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <span class="fa fa-flask fa-fw mr-3"></span>
+          <span class="menu-collapsed">About</span>
+        </div>
+      </a>
+
+    </ul>
+    <!-- List Group END-->
+  </div>
+  <!-- sidebar-container END -->
 {%- endmacro %}

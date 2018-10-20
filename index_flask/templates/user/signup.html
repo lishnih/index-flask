@@ -3,27 +3,25 @@
 {%- from "_formhelpers.html" import render_field %}
 
 {%- block body %}
-<h1>Register</h1>
 
-<form method=post action="?next={{ next }}">
+<h1>Sign up</h1>
+
+<form method="post" action="?next={{ next }}">
   <dl>
-    {{ render_field(form.email, size=40) }}
-    {{ render_field(form.username, size=40) }}
     {{ render_field(form.name, size=40) }}
+    {{ render_field(form.email, size=40) }}
     {{ render_field(form.company, size=40) }}
     {{ render_field(form.password, size=40) }}
     {{ render_field(form.confirm, size=40) }}
     {{ render_field(form.accept_tos) }}
   </dl>
   <p>
-    <input type=submit value="Register">
+    <input type=submit value="Sign up">
   </p>
 </form>
 
 <p>
-  If you registered you can <a href="/login">Login</a>
+  If you registered you can <a href="{{ url_for('user_signin') }}" target="_blank">Sign in</a>
 </p>
-<p>
-  Go to <a href="/">Main page</a>
-</p>
+
 {%- endblock %}

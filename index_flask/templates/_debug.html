@@ -1,19 +1,10 @@
-{% macro debug_footer() %}
-{%- if debug %}
-<pre>
-{{ debug }}
-</pre>
-{%- endif %}
-{%- endmacro %}
-
-
 {% macro dump_value(value) %}
 {%- if value is mapping %}
   {{ dump_dict(value) }}
 {%- elif value is none %}
   <i class="inactive">null</i>
 {%- else %}
-  {{ value|safe_str }}
+  {{ value|safe }}
 {%- endif %}
 {%- endmacro %}
 
@@ -25,7 +16,7 @@
 {%- elif value is none %}
   <i class="inactive">null</i>
 {%- else %}
-  {{ value|safe_str }}
+  {{ value|safe }}
 {%- endif %}
 {%- endautoescape %}
 {%- endmacro %}
@@ -33,7 +24,7 @@
 
 {% macro dump_dict(obj) %}
 {%- if obj is mapping %}
-<table border="1">
+<table class="table table-bordered table-hover table-sm table-responsive">
 {%- for key, value in obj | dictsort %}
 <tr>
   <th>{{ key }}</th>
@@ -70,7 +61,7 @@
 {% macro dump_json(rows) %}
 {%- for row in rows %}
 {%- if row is mapping %}
-<table border="1">
+<table class="table table-bordered table-hover table-sm table-responsive">
 <tr>
 {%- for key, value in row | dictsort %}
 <th>{{ key }}</th>
@@ -94,7 +85,7 @@
 
 {% macro dump_table(names, rows) %}
 <div class="table">
-<table border="1">
+<table class="table table-bordered table-hover table-sm table-responsive">
   <thead>
     {%- if names %}
     <tr>
@@ -131,7 +122,7 @@
 {% macro dump_table_unsafe(names, rows) %}
 {%- autoescape false %}
 <div class="table">
-<table border="1">
+<table class="table table-bordered table-hover table-sm table-responsive">
   <thead>
     {%- if names %}
     <tr>

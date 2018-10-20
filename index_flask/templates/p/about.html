@@ -1,16 +1,16 @@
-{% extends "_p.html" %}
+{% extends "_layout.html" %}
 
 {%- block title %}
   <title>About</title>
 {%- endblock %}
 
-{%- block pbody %}
+{%- block body %}
 
 <p><b>Package</b>: <i>{{ pkgname }}</i></p>
 <p><b>Description</b>: <i>{{ description }}</i></p>
-<p><b>Version</b>: <i>{{ version }}</i></p>
 
 {%- if py_version %}
+<p><b>Version</b>: <i>{{ version }}</i></p>
 <p><b>Python</b>: <i>{{ py_version }}</i></p>
 <p>
   <b>Flask</b>: <i>{{ flask_version }}</i><br />
@@ -27,9 +27,9 @@
 </p>
 
 <p>
-  <b>Admin</b>: <i>{{ is_admin }}</i><br />
-  <b>Debug</b>: <i>{{ is_debug }}</i><br />
-  <b>Statistics</b>: <i>{{ is_statistics }}</i><br />
+  <b>Admin</b>: <i>{{ p_admin }}</i><br />
+  <b>Debug</b>: <i>{{ p_debug }}</i><br />
+  <b>Statistics</b>: <i>{{ p_statistics }}</i><br />
 </p>
 {%- endif %}
 

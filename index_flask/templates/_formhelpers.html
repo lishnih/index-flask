@@ -1,28 +1,70 @@
 {% macro render_field(field) %}
-<p>
-  <dt>{{ field.label(id=field.id) }}</dt>
-  <dd>{{ field(**kwargs)|safe }}
-  {%- if field.errors %}
-    <ul class=errors>
-    {%- for error in field.errors %}
-      <li>{{ error }}</li>
-    {%- endfor %}
-    </ul>
-  {%- endif %}
-  </dd>
-</p>
+{%- if field.errors %}
+  <div class="form-group has-danger">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(class="form-control is-invalid", **kwargs)|safe }}
+{%- else %}
+  <div class="form-group">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(class="form-control", **kwargs)|safe }}
+{%- endif %}
+{%- for error in field.errors %}
+    <div class="invalid-feedback">{{ error|safe }}</div>
+{%- endfor %}
+  </div>
 {%- endmacro %}
 
+
+{% macro render_disabled(field) %}
+{%- if field.errors %}
+  <fieldset disabled="">
+  <div class="form-group has-danger">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(disabled=True, class="form-control is-invalid", **kwargs)|safe }}
+{%- else %}
+  <fieldset disabled="">
+  <div class="form-group">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(disabled=True, class="form-control", **kwargs)|safe }}
+{%- endif %}
+{%- for error in field.errors %}
+    <div class="invalid-feedback">{{ error|safe }}</div>
+{%- endfor %}
+  </fieldset>
+  </div>
+{%- endmacro %}
+
+
+{% macro render_readonly(field) %}
+{%- if field.errors %}
+  <fieldset>
+  <div class="form-group has-danger">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(readonly="readonly", class="form-control is-invalid", **kwargs)|safe }}
+{%- else %}
+  <fieldset>
+  <div class="form-group">
+    {{ field.label(class="form-control-label")|safe }}
+    {{ field(readonly="readonly", class="form-control", **kwargs)|safe }}
+{%- endif %}
+{%- for error in field.errors %}
+    <div class="invalid-feedback">{{ error|safe }}</div>
+{%- endfor %}
+  </fieldset>
+  </div>
+{%- endmacro %}
+
+
 {% macro render_hidden(field) %}
-<p>
-  <dd>{{ field(**kwargs)|safe }}
-  {%- if field.errors %}
-    <ul class=errors>
-    {%- for error in field.errors %}
-      <li>{{ error }}</li>
-    {%- endfor %}
-    </ul>
-  {%- endif %}
-  </dd>
-</p>
+  <div>
+    {{ field.label(class="sr-only")|safe }}
+    {{ field(class="form-control", **kwargs)|safe }}
+  </div>
+{%- endmacro %}
+
+
+{% macro render_submit(field) %}
+  <div>
+    <button type="submit" class="btn btn-primary">{{ field.label.text|safe }}</button>
+  </div>
 {%- endmacro %}
