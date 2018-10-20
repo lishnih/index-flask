@@ -11,8 +11,8 @@ import math
 from sqlalchemy import desc, not_
 from wtforms import Form, StringField, IntegerField, SelectField, validators
 
-from .core.backwardcompat import *
-from .core.db import get_columns_names, get_column
+from ..core.db import get_columns_names, get_column
+from ..core.types23 import *
 
 
 class TableCondForm(Form):
@@ -51,6 +51,7 @@ class TableCondForm(Form):
     unlim = SelectField('Unlimited')
     plain = SelectField('Plain')
     truncate = SelectField('Truncate')
+    mode = SelectField('Mode')
 
     def __init__(self, form, mtable=None, columns=None, templates_list=None, engine=None, **kargs):
         super(TableCondForm, self).__init__(form, **kargs)
@@ -82,7 +83,8 @@ class TableCondForm(Form):
 
         self.unlim.choices = [['off', 'Off'], ['on', 'On']]
         self.plain.choices = [['on', 'On'], ['off', 'Off']]
-        self.truncate.choices = [['80', '80'], ['160', '160'], ['320', '320'], ['off', 'Off']]
+        self.truncate.choices = [['80', '80'], ['160', '160'], ['320', '320'], ['20', '20'], ['off', 'Off']]
+        self.mode.choices = [['default', 'Default'], ['all', 'All']]
 
     def validate(self):
         rv = Form.validate(self)
@@ -268,11 +270,11 @@ class TableCondForm(Form):
         sort_column = "{0} desc".format(column) if cond == 'DESC' else column
 
         if self.mtable is not None:
-            column = get_column(self.mtable, column)
-            if column is None:
-                return
+            mcolumn = get_column(self.mtable, column)
+            if mcolumn is None:
+                raise Exception("Wrong column: {0}".format(column))
 
-            mcolumn = desc(column) if cond == 'DESC' else column
+            mcolumn = desc(mcolumn) if cond == 'DESC' else mcolumn
 
         else:
             mcolumn = sort_column
