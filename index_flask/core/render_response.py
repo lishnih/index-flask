@@ -5,17 +5,76 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from flask import request, render_template, jsonify, flash
+from flask import request, render_template, jsonify, flash, escape
 from jinja2 import Markup, escape
+from werkzeug.wrappers import Response
 
 from flask_principal import Permission, RoleNeed
 
-from ..core.backwardcompat import *
-
-from ..app import safe_str
+from ..core.types23 import *
 
 
 debug_permission = Permission(RoleNeed('debug'))
+
+
+def render_ext2(template_name_or_list=None, default=None, message="",
+        format=None, form=None, **context):
+    format = format or request.values.get('format')
+
+    result = "success"
+    if isinstance(message, tuple):
+        message, result = message
+
+    if format == 'json':
+        return jsonify(dict(
+            result = result,
+            message = message,
+            **context
+        ))
+
+    if message:
+        flash(message, result or "success")
+
+    if isinstance(default, Response) and not format:
+        return default
+
+    return "No template defined!" if not template_name_or_list else \
+        render_template(template_name_or_list,
+            modal = format == 'modal',
+            form = form,
+            **context
+        )
+
+
+def render_ext(template_name, result='ok', format=None, **context):
+    if not debug_permission.can():
+        context.pop('debug', '')
+
+    message = ''
+    if isinstance(result, tuple):
+        if len(result) == 1:
+            result, = result
+
+        else:
+            result, message = result[0:2]
+
+    if format == 'json':
+        context = {k: v for k, v in context.items() if k in \
+            ['action', 'rows', 'debug']}
+        return jsonify(dict(
+            result = result,
+            message = message,
+            **context
+        ))
+
+    if message:
+        flash(message, result)
+
+    return "No view defined!" if not template_name else \
+        render_template(template_name,
+            dialog = format == 'dialog',
+            **context
+        )
 
 
 def swap(s, limit=0):
@@ -28,35 +87,36 @@ def swap(s, limit=0):
     return s
 
 
-def render_format(tmpl_name, flash_t=None, **kargs):
+def render_format(template_name, **context):
     format = request.values.get('format')
 
     if not debug_permission.can():
-        kargs.pop('debug')
+        context.pop('debug')
 
-    truncate = kargs.pop('truncate', None)
+    truncate = context.pop('truncate', None)
+    flash_t = context.pop('flash_t', None)
 
     if format == 'json':
-        for key, val in kargs.items():
+        for key, val in context.items():
             if not isinstance(val, all_types):
-                kargs.pop(key)
+                context.pop(key)
 
         if flash_t:
             message, result = flash_t if len(flash_t) > 1 else flash_t, 'prompt'
-            kargs['flash_cat'] = result
-            kargs['flash_message'] = message
+            context['flash_cat'] = result
+            context['flash_message'] = message
 
-        if 'rows' in kargs:
-            kargs['rows'] = [[safe_str(None, i) for i in row] for row in kargs['rows']]
-            kargs['rows'] = [[swap(i, truncate) for i in row] for row in kargs['rows']]
+        if 'rows' in context:
+            context['rows'] = [[escape(i) for i in row] for row in context['rows']]
+            context['rows'] = [[swap(i, truncate) for i in row] for row in context['rows']]
 
-        return jsonify(**kargs)
+        return jsonify(**context)
 
     else:
         if flash_t:
             flash(*flash_t)
 
-        if 'rows' in kargs:
-            kargs['rows'] = [[swap(i, truncate) for i in row] for row in kargs['rows']]
+        if 'rows' in context:
+            context['rows'] = [[swap(i, truncate) for i in row] for row in context['rows']]
 
-        return render_template(tmpl_name, **kargs)
+        return render_template(template_name, **context)

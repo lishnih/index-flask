@@ -5,11 +5,10 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-import logging
 from inspect import ismethod
 from xml.sax.saxutils import escape, prepare_input_source
 
-from .backwardcompat import *
+from .types23 import *
 
 
 """ Отладочный вывод переменных различных типов

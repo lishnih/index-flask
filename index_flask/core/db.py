@@ -16,21 +16,20 @@ from sqlalchemy.sql import select, text
 
 dbname_ptrn = re.compile("^[\w\-+=\.,\(\)\[\]\{\}';]+$")
 
-
 def init_db(home, dbname, create=False):
     result = dbname_ptrn.match(dbname)
     if result:
+        home = os.path.expanduser(home)
         filename = os.path.join(home, "{0}.sqlite".format(dbname))
         if os.path.isfile(filename) or create:
             db_uri = "{0}:///{1}".format('sqlite', filename)
 
-            engine = create_engine(db_uri)
+            engine = create_engine(db_uri, convert_unicode=True)
             metadata = MetaData(engine, reflect=True)
 
-            session = scoped_session(sessionmaker())
-            session.configure(bind=engine)
+            db_session = scoped_session(sessionmaker(autocommit=False, autoflush=True, bind=engine))
 
-            return db_uri, session, metadata
+            return db_uri, db_session, metadata
 
     return None, None, None
 
@@ -99,7 +98,7 @@ def get_count(query):
 
 
 def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=None, plain=1):
-    s = select('*').select_from(text("({0})".format(sql)))
+    s = select(['*']).select_from(text("({0})".format(sql)))
     total = session.execute(s.count()).scalar()
 
     if criterion:
@@ -168,8 +167,8 @@ def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plai
 
 
 def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=None, plain=1):
-    s = select('*').select_from(mtable)
-    s_count = select([func.count('*')]).select_from(mtable)
+    s = select(['*'], mtable)
+    s_count = select([func.count(['*'])], mtable)
     total = session.execute(s_count).scalar()
 
     if criterion:

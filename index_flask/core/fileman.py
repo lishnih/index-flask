@@ -19,11 +19,14 @@ def list_files(path, root, override_url=None):
     dirlist = []
     filelist = []
 
+    if not os.path.isdir(fullpath):
+        return dirlist, filelist
+
     try:
         ldir = os.listdir(fullpath)
 
     except OSError as e:
-        logging.warning("OSError '{0}'".format(e.message))
+        logging.error("OSError '{0!r}'".format(e))
 
     else:
         for name in ldir:

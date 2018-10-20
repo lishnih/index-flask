@@ -7,7 +7,7 @@ from __future__ import (division, absolute_import,
 
 import os
 
-from ..a import app
+from ..app import app
 
 
 def get_user_templates(user):
@@ -23,14 +23,14 @@ def get_user_templates(user):
             if ext == '.html':
                 yield tpname
 
-    home = os.path.join(app.root_path, 'templates', 'custom', user.username)
-
-    try:
-        ldir = os.listdir(home)
-    except OSError:
-        pass
-    else:
-        for name in ldir:
-            tpname, ext = os.path.splitext(name)
-            if ext == '.html':
-                yield "{0}/{1}".format(user.username, tpname)
+#     home = os.path.join(app.root_path, 'templates', 'custom', user.username)
+#
+#     try:
+#         ldir = os.listdir(home)
+#     except OSError:
+#         pass
+#     else:
+#         for name in ldir:
+#             tpname, ext = os.path.splitext(name)
+#             if ext == '.html':
+#                 yield "{0}/{1}".format(user.username, tpname)
