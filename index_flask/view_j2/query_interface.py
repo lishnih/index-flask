@@ -10,9 +10,9 @@ from __future__ import (division, absolute_import,
 from sqlalchemy import desc, distinct, func, or_
 from sqlalchemy.sql import select
 
+from ..main import require_ext
 from ..core.db import get_primary_tables, get_relative_tables
-
-from ..app import require_ext
+from ..core.types23 import *
 
 
 def qi_columns_list(user, db, tables, fullnames_option=1):

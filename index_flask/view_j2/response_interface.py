@@ -5,8 +5,6 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-# from ..core.dump_html import html
-
 
 def prepare_response(request):
     response = dict(

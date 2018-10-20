@@ -9,9 +9,7 @@ from flask import request, jsonify
 
 from flask_login import login_required
 
-from ..core.backwardcompat import *
-
-from ..a import app
+from ..main import app
 from .. import view_j2
 
 

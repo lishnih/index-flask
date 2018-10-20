@@ -9,10 +9,10 @@ from .request_interface import *
 from .response_interface import *
 from .query_interface import *
 
+from ..main import db
 from ..core.db import init_db, get_dbs_list
-from ..models import Register, Favorite
-
-from ..a import db
+from ..models.favorite import Favorite
+from ..models.register import Register
 
 
 def set_default_db_action(user, request_items, response):
@@ -395,7 +395,7 @@ def search_action(user, request_items, response):
                 for c in mcolumns:
                     or_st.append(c.like("%{0}%".format(search)))
 
-                s = select(mcolumns).select_from(mtable).where(or_(*or_st))
+                s = select(mcolumns, mtable).where(or_(*or_st))
                 res = session.execute(s)
                 names = res.keys()
                 rows1 = [[j for j in i] for i in res.fetchall()]
