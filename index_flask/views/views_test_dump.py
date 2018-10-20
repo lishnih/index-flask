@@ -9,20 +9,19 @@ from flask import request, render_template, abort
 
 from flask_principal import Permission, RoleNeed
 
-from ..core.backwardcompat import *
-
-from ..a import app
+from ..app import app
 
 
 # ===== Roles =====
 
 debug_permission = Permission(RoleNeed('debug'))
+# debug_permission = Permission()
 
 
 # ===== Routes =====
 
-@app.route('/debug/tests/')
-def debug_tests():
+@app.route('/test_dump/')
+def test_dump():
     if not debug_permission.can():
         abort(404)
 
@@ -33,8 +32,8 @@ def debug_tests():
            )
 
 
-@app.route('/debug/tests/list')
-def debug_tests_list():
+@app.route('/test_dump/list')
+def test_dump_list():
     if not debug_permission.can():
         abort(404)
 
@@ -45,8 +44,8 @@ def debug_tests_list():
            )
 
 
-@app.route('/debug/tests/dict')
-def debug_tests_dict():
+@app.route('/test_dump/dict')
+def test_dump_dict():
     if not debug_permission.can():
         abort(404)
 
@@ -57,8 +56,8 @@ def debug_tests_dict():
            )
 
 
-@app.route('/debug/tests/json')
-def debug_tests_json():
+@app.route('/test_dump/json')
+def test_dump_json():
     if not debug_permission.can():
         abort(404)
 
@@ -74,8 +73,8 @@ def debug_tests_json():
            )
 
 
-@app.route('/debug/tests/table')
-def debug_tests_table():
+@app.route('/test_dump/table')
+def test_dump_table():
     if not debug_permission.can():
         abort(404)
 
@@ -92,8 +91,8 @@ def debug_tests_table():
            )
 
 
-@app.route('/debug/tests/table_unsafe')
-def debug_tests_table_unsafe():
+@app.route('/test_dump/table_unsafe')
+def test_dump_table_unsafe():
     if not debug_permission.can():
         abort(404)
 
@@ -110,8 +109,8 @@ def debug_tests_table_unsafe():
            )
 
 
-@app.route('/debug/tests/tables')
-def debug_tests_tables():
+@app.route('/test_dump/tables')
+def test_dump_tables():
     if not debug_permission.can():
         abort(404)
 
