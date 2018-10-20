@@ -4,22 +4,21 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from index_flask import __pkgname__, __description__, __version__
+from index_flask import (__pkgname__, __description__, __version__,
+                         PY2, py_version)
 
 import sys
 import os
 from setuptools import setup, find_packages
 
-py_version = sys.version_info[:2]
-PY3 = py_version[0] == 3
-if PY3:
-    if py_version < (3, 3):
-        raise RuntimeError('On Python 3, Index requires Python 3.3 or better')
-else:
+if PY2:
     if py_version < (2, 6):
-        raise RuntimeError('On Python 2, Index requires Python 2.6 or better')
+        raise RuntimeError('On Python 2, the package requires Python 2.6 or better')
+else:
+    if py_version < (3, 3):
+        raise RuntimeError('On Python 3, the package requires Python 3.3 or better')
 
-here = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+here = os.path.abspath(os.path.dirname(__file__))
 try:
     README = open(os.path.join(here, 'README.rst')).read()
     CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
@@ -27,19 +26,15 @@ except IOError:
     README = CHANGES = ''
 
 
-
-
 data_files = []
 
 start_point = os.path.join(__pkgname__, 'static')
 for root, dirs, files in os.walk(start_point):
-    root_files = [os.path.join(root, i) for i in files]
-    data_files.append((root, root_files))
+    data_files.append((root, [os.path.join(root, i) for i in files]))
 
 start_point = os.path.join(__pkgname__, 'templates')
 for root, dirs, files in os.walk(start_point):
-    root_files = [os.path.join(root, i) for i in files]
-    data_files.append((root, root_files))
+    data_files.append((root, [os.path.join(root, i) for i in files]))
 
 
 if __name__ == '__main__':
@@ -65,16 +60,22 @@ if __name__ == '__main__':
         data_files=data_files,
 
         scripts=[
-            'index_flask-initialize_app.py',
+            'index_flask-initialize.py',
             'index_flask-standalone.py',
-            'index_flask-standalone_debug.py',
         ],
 
         install_requires=[
-            'flask_sqlalchemy',
+            'wtforms',
             'flask_login',
             'flask_principal',
-            'wtforms',
+            'flask_bcrypt',
+            'flask_sqlalchemy',
+            'flask_migrate',
+            'social-auth-app-flask-sqlalchemy',
+            'dropbox',
+            'yadisk',
+            'python-docx',
+#           'pyOpenSSL',
         ],
 
         classifiers=[

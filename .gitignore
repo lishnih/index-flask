@@ -117,5 +117,9 @@ backup
 archive.list
 
 # index_flask
+flask.ini
+wsgi.py
+wsgi_debug.py
+index_flask.service
 index_flask/test/
 index_flask/templates/custom
