@@ -7,16 +7,17 @@ from __future__ import (division, absolute_import,
 
 import os
 
-from flask import request, render_template, jsonify, redirect, flash
+from flask import request, jsonify, redirect, flash
 from jinja2 import Markup, escape
 
 from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
-from ..core.html_helpers import parse_input, parse_span, dye_red, dye_green
+from ..core.html_helpers import parse_input, parse_span, highlighted
 from ..core.load_modules import is_loaded
+from ..core.render_response import render_ext
 from ..models.module import Module
 
 
@@ -85,10 +86,10 @@ def admin_modules():
         ))
         # On the disk
         fl = os.path.isfile(os.path.join(app.root_path, module.folder, "{0}.py".format(module.name)))
-        row.append(dye_green('Yes') if fl else dye_red('No'))
+        row.append(highlighted('Yes', 'success') if fl else highlighted('No', 'danger'))
         # Is loaded
         fl = is_loaded(module.name, module.folder)
-        row.append(dye_green('Yes') if fl else dye_red('No'))
+        row.append(highlighted('Yes', 'success') if fl else highlighted('No', 'danger'))
 
         rows.append(row)
 
@@ -96,7 +97,7 @@ def admin_modules():
     names.append('On the disk')
     names.append('Is loaded')
 
-    return render_template('admin/table_unsafe.html',
+    return render_ext('admin/table_unsafe.html',
              title = 'App modules',
              names = names,
              rows = rows,

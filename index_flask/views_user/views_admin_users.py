@@ -7,16 +7,16 @@ from __future__ import (division, absolute_import,
 
 import os
 
-from flask import request, render_template, jsonify, redirect, flash
+from flask import request, jsonify, redirect, flash
 from jinja2 import Markup, escape
 
 from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
-from ..core.html_helpers import parse_input, parse_span, dye_red, dye_green
 from ..core.load_modules import is_loaded
+from ..core.render_response import render_ext
 from ..forms.user import RegistrationForm
 from ..models.user import User
 
@@ -32,7 +32,7 @@ admin_permission = Permission(RoleNeed('admin'))
 @login_required
 @admin_permission.require(403)
 def admin():
-    return render_template('admin/index.html',
+    return render_ext('admin/index.html',
              title = 'Admin page',
            )
 
@@ -57,7 +57,7 @@ def admin_users():
 
         rows.append(row)
 
-    return render_template('base.html',
+    return render_ext('base.html',
              title = 'Users',
              names = names,
              rows = rows,
@@ -74,7 +74,7 @@ def admin_user(email):
     names = [i.name for i in User.__table__.c]
     rows = [[user.__dict__.get(i) for i in names]]
 
-    return render_template('base.html',
+    return render_ext('base.html',
              title = 'User',
              names = names,
              rows = rows,
@@ -92,7 +92,6 @@ def admin_add_user():
             email = form.email.data,
             password = form.password.data,
             name = form.name.data,
-            company = form.company.data,
         )
         db.session.add(user)
         db.session.commit()
@@ -102,7 +101,7 @@ def admin_add_user():
         flash('User added!')
         return redirect(get_next('admin'))
 
-    return render_template('user/signup.html',
+    return render_ext('user/signup.html',
              title = 'Registering new user',
              form = form,
              next = request.args.get('next', '/admin/'),

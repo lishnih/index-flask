@@ -1,24 +1,24 @@
-{% extends "_layout.html" %}
+{% extends "base.html" %}
 
-{%- from "_formhelpers.html" import render_field %}
+{%- from "_formhelpers.html" import render_submit, render_field %}
 
 {%- block body %}
 
+{%- if form %}
 <h1>Sign in</h1>
 
 <form method="post" action="?next={{ next }}">
-  <dl>
-    {{ render_field(form.email, size=40) }}
-    {{ render_field(form.password, size=40) }}
-    {{ render_field(form.remember) }}
-  </dl>
-  <p>
-    <input type=submit value="Sign in">
-  </p>
+  {{ render_field(form.email, size=40) }}
+  {{ render_field(form.password, size=40) }}
+  {{ render_field(form.remember) }}
+  {{ render_submit(form.submit) }}
 </form>
 
+{%- if not modal %}
 <p>
   If you not registered yet you can <a href="{{ url_for('user_signup') }}">Sign up</a>
 </p>
+{%- endif %}
+{%- endif %}
 
 {%- endblock %}

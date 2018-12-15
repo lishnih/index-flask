@@ -84,7 +84,3 @@ def error_handler(error):
 @app.route("/socialerror")
 def socialerror():
     k
-    return render_template('base.html',
-        title = 'Index',
-        text = 'Welcome!',
-    )

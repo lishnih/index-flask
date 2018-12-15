@@ -14,8 +14,9 @@ from sqlalchemy import and_
 from index_flask.config import *
 
 print('INDEX_SQLITE_HOME:', INDEX_SQLITE_HOME)
-if not os.path.isdir(INDEX_SQLITE_HOME):
-    os.mkdir(INDEX_SQLITE_HOME)
+_dir = os.path.expanduser(INDEX_SQLITE_HOME)
+if not os.path.isdir(_dir):
+    os.mkdir(_dir)
 
 
 # ===== Import =====
@@ -96,7 +97,7 @@ if __name__ == '__main__':
     init_user()
     db.session.commit()
 
-    if not Handler.query.filter_by(name='initial_scan').first():
-        handler = Handler(name='initial_scan', module='index_flask.handlers.initial_scan', entry='proceed')
+    if not Handler.query.filter_by(name='scan_files').first():
+        handler = Handler(name='scan_files', module='index_cli.main', entry='main')
         db.session.add(handler)
     db.session.commit()

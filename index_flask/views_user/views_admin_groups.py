@@ -7,16 +7,17 @@ from __future__ import (division, absolute_import,
 
 import os
 
-from flask import request, render_template, jsonify, redirect, flash
+from flask import request, jsonify, redirect, flash
 from jinja2 import Markup, escape
 
 from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
-from ..core.html_helpers import parse_input, parse_span, dye_red, dye_green
+from ..core.html_helpers import parse_input, parse_span
 from ..core.load_modules import is_loaded
+from ..core.render_response import render_ext
 from ..forms.group import AddGroupForm
 from ..models.group import Group
 from ..models.user import User
@@ -49,7 +50,7 @@ def admin_groups():
 
         rows.append(row)
 
-    return render_template('base.html',
+    return render_ext('base.html',
              title = 'Groups',
              names = names,
              rows = rows,
@@ -66,7 +67,7 @@ def admin_group(name):
     names = [i.name for i in Group.__table__.c]
     rows = [[group.__dict__.get(i) for i in names]]
 
-    return render_template('base.html',
+    return render_ext('base.html',
              title = 'Group',
              names = names,
              rows = rows,
@@ -127,7 +128,7 @@ def admin_user_groups():
 
         rows.append(row)
 
-    return render_template('admin/table_unsafe.html',
+    return render_ext('admin/table_unsafe.html',
              title = 'User groups',
              names = names,
              rows = rows,
@@ -151,7 +152,7 @@ def admin_add_group():
         flash('Group added!')
         return redirect(get_next('admin'))
 
-    return render_template('admin/add_group.html',
+    return render_ext('admin/add_group.html',
              title = 'Appending new group',
              form = form,
            )

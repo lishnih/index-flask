@@ -21,11 +21,11 @@ from sqlalchemy.sql import select, text
 
 from wtforms import Form, TextAreaField, StringField, SelectField, HiddenField, validators
 
-from ..core.backwardcompat import *
+from ..core.types23 import *
 from ..core.db import init_db, get_dbs_list
 from ..core.dump_html import html
 
-from ..a import app
+from ..app import app
 
 
 # ===== Models =====

@@ -1,11 +1,10 @@
-{% extends "_layout.html" %}
+{% extends "base.html" %}
 
 {%- block body %}
 
 <table class="table table-bordered table-hover table-sm table-responsive">
   <tr><td><b>Name:</b></td><td>{{ user.name }}</td></tr>
   <tr><td><b>Email:</b></td><td>{{ user.email }}</td></tr>
-  <tr><td><b>Company:</b></td><td>{{ user.company }}</td></tr>
   <tr><td><b>Created:</b></td><td>{{ user.created }}</td></tr>
   <tr><td><b>Email verified:</b></td><td>{{ verified }}</td></tr>
 </table>

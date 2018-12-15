@@ -15,7 +15,7 @@ from .handler import Handler
 from .source import Source
 
 
-class SourceTask(db.Model):   # Rev. 2018-09-28
+class SourceTask(db.Model):   # Rev. 2018-11-20
     __tablename__ = 'source_tasks'
 
     source = db.relationship('Source', backref=db.backref(__tablename__,
@@ -36,6 +36,7 @@ class SourceTask(db.Model):   # Rev. 2018-09-28
     mode = db.Column(db.String, nullable=False, default='manual')
     options = db.Column(JsonType, nullable=False, default={})
     status = db.Column(db.Integer, nullable=False, default=0)
+    pid = db.Column(db.Integer, nullable=False, default=0)
     created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     finished = db.Column(db.DateTime)
 

@@ -5,17 +5,28 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from wtforms import (Form, StringField, PasswordField, HiddenField,
-                     BooleanField, validators)
+from wtforms import (Form, SubmitField, StringField, TextAreaField,
+                     HiddenField, validators)
 
 from ..models.group import Group
 
 
 class AddGroupForm(Form):
-    name = StringField('Name *', [
-        validators.Length(min=3, max=40),
-    ])
-    description = StringField('Description')
+    name = StringField('Name:', [
+            validators.DataRequired(),
+            validators.Length(min=3, max=40),
+        ],
+        render_kw={
+            "placeholder": "Group name (required)",
+        }
+    )
+    description = TextAreaField('Description:',
+        render_kw={
+            "placeholder": "Group description (optional)",
+        }
+    )
+    format = StringField()
+    submit = SubmitField('Add group')
 
     def validate(self):
         rv = Form.validate(self)

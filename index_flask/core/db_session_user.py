@@ -13,25 +13,42 @@ from flask_login import login_required, current_user
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import scoped_session, sessionmaker
+# from sqlalchemy_utils.functions import database_exists
 
-
-""" Creates a context with an open SQLAlchemy session.
-"""
 
 dbname_ptrn = re.compile("^[\w\-+=\.,\(\)\[\]\{\}';]+$")
 
-@contextmanager
-def user_db_session(dbname, create=False):
-    home = os.path.expanduser(current_user.home)
+
+def user_db_uri(dbname):
     result = dbname_ptrn.match(dbname)
     if not result:
-        raise Exception("Wrong DB name!")
+        raise Exception("Database name is incorrect: {0}".format(dbname))
 
+    home = os.path.expanduser(current_user.home)
     filename = os.path.join(home, "{0}.sqlite".format(dbname))
-    if not os.path.isfile(filename) and not create:
-        raise Exception("DB does not exist: {0}".format(dbname))
+    return "{0}:///{1}".format('sqlite', filename)
 
-    dburi = "{0}:///{1}".format('sqlite', filename)
+
+def user_db_exists(dbname):
+    dburi = user_db_uri(dbname)
+    return database_exists(dburi)
+
+#     result = dbname_ptrn.match(dbname)
+#     if not result:
+#         raise Exception("Database name is incorrect: {0}".format(dbname))
+#
+#     home = os.path.expanduser(current_user.home)
+#     filename = os.path.join(home, "{0}.sqlite".format(dbname))
+#     return os.path.isfile(filename):
+
+#     if not os.path.isfile(filename):
+#         raise Exception("Database does not exist: {0}".format(dbname))
+
+""" Creates a context with an open SQLAlchemy session.
+"""
+@contextmanager
+def user_db_session(dbname, create=False):
+    dburi = user_db_uri(dbname)
 
     engine = create_engine(dburi, convert_unicode=True)
     connection = engine.connect()
@@ -45,16 +62,7 @@ def user_db_session(dbname, create=False):
 
 @contextmanager
 def user_db_session_metadata(dbname, create=False):
-    home = os.path.expanduser(current_user.home)
-    result = dbname_ptrn.match(dbname)
-    if not result:
-        raise Exception("Wrong DB name!")
-
-    filename = os.path.join(home, "{0}.sqlite".format(dbname))
-    if not os.path.isfile(filename) and not create:
-        raise Exception("DB does not exist: {0}".format(dbname))
-
-    dburi = "{0}:///{1}".format('sqlite', filename)
+    dburi = user_db_uri(dbname)
 
     engine = create_engine(dburi, convert_unicode=True)
     connection = engine.connect()

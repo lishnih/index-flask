@@ -13,7 +13,6 @@ from flask_principal import Permission, RoleNeed
 
 from sqlalchemy import desc, distinct, func, and_, or_, not_
 # from sqlalchemy.sql import text
-from wtforms import Form, StringField, IntegerField, SelectField, validators
 
 from ..main import app, db
 from ..core.db import get_rows_model

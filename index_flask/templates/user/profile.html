@@ -1,22 +1,24 @@
-{% extends "_layout.html" %}
+{% extends "base.html" %}
 
 {%- block body %}
 
 <table class="table table-bordered table-hover table-sm table-responsive">
   <tr><td><b>Name:</b></td><td>{{ user.name }}</td></tr>
   <tr><td><b>Email:</b></td><td>{{ user.email }}</td></tr>
-  <tr><td><b>Company:</b></td><td>{{ user.company }}</td></tr>
   <tr><td><b>Created:</b></td><td>{{ user.created }}</td></tr>
   <tr><td><b>Email verified:</b></td><td>{{ verified }}</td></tr>
 </table>
 
 <p>
-  <a href="{{ app_root }}/edit">Edit profile</a><br />
+  <a href="{{ url_for('user_edit') }}" data-toggle="modal" data-target="#iaModal2" data-dismiss="modal" data-reload_on_close="location">
+    <i class="fa fa-user-edit"></i> Edit profile
+  </a>
 </p>
 <p>
-  <a href="{{ app_root }}/change_password">Change password</a><br />
+  <a href="{{ url_for('user_change_password') }}" data-toggle="modal" data-target="#iaModal2" data-dismiss="modal">
+    <i class="fa fa-user-edit"></i> Change password
+  </a>
 </p>
-
 
 <p>
   <b>User groups:</b><br />
@@ -38,16 +40,16 @@
 {%- if not user.is_verified %}
 <p>
   Your email is not confirmated!<br />
-  <a href="{{ app_root }}/send_verification">Send verification code</a><br />
+  <a href="{{ url_for('user_send_verification') }}">Send verification code</a><br />
 </p>
 {%- endif %}
 
 <p>
-  <a href="{{ app_root }}/logout">Log out</a><br />
+  <a href="{{ url_for('user_logout') }}">Log out</a><br />
 </p>
 
 <p>
-  <a href="{{ app_root }}/delete_account">Delete account</a><br />
+  <a href="{{ url_for('user_delete') }}">Delete account</a><br />
 </p>
 
 {%- endblock %}

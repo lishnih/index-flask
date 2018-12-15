@@ -13,7 +13,7 @@ from flask import escape
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.sql import select, func, join, column, text, desc, and_
+from sqlalchemy.sql import select, func, join, column, text, desc, and_, or_
 
 from .parse_multi_form import parse_multi_form
 

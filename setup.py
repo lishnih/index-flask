@@ -72,6 +72,7 @@ if __name__ == '__main__':
             'flask_sqlalchemy',
             'flask_migrate',
             'social-auth-app-flask-sqlalchemy',
+            'markdown',
             'dropbox',
             'yadisk',
             'python-docx',

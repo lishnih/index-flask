@@ -7,21 +7,16 @@ from __future__ import (division, absolute_import,
 
 import os
 
-from flask import session, request, render_template, redirect, url_for, jsonify, flash
+from flask import session, request, redirect, url_for
 
 from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
+from ..core.render_response import render_ext
 from ..forms.user import RegistrationForm, LoginForm, ChangePasswordForm
 from ..models.user import User
-
-
-# ===== Interface =====
-
-def json_required(form):
-    return 'type' in form and form.type.data == 'json'
 
 
 # ===== Routes =====
@@ -29,14 +24,12 @@ def json_required(form):
 @app.route('/signup', methods=['GET', 'POST'])
 def user_signup():
     form = RegistrationForm(request.form)
+    message = None
 
     if not current_user.is_anonymous:
-        if json_required(form):
-            return jsonify({'result': 'error', 'message': 'Already logged!'})
-
-        return render_template('user/logout.html',
+        return render_ext('user/logout.html',
             title = 'Logout',
-            name = current_user.name,
+            message = ("Already logged!", 'warning'),
             next = url_for('user_signup'),
         )
 
@@ -47,7 +40,6 @@ def user_signup():
                 email = form.email.data,
                 password = form.password.data,
                 name = form.name.data,
-                company = form.company.data,
             )
             db.session.add(user)
             db.session.commit()
@@ -57,34 +49,30 @@ def user_signup():
 
             user.init_env()
 
-            if json_required(form):
-                return jsonify({'result': 'ok'})
-
-            flash('Thank you for registering!')
-            return redirect(get_next())
+            return render_ext("base.html",
+                default = redirect(get_next()),
+                message = "Thank you for registering!",
+            )
 
         else:
-            if json_required(form):
-                return jsonify({'result': 'error', 'message': 'Invalid data!'})
+            message = "Invalid data!", 'warning'
 
-    return render_template('user/signup.html',
+    return render_ext('user/signup.html',
         title = 'Registering new user',
+        message = message,
         form = form,
-        next = get_next(),
     )
 
 
 @app.route('/signin', methods=['GET', 'POST'])
 def user_signin(user=None):
     form = LoginForm(request.form)
+    message = None
 
     if not current_user.is_anonymous:
-        if json_required(form):
-            return jsonify({'result': 'error', 'message': 'Already logged!'})
-
-        return render_template('user/logout.html',
+        return render_ext('user/logout.html',
             title = 'Logout',
-            name = current_user.name,
+            message = ("Already logged!", 'warning'),
             next = url_for('user_signin'),
         )
 
@@ -93,20 +81,18 @@ def user_signin(user=None):
             login_user(form.user, remember=form.remember.data)
             identity_changed.send(app, identity=Identity(form.user.id))
 
-            if json_required(form):
-                return jsonify({'result': 'ok'})
-
-            flash('Successfully logged in as {0}'.format(form.user.name))
-            return redirect(get_next())
+            return render_ext("base.html",
+                default = redirect(get_next()),
+                message = "Successfully logged in as {0}".format(form.user.name),
+            )
 
         else:
-            if json_required(form):
-                return jsonify({'result': 'error', 'message': 'Invalid email or password!'})
+            message = "Invalid data!", 'warning'
 
-    return render_template('user/signin.html',
+    return render_ext('user/signin.html',
         title = 'Sign in',
+        message = message,
         form = form,
-        next = get_next(),
     )
 
 
@@ -114,24 +100,24 @@ def user_signin(user=None):
 @login_required
 def user_change_password():
     form = ChangePasswordForm(request.form)
+    message = None
 
     if request.method == 'POST':
         if form.validate():
             form.user.change_password(form.password.data)
             db.session.commit()
 
-            if json_required(form):
-                return jsonify({'result': 'ok'})
-
-            flash('Successfully changed password')
-            return redirect(get_next())
+            return render_ext("base.html",
+                default = redirect(get_next()),
+                message = "Successfully changed password!",
+            )
 
         else:
-            if json_required(form):
-                return jsonify({'result': 'error', 'message': 'Invalid data!'})
+            message = ("Invalid data!", 'warning'),
 
-    return render_template('user/change_password.html',
+    return render_ext('user/change_password.html',
         title = 'Change Password',
+        message = message,
         form = form,
         next = url_for('user_profile'),
     )
@@ -139,19 +125,18 @@ def user_change_password():
 
 @app.route("/confirm/<code>", methods=['GET', 'POST'])
 def user_confirm(code=None):
-    user = User.query.filter_by(verified=code).first()
+    user = User.query.filter_by(verified=code, active=True).first()
     if user:
         status = 'verified'
         user.set_verified()
         db.session.commit()
+
     else:
         status = 'not verified'
 
-    if request.method == 'POST':
-        return jsonify({'result': 'ok', 'status': status})
-
-    return render_template('user/confirm.html',
+    return render_ext('user/confirm.html',
         title = 'Confirm email',
+        format = 'json' if request.method == 'POST' else None,
         status = status,
     )
 
@@ -166,53 +151,46 @@ def user_logout():
 
     identity_changed.send(app, identity=AnonymousIdentity())
 
-    if request.method == 'POST':
-        return jsonify({'result': 'ok'})
-
-    return redirect(get_next())
+    return render_ext("base.html",
+        default = redirect(get_next()),
+        format = 'json' if request.method == 'POST' else None,
+        message = "Successfully logged out!",
+    )
 
 
 @app.route("/delete", methods=['GET', 'POST'])
 @login_required
 def user_delete():
-    current_user.active = -1
+    current_user.active = False
     db.session.commit()
 
     user_logout()
+    session.pop('_flashes', None)
 
-    if request.method == 'POST':
-        return jsonify({'result': 'ok'})
-
-    return redirect(get_next(back=True))
+    return render_ext("base.html",
+        default = redirect(get_next(back=True)),
+        format = 'json' if request.method == 'POST' else None,
+        message = "Successfully deleted!",
+    )
 
 
 @app.route("/profile", methods=['GET', 'POST'])
 @login_required
 def user_profile():
-    if request.method == 'POST':
-        return jsonify({
-            'result': 'ok',
-            'name': current_user.name,
-        })
-
-    return render_template('user/profile.html',
+    return render_ext('user/profile.html',
         title = 'Profile',
+        format = 'json' if request.method == 'POST' else None,
         user = current_user,
-        verified = 'not verified' if current_user.verified else 'verified',
         groups = current_user.groups,
+        verified = 'verified' if current_user.is_verified else 'not verified',
+        name = current_user.name,   # Переменная для json запроса
     )
 
 
 @app.route("/edit", methods=['GET', 'POST'])
 @login_required
 def user_edit():
-    if request.method == 'POST':
-        return jsonify({
-            'result': 'ok',
-            'name': current_user.name,
-        })
-
-    return render_template('user/edit.html',
+    return render_ext('user/edit.html',
         title = 'Edit profile',
         user = current_user,
     )
@@ -220,11 +198,19 @@ def user_edit():
 
 @app.route("/logged", methods=['GET', 'POST'])
 def user_logged():
-    if request.method == 'POST':
-        return jsonify({
-            'result': 'ok',
-            'is_anonymous': current_user.is_anonymous,
-            'name': '' if current_user.is_anonymous else current_user.name,
-        })
+    return render_ext("base.html",
+        title = 'Status info',
+        format = 'json' if request.method == 'POST' else None,
+        message = "Not logged!" if current_user.is_anonymous else "Logged!",
+        name = '' if current_user.is_anonymous else current_user.name,  # Переменная для json запроса
+    )
 
-    return redirect(get_next())
+
+@app.route("/send_verification", methods=['GET', 'POST'])
+def user_send_verification():
+    return render_ext("base.html",
+        title = 'Status info',
+        format = 'json' if request.method == 'POST' else None,
+        message = "Not logged!" if current_user.is_anonymous else "Logged!",
+        name = '' if current_user.is_anonymous else current_user.name,  # Переменная для json запроса
+    )

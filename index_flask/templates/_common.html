@@ -37,8 +37,25 @@
 
 
 {%- macro text_ia_modal() %}
-<!-- Interactive modal -->
-<div class="modal fade" id="iaModal" tabindex="-1" role="dialog" aria-labelledby="iaModalLabel" aria-hidden="true">
+<!-- Two Interactive modals -->
+<div class="modal fade interactive" id="iaModal1" tabindex="-1" role="dialog" aria-labelledby="iaModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true"><i class="fa fa-close"></i></span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade interactive" id="iaModal2" tabindex="-1" role="dialog" aria-labelledby="iaModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
 
@@ -116,13 +133,13 @@
       </li>
       <!-- Smaller devices menu END -->
 
+      <li class="nav-item">
+        <a class="nav-link" href="{{ app_root }}/">Home</a>
+      </li>
+
 {%- if without_sidebar and request.referrer %}
       <li class="nav-item">
         <a class="nav-link" href="{{ request.referrer }}">< Back</a>
-      </li>
-{%- else %}
-      <li class="nav-item">
-        <a class="nav-link" href="{{ app_root }}/">Home</a>
       </li>
 {%- endif %}
 
@@ -148,12 +165,12 @@
 
 {%- if name %}
   <div class="dropdown" id="user_section">
-    <a class="nav-link dropdown-toggle" href="profile" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <a class="nav-link dropdown-toggle" href="{{ app_root }}/profile" id="dropdown02" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <b>{{ name }}</b>
     </a>
     <div class="dropdown-menu" aria-labelledby="dropdown02">
-      <a class="dropdown-item" href="profile" id="{{ app_root }}/profile">Profile</a>
-      <a class="dropdown-item" href="logout" id="{{ app_root }}/logout">Log out</a>
+      <a class="dropdown-item" href="{{ app_root }}/profile" id="profile">Profile</a>
+      <a class="dropdown-item" href="{{ app_root }}/logout" id="logout">Log out</a>
     </div>
   </div>
 {%- else %}

@@ -6,12 +6,10 @@ from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
 
-def parse_input(sid, checked, action, **kargs):
+def parse_input(sid, checked, action, cls = 'for_action', **kargs):
     kargs['action'] = action
-    data = ''
-    for key, val in kargs.items():
-        data += ' data-{0}="{1}"'.format(key, val)
-    cls = 'for_action'
+    data = ['data-{0}="{1}"'.format(key, val) for key, val in kargs.items()]
+    data = ' '.join(data)
     cls = ' class="{0}"'.format(cls) if cls else ''
     sid = ' id="{0}"'.format(sid) if sid else ''
 
@@ -19,30 +17,20 @@ def parse_input(sid, checked, action, **kargs):
            'checked' if checked else '')
 
 
-def parse_span(sid, text, action, **kargs):
+def parse_span(sid, text, action, cls = 'a for_action', **kargs):
     kargs['action'] = action
-    data = ''
-    for key, val in kargs.items():
-        data += ' data-{0}="{1}"'.format(key, val)
-    cls = 'a for_action'
+    data = ['data-{0}="{1}"'.format(key, val) for key, val in kargs.items()]
+    data = ' '.join(data)
     cls = ' class="{0}"'.format(cls) if cls else ''
     sid = ' id="{0}"'.format(sid) if sid else ''
 
     return '<span{0}{1}{2}>{3}</span>'.format(cls, sid, data, text)
 
 
-def dye(text, color, background=None):
-    background = ' background-color: {0}'.format(background) if background else ''
-    return '<span style="color: {0};{1}"><b>{2}</b></span>'.format(color, background, text)
-
-
-def dye_red(text, background=None):
-    return dye(text, 'Red', background)
-
-
-def dye_green(text, background=None):
-    return dye(text, 'Green', background)
-
-
-def dye_blue(text, background=None):
-    return dye(text, 'Blue', background)
+def highlighted(text, color='info', bg='', b=True):
+    text = '<b>{0}</b>'.format(text) if b else text
+    return '<span class="{0}{1}">{2}</span>'.format(
+        " text-{}".format(color) if color else '',
+        " bg-{}".format(bg) if bg else '',
+        text
+    )

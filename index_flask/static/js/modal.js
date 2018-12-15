@@ -1,12 +1,15 @@
 // stan 2018-10-12
 
 
-$('#iaModal').on('show.bs.modal', function (e) {
+$('.interactive').on('show.bs.modal', function (e) {
   var modal = $(this);
   var a = e.relatedTarget;
-  if (a != null) {
+  if ( a != null ) {
     var url = new URL(a.href);
     url.searchParams.set('format', 'modal');
+
+    var reload_on_close = a.dataset.reload_on_close ? a.dataset.reload_on_close : '';
+    this.dataset.reload_on_close = reload_on_close;
 
     modal
       .addClass('modal-scrollfix')
@@ -24,14 +27,23 @@ $('#iaModal').on('show.bs.modal', function (e) {
 });
 
 
-$('#iaModal').on('hide.bs.modal', function() {
-//   location.reload();
-  var table = $('table#table1').DataTable();
-  table.draw();
+$('.interactive').on('hide.bs.modal', function() {
+  reload_on_close = this.dataset.reload_on_close
+
+  if ( reload_on_close == 'location' )
+    location.reload();
+
+  else if ( reload_on_close ) {
+    var table = $('table#table1').DataTable();
+    table.draw();
+  } // if
 });
 
 
 function init_form(modal, url) {
+  if (typeof url == "undefined")
+    var url = location.href;
+
   var form = modal.find('form');
   form.attr('action', url);
   form.submit(submit_form);

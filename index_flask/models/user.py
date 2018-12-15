@@ -11,7 +11,7 @@ from datetime import datetime
 from ..app import app, db, bcrypt
 
 
-class User(db.Model):         # Rev. 2018-09-16
+class User(db.Model):         # Rev. 2018-10-21
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -21,9 +21,10 @@ class User(db.Model):         # Rev. 2018-09-16
     name = db.Column(db.String, nullable=False)
     company = db.Column(db.String, nullable=False, default='')
     password = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     active = db.Column(db.Boolean, nullable=False, default=True)
     verified = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     home = db.Column(db.String, nullable=False, default='')
 
     @property
@@ -67,7 +68,7 @@ class User(db.Model):         # Rev. 2018-09-16
         self.password = self.get_password(password)
 
     def init_env(self, send=True):
-        self.home = "{0}/id{1}".format(app.config['INDEX_USERS_ROOT'], self.id)
+        self.home = "{0}/id{1}".format(app.config['INDEX_USERS_DIR'], self.id)
         fullpath = os.path.expanduser(self.home)
         if not os.path.isdir(fullpath):
             os.makedirs(fullpath)

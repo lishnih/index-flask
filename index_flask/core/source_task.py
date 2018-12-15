@@ -47,10 +47,9 @@ def worker(task_id):
 #                   _, code, value = res
 #                   options[key] = decode(code, value)
 
-            options['files'] = task.source.path_id
-            options['source_id'] = task.source.id
-            options['path'] = task.source.path
+            options['files'] = task.source.path
             options['provider'] = task.source.provider
+            options['path_id'] = task.source.path_id
             options['dbhome'] = task.source.user.home
 
             cloud = get_cloud(task.source.user, task.source.provider)
@@ -78,8 +77,8 @@ def worker(task_id):
 
 
 def source_task_create(user_source, handler, mode='manual'):
-    if handler == 'initial_scan':
-        handler = Handler.query.filter_by(name='initial_scan').first()
+    if handler == 'scan_files':
+        handler = Handler.query.filter_by(name='scan_files').first()
 #       mode = 'auto'
 
     user_source_task = SourceTask(
@@ -98,12 +97,12 @@ def source_task_create(user_source, handler, mode='manual'):
 
 
 def source_task_request(user_source_task):
-#     if user_source_task.status:
+#     if user_source_task.status == -1:
 #         print("Task in progress or finished:", user_source_task)
 #         return
 
-    user_source_task.status = -1
-    db.session.commit()
-
     t = multiprocessing.Process(target=worker, args=(user_source_task.id,))
     t.start()
+
+    user_source_task.pid = t.pid
+    db.session.commit()
