@@ -23,9 +23,10 @@ relationship_user_app = db.Table('rs_user_app',
 )
 
 
-class RS_App(db.Model):       # Rev. 2016-07-23
+class RS_App(db.Model):
     __tablename__ = 'rs_user_app'
     __table_args__ = {'extend_existing': True}
+    __rev__ = '2016-07-23'
 
     id = db.Column(db.Integer, primary_key=True)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -53,8 +54,9 @@ class RS_App(db.Model):       # Rev. 2016-07-23
         return token
 
 
-class App(db.Model):          # Rev. 2018-09-29
+class App(db.Model):
     __tablename__ = 'apps'
+    __rev__ = '2018-09-29'
 
     users = db.relationship('User', secondary=relationship_user_app,
         backref=db.backref(__tablename__))

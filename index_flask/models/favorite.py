@@ -12,8 +12,9 @@ from ..app import db
 from . import StrType
 
 
-class Favorite(db.Model):     # Rev. 2018-09-29
+class Favorite(db.Model):
     __tablename__ = 'favorites'
+    __rev__ = '2018-09-29'
 
     user = db.relationship('User', backref=db.backref(__tablename__,
         cascade='all, delete, delete-orphan'))

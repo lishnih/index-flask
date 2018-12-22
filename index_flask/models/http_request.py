@@ -16,9 +16,10 @@ from flask_login import current_user
 from ..app import db
 
 
-class HttpRequest(db.Model):  # Rev. 2018-09-29
+class HttpRequest(db.Model):
     __tablename__ = 'http_requests'
     __bind_key__ = 'http_requests'
+    __rev__ = '2018-09-29'
 
     id = db.Column(db.Integer, primary_key=True)
     remote_addr = db.Column(db.String)  # request property
@@ -41,6 +42,3 @@ class HttpRequest(db.Model):  # Rev. 2018-09-29
 
         self.user = 0 if current_user.is_anonymous else current_user.id
 #       self.values = json.dumps(dict(request.values.items()))
-
-
-db.create_all(bind=['http_requests'])

@@ -9,7 +9,9 @@ from flask import Flask
 
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+# from flask_migrate import Migrate
+
+from celery import Celery
 
 from . import config
 
@@ -21,4 +23,7 @@ app.config.from_object(config)
 
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
+
+celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+celery.conf.update(app.config)

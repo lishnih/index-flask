@@ -7,11 +7,9 @@ from __future__ import (division, absolute_import,
 
 from flask import render_template
 
-from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
 
 from ..app import app
-from ..core.fileman import list_files
 from .. import __pkgname__, __description__, __version__
 
 
@@ -48,9 +46,14 @@ def about():
         import flask
         import werkzeug
         import jinja2
+        import wtforms
         import flask_principal
+        import flask_bcrypt
         import sqlalchemy
         import flask_sqlalchemy
+        import social_core
+        import markdown
+        import celery
         from flask_login import __about__
 
         additionals = dict(
@@ -58,10 +61,17 @@ def about():
             flask_version = flask.__version__,
             werkzeug_version = werkzeug.__version__,
             jinja2_version = jinja2.__version__,
-            flask_principal_version = flask_principal.__version__,
+            wtforms_version = wtforms.__version__,
+
             flask_login_version = __about__.__version__,
+            flask_principal_version = flask_principal.__version__,
+            flask_bcrypt_version = flask_bcrypt.__version__,
             sqlalchemy_version = sqlalchemy.__version__,
             flask_sqlalchemy_version = flask_sqlalchemy.__version__,
+
+            social_core_version = social_core.__version__,
+            markdown_version = markdown.version,
+            celery_version = celery.__version__,
             version = __version__,
         )
 

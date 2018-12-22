@@ -14,7 +14,7 @@ from flask import request
 from flask_login import current_user
 
 from ..app import app, db
-from ..models.logging import Logging
+from ..models.logging_ import Logging
 
 
 class SQLAlchemyHandler(logging.Handler):

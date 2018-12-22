@@ -12,8 +12,9 @@ from ..app import db
 from . import StrType
 
 
-class SQLTemplate(db.Model):  # Rev. 2018-09-29
+class SQLTemplate(db.Model):
     __tablename__ = 'sql_templates'
+    __rev__ = '2018-09-29'
 
     user = db.relationship('User', backref=db.backref(__tablename__,
         cascade='all, delete, delete-orphan'))

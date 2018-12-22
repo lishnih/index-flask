@@ -15,8 +15,9 @@ from .handler import Handler
 from .source import Source
 
 
-class SourceTask(db.Model):   # Rev. 2018-11-20
+class SourceTask(db.Model):
     __tablename__ = 'source_tasks'
+    __rev__ = '2018-11-20'
 
     source = db.relationship('Source', backref=db.backref(__tablename__,
         cascade='all, delete, delete-orphan'))

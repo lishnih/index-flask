@@ -10,8 +10,9 @@ from datetime import datetime
 from ..app import db
 
 
-class Module(db.Model):       # Rev. 2018-09-14
+class Module(db.Model):
     __tablename__ = 'modules'
+    __rev__ = '2018-09-14'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)

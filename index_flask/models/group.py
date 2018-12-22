@@ -20,8 +20,9 @@ relationship_user_group = db.Table('rs_user_group',   # Rev. 2018-09-14
 )
 
 
-class Group(db.Model):        # Rev. 2018-09-14
+class Group(db.Model):
     __tablename__ = 'groups'
+    __rev__ = '2018-09-14'
 
     users = db.relationship('User', secondary=relationship_user_group,
         backref=db.backref(__tablename__))

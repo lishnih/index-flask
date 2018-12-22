@@ -14,12 +14,13 @@ from sqlalchemy.orm import backref, relationship
 from ..app import db
 
 
-class Logging(db.Model):      # rev. 20180927
+class Logging(db.Model):
     __tablename__ = 'logging'
     __bind_key__ = 'logging'
     __table_args__ = (
         {'sqlite_autoincrement': True},
     )
+    __rev__ = '2018-09-27'
 
     user = relationship('User', backref=backref(__tablename__))
 
@@ -35,6 +36,3 @@ class Logging(db.Model):      # rev. 20180927
     ip = db.Column(db.String, nullable=False, server_default='')
     created = db.Column(db.DateTime, nullable=False, server_default=func.now())
 #   created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
-
-db.create_all(bind=['logging'])

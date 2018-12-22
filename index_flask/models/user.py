@@ -11,8 +11,9 @@ from datetime import datetime
 from ..app import app, db, bcrypt
 
 
-class User(db.Model):         # Rev. 2018-10-21
+class User(db.Model):
     __tablename__ = 'users'
+    __rev__ = '2018-10-21'
 
     id = db.Column(db.Integer, primary_key=True)
 

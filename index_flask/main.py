@@ -10,11 +10,15 @@ from __future__ import (division, absolute_import,
 from .app import app, db
 
 
-# ===== Create the tables =====
-from .models import (user, app_, group, database, favorite, register, page,
-                     sql_template, handler, source, source_task, module)
+# ===== Import models and create tables =====
+from .models import check_model
+from .models import *
 
-db.create_all()
+db.create_all(bind='__all__')
+
+for c in db.Model._decl_class_registry.values():
+    if hasattr(c, '__tablename__'):
+        check_model(c)
 
 
 # ===== Import extensions =====

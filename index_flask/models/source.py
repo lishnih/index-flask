@@ -12,8 +12,9 @@ from ..app import db
 from . import StrType
 
 
-class Source(db.Model):       # Rev. 2018-09-29
+class Source(db.Model):
     __tablename__ = 'sources'
+    __rev__ = '2018-09-29'
 
     user = db.relationship('User', backref=db.backref(__tablename__,
         cascade='all, delete, delete-orphan'))

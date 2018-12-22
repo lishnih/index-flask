@@ -20,8 +20,4 @@ login_manager.login_view = 'user_signin'
 
 @login_manager.user_loader
 def load_user(email):
-    if request.endpoint in ['static']:
-        print('==================== static ====================')
-
-    print('l1', User.query.filter_by(email=email).first())
-    return User.query.filter_by(email=email).first()
+    return User.query.filter_by(email=email, active=True).first()

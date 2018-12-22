@@ -15,11 +15,12 @@ from . import StrType
 from ..core.json_type import JsonType
 
 
-class Handler(db.Model):      # Rev. 2018-09-29
+class Handler(db.Model):
     __tablename__ = 'handlers'
     __table_args__ = (
         UniqueConstraint('_user_id', '_group_id', 'name'),
     )
+    __rev__ = '2018-09-29'
 
     user = db.relationship('User', backref=db.backref(__tablename__,
         cascade='all, delete, delete-orphan'))
