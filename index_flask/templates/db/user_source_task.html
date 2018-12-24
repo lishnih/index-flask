@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{%- block body %}
+
+{%- from "db/_source_task.html" import user_source_task_info %}
+{{ user_source_task_info(source_task) }}
+
+{%- from "db/_options_table.html" import options_table %}
+{{ options_table(source_task.options) }}
+
+<p>
+  <a href="{{ url_for('user_source_task_delete', uid=source_task.uid, name=source_task.name, next=url_for('user_source_tasks')) }}">Delete</a>
+</p>
+
+{%- from "db/_source.html" import user_source_info %}
+{{ user_source_info(source_task.source) }}
+
+{%- from "db/_handler.html" import user_handler_info %}
+{{ user_handler_info(source_task.handler) }}
+
+{%- from "db/_options_table.html" import options_table %}
+{{ options_table(source_task.handler.options) }}
+
+{%- endblock %}

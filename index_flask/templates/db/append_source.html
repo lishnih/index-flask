@@ -1,0 +1,158 @@
+{% extends "_layout.html" %}
+
+{%- from "_formhelpers.html" import render_field, render_readonly, render_hidden, render_submit %}
+
+
+{%- block body %}
+
+<h1>Append new data source</h1>
+
+<p>
+  <select id="provider_list" class="custom-select">
+    <option value="" selected>Select your provider</option>
+  {%- for provider, name in providers %}
+    <option value="{{ provider }}">{{ name }}</option>
+  {%- endfor %}
+  </select>
+</p>
+
+
+<div id="file_tree"></div>
+
+
+<form method="post">
+  {{ render_field(form.name, size=40) }}
+  {{ render_readonly(form.path, size=80) }}
+  {{ render_hidden(form.path_id, size=40) }}
+  {{ render_hidden(form.provider, size=40) }}
+  {{ render_submit(form.submit) }}
+</form>
+
+
+{%- endblock %}
+
+
+{%- block script %}
+
+<script>
+
+function expand(e) {
+  e = e || window.event;
+  var target = e.target || e.srcElement;
+
+  button = $(target).closest("button");
+  var path = button.data('path');
+  var path_id = button.data('path_id');
+  var provider = button.data('provider');
+  var level = button.data('level');
+  plus_span = $('span.fa-plus', button);
+  plus_span.removeClass('fa-plus').addClass('fa-minus');
+  plus_span.prop("onclick", null).off("click");
+
+  get_files(provider, path_id, function (dirs, files) {
+    if (dirs.length || files.length)
+      button.after(build_list(dirs, files, provider, level+1));
+    else
+      button.after(
+`<span style="margin-left: ${level*15}px;"></span>
+No files in this directory!`
+);
+  });
+} // function
+
+
+function get_files(provider, dir, callback) {
+  $('#loading').show();
+  $.post('interface', {
+    'action': 'get_cloud_files',
+    'provider': provider,
+    'dir': dir,
+  }).done(function (data) {
+    $('#loading').hide();
+    if (data.result == 'error') {
+      show_error(data.message, '', data.debug)
+    } else {
+      console.log(data);
+
+      var [dirs, files] = data.rows;
+      callback(dirs, files);
+    } // if
+  });
+} // function
+
+
+function build_list(dirs, files, provider, level) {
+  var text = ""
+
+  dirs.forEach( function(item) {
+    text +=
+`<button type="button" class="list-group-item list-group-item-action" data-path="${item.path}" data-path_id="${item.path_id}" data-provider="${provider}" data-level="${level}">
+  <span style="margin-left: ${(level-1)*15}px;"></span>
+  <span class="fa fa-plus fa-fw" onclick="expand(event);"></span>
+  <span class="fa fa-folder fa-fw"></span>
+  ${item.name}
+</button>`;
+  });
+
+  files.forEach( function(item) {
+    text +=
+`<button type="button" class="list-group-item list-group-item-action" data-path="${item.path}" data-path_id="${item.path_id}" data-provider="${provider}">
+  <span style="margin-left: ${(level-1)*15}px;"></span>
+  <span class="fa fa-fw"></span>
+  <span class="fa fa-file fa-fw"></span>
+  ${item.name}
+</button>`;
+  });
+
+  return text;
+} // function
+
+
+jQuery( function($) {
+
+
+  $('select#provider_list').bind('input propertychange',
+    function(data) {
+      select = $(this);
+      var provider = $('option:selected', select).val();
+
+      if ( provider ) {
+        root_item = $('#file_tree');
+        root_item.html('<p>Select an item:</p>');
+
+        get_files(provider, '', function (dirs, files) {
+          root_item.append('<div class="list-group">');
+
+          root_item.append(
+`<button type="button" class="list-group-item list-group-item-action" data-path="/" data-path_id="" data-provider="${provider}">
+  <span class="fa fa-fw"></span>
+  <span class="fa fa-folder fa-fw"></span>
+  <i><b>Root</b></i>
+</button>`);
+
+          root_item.append(build_list(dirs, files, provider, 1));
+          root_item.append('</div>');
+        });
+      } // if
+    } // function
+  );
+
+
+  $('div#file_tree').on('click',
+    function(e) {
+      e.preventDefault()
+      var path = $(e.target).data('path');
+      $('input#path').val(path);
+      var path_id = $(e.target).data('path_id');
+      $('input#path_id').val(path_id);
+      var provider = $(e.target).data('provider');
+      $('input#provider').val(provider);
+    } // function
+  );
+
+
+});
+
+</script>
+
+{%- endblock %}

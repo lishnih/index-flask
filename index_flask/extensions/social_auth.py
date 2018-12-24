@@ -35,7 +35,6 @@ def global_user():
 
 @app.teardown_appcontext
 def commit_on_success(error=None):
-    print(222, error)
     if error is None:
         db.session.commit()
     else:

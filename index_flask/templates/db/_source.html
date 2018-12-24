@@ -1,0 +1,77 @@
+{% macro user_source_list(sources) %}
+
+<h1>Sources:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>List of user sources</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Provider</th>
+      <th scope="col">Path</th>
+      <th scope="col">Created</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{%- for source in sources %}
+    <tr>
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      <th scope="row">{{ source.name }}</th>
+      <td>{{ get_provider(source.provider) }}</td>
+      <td>{{ source.path }}</td>
+      <td>{{ source.created }}</td>
+      <td><a href="{{ url_for('user_source_configure', uid=source.uid, name=source.name) }}">Configure</a></td>
+    </tr>
+{%- endfor %}
+  </tbody>
+</table>
+
+{%- endmacro %}
+
+
+{% macro user_source_info(source) %}
+
+<h1>Source:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>User source</caption>
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="col">Name</th><td>{{ source.name }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Provider</th><td>{{ get_provider(source.provider) }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Path</th><td>{{ source.path }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Created</th><td>{{ source.created }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{%- endmacro %}
+
+
+{% macro get_provider(provider) %}
+
+{%- if provider == 'dropbox-oauth2' %}
+Dropbox
+{%- elif provider == 'yandex-oauth2' %}
+Yandex Disk
+{%- elif provider == 'google-oauth2' %}
+Google drive
+{%- else %}
+provider
+{%- endif %}
+
+{%- endmacro %}

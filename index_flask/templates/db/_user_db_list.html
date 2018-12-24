@@ -1,0 +1,40 @@
+{% macro user_db_list(databases) %}
+
+<h1>Databases:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>List of user databases</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{%- for db in databases %}
+  <tr>
+    <td><i class="inactive">{{ loop.index }}</i></td>
+    <td><b>{{ db }}</b></td>
+    <td><a href="{{ url_for('user_db', db=db) }}">View</a></td>
+    <td><a href="{{ url_for('user_db_info', db=db) }}">Info</a></td>
+    <td><a href="{{ url_for('user_db_info_session', db=db) }}">Session</a></td>
+    <td><a href="{{ url_for('user_db_info_metadata', db=db) }}">Metadata</a></td>
+    <td><a href="{{ url_for('user_db_delete', db=db) }}">Delete</a></td>
+  </tr>
+{%- endfor %}
+  </tbody>
+</table>
+
+<p>
+  <a href="{{ url_for('user_db_append') }}">Append an existing database</a>
+</p>
+<p>
+  <a href="{{ url_for('user_db_new') }}">Create local database</a>
+</p>
+
+{%- endmacro %}

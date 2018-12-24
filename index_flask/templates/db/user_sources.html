@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{%- block body %}
+
+{%- from "db/_source.html" import user_source_list %}
+{{ user_source_list(sources) }}
+
+<p>
+  <a href="{{ url_for('user_source_append') }}">Append new data source</a>
+</p>
+
+{%- endblock %}

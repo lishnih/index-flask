@@ -1,0 +1,16 @@
+{% extends "_layout.html" %}
+
+{%- block title %}
+  <title>Test injected variables</title>
+{%- endblock %}
+
+{%- block body %}
+
+<p><b>app_debug</b>: <i>{{ app_debug }}</i></p>
+<p><b>app_root</b>: <i>{{ app_root }}</i></p>
+<p><b>name</b>: <i>{{ name }}</i></p>
+<p><b>p_admin</b>: <i>{{ p_admin }}</i></p>
+<p><b>p_debug</b>: <i>{{ p_debug }}</i></p>
+<p><b>p_statistics</b>: <i>{{ p_statistics }}</i></p>
+
+{%- endblock %}

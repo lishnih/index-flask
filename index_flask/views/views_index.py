@@ -49,6 +49,7 @@ def about():
         import wtforms
         import flask_principal
         import flask_bcrypt
+        import flask_mail
         import sqlalchemy
         import flask_sqlalchemy
         import social_core
@@ -66,6 +67,7 @@ def about():
             flask_login_version = __about__.__version__,
             flask_principal_version = flask_principal.__version__,
             flask_bcrypt_version = flask_bcrypt.__version__,
+            flask_mail_version = flask_mail.__version__,
             sqlalchemy_version = sqlalchemy.__version__,
             flask_sqlalchemy_version = flask_sqlalchemy.__version__,
 

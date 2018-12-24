@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{%- block body %}
+
+{%- from "db/_source.html" import user_source_info %}
+{{ user_source_info(source) }}
+
+<p>
+  <a href="{{ url_for('user_source_delete', uid=source.uid, name=source.name, next=url_for('user_sources')) }}">Delete</a>
+</p>
+
+{%- endblock %}

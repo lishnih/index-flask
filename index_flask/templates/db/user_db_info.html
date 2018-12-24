@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{%- block body %}
+
+
+{%- from "db/_user_db_list.html" import user_db_list %}
+{{ user_db_list(databases) }}
+
+
+{%- endblock %}

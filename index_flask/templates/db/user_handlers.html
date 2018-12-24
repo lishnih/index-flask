@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{%- block body %}
+
+{%- from "db/_handler.html" import user_handler_list %}
+{{ user_handler_list(handlers, user_handlers) }}
+
+<p>
+  <a href="{{ url_for('user_handler_append') }}">Append new data handler</a>
+</p>
+
+{%- endblock %}

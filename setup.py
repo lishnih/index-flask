@@ -70,6 +70,7 @@ if __name__ == '__main__':
             'flask_principal',
             'flask_bcrypt',
             'flask_sqlalchemy',
+            'flask_mail',
 #           'flask_migrate',
             'social-auth-app-flask-sqlalchemy',
             'celery',       # For Windows: pip install https://github.com/celery/celery/zipball/master
