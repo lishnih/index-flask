@@ -168,7 +168,7 @@ def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plai
 
 def get_rows_base(session, mtable, offset=0, limit=None, criterion=None, order=None, plain=1):
     s = select(['*'], mtable)
-    s_count = select([func.count(['*'])], mtable)
+    s_count = select([func.count()], mtable)
     total = session.execute(s_count).scalar()
 
     if criterion:

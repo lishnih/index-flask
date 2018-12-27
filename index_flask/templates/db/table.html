@@ -1,65 +1,6 @@
 {% extends "_layout.html" %}
 
 
-{%- block head %}
-
-  <script type="text/javascript">
-
-    jQuery( function($) {
-
-
-      $("table#table1 th:eq(0)").click(function( event ) {
-        th = $(this);
-        table = th.closest("table");
-
-        var offset = table.data("offset");
-        var limit = table.data("limit");
-        var query = table.data("query");
-
-        show_info("offset: {0}<br />limit: {1}<br />{2}".format(offset, limit, var_dump1(query)), event);
-      });
-
-
-      $(".output_params").click( function(event) {
-        $('input#offset').val(0);
-        $('input#limit').val(15);
-      } );
-
-
-      $(".output_clause").click( function(event) {
-        $('select#column1').val('');
-        $('select#condition1').val('');
-        $('input#value1').val('');
-
-        $('select#column2').val('');
-        $('select#condition2').val('');
-        $('input#value2').val('');
-
-        $('select#column3').val('');
-        $('select#condition3').val('');
-        $('input#value3').val('');
-      } );
-
-
-      $(".output_sorting").click( function(event) {
-        $('select#sorting1').val('');
-        $('select#sort_dir1').val('ASC');
-
-        $('select#sorting2').val('');
-        $('select#sort_dir2').val('ASC');
-
-        $('select#sorting3').val('');
-        $('select#sort_dir3').val('ASC');
-      } );
-
-
-    } );
-
-  </script>
-
-{%- endblock %}
-
-
 {%- from "_tablehelpers.html" import render_tr, render_tr_filter, render_tr_sorting, render_navigator %}
 
 {%- block body %}
@@ -188,5 +129,65 @@
 <i>Нет данных</i>
 {%- endif %}
 </div>
+
+{%- endblock %}
+
+
+{%- block script %}
+
+  <script src="{{ app_root }}/js/view.js" async></script>
+  <script type="text/javascript">
+
+    jQuery( function($) {
+
+
+      $("table#table1 th:eq(0)").click(function( event ) {
+        th = $(this);
+        table = th.closest("table");
+
+        var offset = table.data("offset");
+        var limit = table.data("limit");
+        var query = table.data("query");
+
+        show_info(`offset: ${offset}<br />limit: ${limit}<br />${var_dump1(query)}`, event);
+      });
+
+
+      $(".output_params").click( function(event) {
+        $('input#offset').val(0);
+        $('input#limit').val(15);
+      } );
+
+
+      $(".output_clause").click( function(event) {
+        $('select#column1').val('');
+        $('select#condition1').val('');
+        $('input#value1').val('');
+
+        $('select#column2').val('');
+        $('select#condition2').val('');
+        $('input#value2').val('');
+
+        $('select#column3').val('');
+        $('select#condition3').val('');
+        $('input#value3').val('');
+      } );
+
+
+      $(".output_sorting").click( function(event) {
+        $('select#sorting1').val('');
+        $('select#sort_dir1').val('ASC');
+
+        $('select#sorting2').val('');
+        $('select#sort_dir2').val('ASC');
+
+        $('select#sorting3').val('');
+        $('select#sort_dir3').val('ASC');
+      } );
+
+
+    } );
+
+  </script>
 
 {%- endblock %}

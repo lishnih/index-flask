@@ -5,6 +5,8 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
+import logging
+
 from flask import Flask
 
 from flask_bcrypt import Bcrypt
@@ -18,9 +20,13 @@ from . import config
 
 
 app = Flask(__name__, static_url_path='')
-
 app.config.from_object(config)
-# app.config.from_pyfile('app.cfg')
+
+credential_cfg = '../credentials_cfg.py'
+try:
+    app.config.from_pyfile(credential_cfg)
+except:
+    logging.warning("Config file '{0}' not found".format(credential_cfg))
 
 bcrypt = Bcrypt(app)
 db = SQLAlchemy(app)

@@ -17,7 +17,6 @@ from ..main import app, db
 from ..core.cloud_interface import get_cloud_files
 from ..core.functions import get_next
 from ..core.render_response import render_ext
-from ..core.source_task import source_task_create
 from ..forms.source import AddSourceForm
 from ..models.source import Source
 
@@ -66,6 +65,26 @@ def get_provider_name(provider):
         return provider
 
 
+def source_task_create(user_source, handler, mode='manual'):
+    if handler == 'scan_files':
+        handler = Handler.query.filter_by(name='scan_files').first()
+#       mode = 'auto'
+
+    user_source_task = SourceTask(
+        source = user_source,
+        handler = handler,
+        mode = mode,
+    )
+
+    db.session.add(user_source_task)
+    db.session.commit()
+
+    if mode == 'auto':
+        source_task_request(user_source_task)
+
+    return user_source_task
+
+
 # ===== Routes =====
 
 @app.route('/accounts')
@@ -89,14 +108,14 @@ def user_sources():
 def user_source_configure():
     uid = request.values.get('uid')
     name = request.values.get('name')
-    result_m = 'ok'
 
     user_source = db.session.query(Source).filter_user().filter_by(uid=uid).first()
     if not user_source:
-        result_m = 'error', "Источник данных не задан: {0}".format(name)
-        return render_ext('base.html', result_m)
+        return render_ext('base.html',
+            message = ("Source does not exist or deleted!", 'danger')
+        )
 
-    return render_ext('db/user_source.html', result_m,
+    return render_ext('db/user_source.html',
         source = user_source,
     )
 
@@ -104,7 +123,7 @@ def user_source_configure():
 @app.route('/source/interface', methods=['GET', 'POST'])
 @login_required
 def user_source_interface():
-    result_m = 'ok'
+    message = ''
     d = dict(format='json')
 
     action = request.values.get('action')
@@ -116,30 +135,32 @@ def user_source_interface():
             d['rows'] = get_cloud_files(cloud, dir_)
 
         except ProxyError as e:   # > ConnectionError > RequestException > IOError
-            result_m = 'error', 'Proxy Error!'
+            message = 'Proxy Error!', 'danger'
             d['debug'] = repr(e)
 
         except ReadTimeout as e:  # > Timeout > RequestException > IOError
-            result_m = 'error', 'Read Timeout Error!'
+            message = 'Read Timeout Error!', 'danger'
             d['debug'] = repr(e)
 
         except RequestException as e:
-            result_m = 'error', 'Request error!'
+            message = 'Request error!', 'danger'
             d['debug'] = repr(e)
 
         except Exception as e:
-            result_m = 'error', 'General error!'
+            message = 'General error!', 'danger'
             d['debug'] = repr(e)
 
     else:
-        result_m = 'error', 'Action required!'
+        message = 'Action required!', 'danger'
 
-    return render_ext(None, result_m=result_m, **d)
+    return render_ext(None, message=message, **d)
 
 
 @app.route('/source/append', methods=['GET', 'POST'])
 @login_required
 def user_source_append():
+    message = ''
+
     total, clouds = get_clouds(current_user)
     if not total:
         return render_ext('base.html',
@@ -149,7 +170,6 @@ def user_source_append():
     providers = [[i.provider, get_provider_name(i.provider)] for i in clouds]
 
     form = AddSourceForm(request.form)
-    result_m = 'ok'
 
     if request.method == 'POST':
         if form.validate():
@@ -165,12 +185,13 @@ def user_source_append():
 
             source_task_create(user_source, 'scan_files', 'auto')
 
-            result_m = 'ok', "Successfully append {0}".format(form.name.data)
+            message = "Successfully append {0}".format(form.name.data)
 
         else:
-            result_m = 'error', 'Invalid data!'
+            message = 'Invalid data!', 'danger'
 
-    return render_ext('db/append_source.html', result_m,
+    return render_ext('db/append_source.html',
+        message = message,
         form = form,
         total = total,
         providers = providers,
@@ -182,12 +203,12 @@ def user_source_append():
 def user_source_delete():
     uid = request.values.get('uid')
     name = request.values.get('name')
-    result_m = 'ok'
 
     user_source = db.session.query(Source).filter_user().filter_by(uid=uid).first()
     if not user_source:
-        result_m = 'error', "Источник данных не задан: {0}".format(name)
-        return render_ext('base.html', result_m)
+        return render_ext('base.html',
+            message = ("Источник данных не задан: {0}".format(name), 'danger')
+        )
 
     user_source.deleted = True
     db.session.commit()

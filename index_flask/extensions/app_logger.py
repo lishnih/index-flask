@@ -33,7 +33,7 @@ class SQLAlchemyHandler(logging.Handler):
             ip = None
 
         RECORD = Logging(
-            user=None if current_user.is_anonymous else current_user,
+            _user_id=0 if current_user.is_anonymous else current_user.id,
             logger=record.__dict__['name'],
             level=record.__dict__['levelname'],
             trace=trace,

@@ -17,15 +17,20 @@ from ..core.types23 import *
 debug_permission = Permission(RoleNeed('debug'))
 
 
-def render_ext2(template_name_or_list=None, default=None, message="",
+def render_ext(template_name_or_list=None, default=None, message="",
         format=None, form=None, **context):
     format = format or request.values.get('format')
+
+    if not debug_permission.can():
+        context.pop('debug', '')
 
     result = "success"
     if isinstance(message, tuple):
         message, result = message
 
     if format == 'json':
+#       context = {k: v for k, v in context.items() if k in \
+#           ['action', 'rows', 'debug']}
         return jsonify(dict(
             result = result,
             message = message,
@@ -42,37 +47,6 @@ def render_ext2(template_name_or_list=None, default=None, message="",
         render_template(template_name_or_list,
             modal = format == 'modal',
             form = form,
-            **context
-        )
-
-
-def render_ext(template_name, result='ok', format=None, **context):
-    if not debug_permission.can():
-        context.pop('debug', '')
-
-    message = ''
-    if isinstance(result, tuple):
-        if len(result) == 1:
-            result, = result
-
-        else:
-            result, message = result[0:2]
-
-    if format == 'json':
-        context = {k: v for k, v in context.items() if k in \
-            ['action', 'rows', 'debug']}
-        return jsonify(dict(
-            result = result,
-            message = message,
-            **context
-        ))
-
-    if message:
-        flash(message, result)
-
-    return "No view defined!" if not template_name else \
-        render_template(template_name,
-            dialog = format == 'dialog',
             **context
         )
 

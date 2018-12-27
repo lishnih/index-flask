@@ -17,7 +17,7 @@ from sqlalchemy import desc, distinct, func, and_, or_, not_
 from ..main import app, db
 from ..core.db import get_rows_model
 from ..core.dump_html import html
-from ..forms.db101 import TableCondForm
+from ..forms.dbview import TableCondForm
 from ..models.http_request import HttpRequest
 
 

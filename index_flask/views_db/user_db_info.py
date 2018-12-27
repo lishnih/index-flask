@@ -23,7 +23,6 @@ from ..core.dump_html import html
 from ..core.functions import debug_query
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
-from ..forms.db101 import TableCondForm
 from ..views_db.user_db import get_db_list, get_db
 
 

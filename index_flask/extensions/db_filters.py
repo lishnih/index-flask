@@ -20,10 +20,11 @@ BaseQuery.filter_active = filter_active
 
 def filter_user(self, public=False):
     if public:
-        # left reference stolen from sqlalchemy/orm/query.py#L2187
+        # left reference taken from sqlalchemy/orm/query.py#L2187
         left = self._entities[0].entity_zero_or_selectable
         left_tbl = _interpret_as_from(left)
         return self.filter(or_(left_tbl.c._user_id==current_user.id, left_tbl.c._user_id==None), left_tbl.c.deleted==False)
+
     else:
         return self.filter_by(_user_id=current_user.id, deleted=False)
 

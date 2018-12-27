@@ -34,14 +34,14 @@ def user_handlers():
 def user_handler_configure():
     uid = request.values.get('uid')
     name = request.values.get('name')
-    result_m = 'ok'
 
     user_handler = db.session.query(Handler).filter_user(public=True).filter_by(uid=uid).first()
     if not user_handler:
-        result_m = 'error', "Обработчик не задан: {0}".format(name)
-        return render_ext('base.html', result_m)
+        return render_ext('base.html',
+            message = ("Handler does not exist or deleted!", 'danger')
+        )
 
-    return render_ext('db/user_handler.html', result_m,
+    return render_ext('db/user_handler.html',
         handler = user_handler,
     )
 
@@ -55,8 +55,6 @@ def user_handler_append():
 @app.route('/handler/append_test', methods=['GET', 'POST'])
 @login_required
 def user_handler_append_initial():
-    result_m = 'ok'
-
     handler = db.session.query(Handler).filter_by(name = 'scan_rfi').first()
     if handler:
         db.session.delete(handler)
@@ -105,7 +103,7 @@ def user_handler_append_initial():
 
     db.session.commit()
 
-    return render_ext('base.html', result_m)
+    return render_ext('base.html')
 
 
 @app.route('/handler/delete', methods=['GET', 'POST'])
@@ -113,12 +111,12 @@ def user_handler_append_initial():
 def user_handler_delete():
     uid = request.values.get('uid')
     name = request.values.get('name')
-    result_m = 'ok'
 
     user_handler = db.session.query(Handler).filter_user().filter_by(uid=uid).first()
     if not user_handler:
-        result_m = 'error', "Обработчик не задан: {0}".format(name)
-        return render_ext('base.html', result_m)
+        return render_ext('base.html',
+            message = ("Handler does not exist or deleted!", 'danger')
+        )
 
     user_handler.deleted = True
     db.session.commit()

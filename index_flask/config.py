@@ -2,7 +2,6 @@
 # coding=utf-8
 
 import os
-import logging
 
 
 APPLICATION_ROOT = '/index'
@@ -38,15 +37,12 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 
 
 # Flask-Mail configuration
-MAIL_SERVER = 'smtp.yandex.ru'
-MAIL_PORT = 465
+MAIL_SERVER = 'smtp.yandex.com'
+MAIL_PORT = 587
 MAIL_USE_TLS = True
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 MAIL_DEFAULT_SENDER = 'support@index.net.ru'
-
-if not MAIL_USERNAME or not MAIL_PASSWORD:
-    logging.info("MAIL_USERNAME and MAIL_PASSWORD not set!")
 
 
 # ===================
@@ -87,9 +83,6 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_DROPBOX_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_DROPBOX_OAUTH2_KEY')
 SOCIAL_AUTH_DROPBOX_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_DROPBOX_OAUTH2_SECRET')
 
-if not SOCIAL_AUTH_DROPBOX_OAUTH2_KEY or not SOCIAL_AUTH_DROPBOX_OAUTH2_SECRET:
-    logging.info("Dropbox OAuth credentials not set!")
-
 
 # https://python-social-auth.readthedocs.io/en/latest/backends/google.html
 # https://developers.google.com/identity/protocols/googlescopes
@@ -102,13 +95,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
 #   'https://www.googleapis.com/auth/userinfo.email',
 ]
 
-if not SOCIAL_AUTH_GOOGLE_OAUTH2_KEY or not SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET:
-    logging.info("Google OAuth credentials not set!")
-
 
 # Yandex
 SOCIAL_AUTH_YANDEX_OAUTH2_KEY = os.environ.get('SOCIAL_AUTH_YANDEX_OAUTH2_KEY')
 SOCIAL_AUTH_YANDEX_OAUTH2_SECRET = os.environ.get('SOCIAL_AUTH_YANDEX_OAUTH2_SECRET')
-
-if not SOCIAL_AUTH_YANDEX_OAUTH2_KEY or not SOCIAL_AUTH_YANDEX_OAUTH2_SECRET:
-    logging.info("Yandex OAuth credentials not set!")

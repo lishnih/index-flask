@@ -199,12 +199,10 @@ jQuery.fn.extend({
 
         if (event.filtered_rows_count == event.full_rows_count)
           jtable_info
-            .text('Показано: {0} из {1}'
-              .format(event.rows_count, event.filtered_rows_count));
+            .text(`Shown: ${event.rows_count} of ${event.filtered_rows_count}`);
         else
           jtable_info
-            .text('Показано: {0} из {1} (до фильтрации: {2})'
-              .format(event.rows_count, event.filtered_rows_count, event.full_rows_count));
+            .text(`Shown: ${event.rows_count} of ${event.filtered_rows_count} (without filter: {event.full_rows_count})`);
 
         jtable_debug.text(event.query);
 

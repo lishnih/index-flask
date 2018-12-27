@@ -22,7 +22,7 @@ from ..core.db import init_db, get_dbs_list, get_rows_plain
 from ..core.functions import get_next
 from ..core.render_response import render_format
 from ..core.user_templates import get_user_templates
-from ..forms.db101 import TableCondForm
+from ..forms.dbview import TableCondForm
 
 
 # ===== Constants =====
