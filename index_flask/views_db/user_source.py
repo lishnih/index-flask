@@ -65,26 +65,6 @@ def get_provider_name(provider):
         return provider
 
 
-def source_task_create(user_source, handler, mode='manual'):
-    if handler == 'scan_files':
-        handler = Handler.query.filter_by(name='scan_files').first()
-#       mode = 'auto'
-
-    user_source_task = SourceTask(
-        source = user_source,
-        handler = handler,
-        mode = mode,
-    )
-
-    db.session.add(user_source_task)
-    db.session.commit()
-
-    if mode == 'auto':
-        source_task_request(user_source_task)
-
-    return user_source_task
-
-
 # ===== Routes =====
 
 @app.route('/accounts')
@@ -183,7 +163,7 @@ def user_source_append():
             db.session.add(user_source)
             db.session.commit()
 
-            source_task_create(user_source, 'scan_files', 'auto')
+#           source_task_create(user_source, 'scan_files', 'auto')
 
             message = "Successfully append {0}".format(form.name.data)
 

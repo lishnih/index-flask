@@ -99,8 +99,8 @@ def user_signin(user=None):
 @app.route("/change_password", methods=['GET', 'POST'])
 @login_required
 def user_change_password():
-    form = ChangePasswordForm(request.form)
     message = None
+    form = ChangePasswordForm(request.form, current_user)
 
     if request.method == 'POST':
         if form.validate():
@@ -113,7 +113,7 @@ def user_change_password():
             )
 
         else:
-            message = ("Invalid data!", 'warning'),
+            message = "Invalid data!", 'warning'
 
     return render_ext('user/change_password.html',
         title = 'Change Password',

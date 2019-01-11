@@ -22,7 +22,6 @@
   <link href="/external/highlight/highlight.css" rel="stylesheet" />
   <script src="/external/highlight/highlight.js"></script>
 
-  <script src="/external/string.format-1.0.packed.js"></script>
   <script src="/external/jquery.json-2.3.min.js"></script>
 
   <link href="/debug/default.css" rel="stylesheet" />
@@ -192,7 +191,7 @@
             $( "option", select ).remove();
             select.append('<option value=""></option>');
             data.rows.forEach(function(entry) {
-              select.append('<option value="{0}">{0}</option>'.format(entry));
+              select.append(`<option value="${entry}">${entry}</option>`);
             });
           }
         );
@@ -206,7 +205,7 @@
             if (data.rows.length) {
               select.append('<option value=""></option>');
               data.rows.forEach(function(entry) {
-                select.append('<option value="{0}">{0}</option>'.format(entry));
+                select.append(`<option value="${entry}">${entry}</option>`);
               });
             } else
               select.append('<option value=""><i>No tables created yet</i></option>');

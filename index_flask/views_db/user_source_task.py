@@ -54,8 +54,8 @@ def source_task_create(user_source, handler, mode='manual'):
     db.session.add(user_source_task)
     db.session.commit()
 
-    if mode == 'auto':
-        source_task_request(user_source_task)
+#   if mode == 'auto':
+#       source_task_request(user_source_task)
 
     return user_source_task
 
@@ -90,20 +90,20 @@ def user_source_task_run():
     cloud = get_cloud(user_source_task.source.user, user_source_task.source.provider)
     parsed = json.loads(cloud.extra_data)
 
-    options = user_source_task.handler.options
-    options['files'] = s.get('path')
-    options['provider'] = s.get('provider')
-    options['path_id'] = s.get('path_id')
+    options = dict(user_source_task.handler.options)
+    options['files'] = user_source_task.source.path
+    options['provider'] = user_source_task.source.provider.replace('-oauth2', '')
+    options['path_id'] = user_source_task.source.path_id
     options['dbhome'] = user_source_task.source.user.home
-    options['dbhome'] = parsed.get('access_token')
+    options['access_token'] = parsed.get('access_token')
 #   for key, value in options.items():
 #       res = re.split('^{{ (.+) }}', value, 1)
 #       if len(res) == 3:
 #           _, code, value = res
 #           options[key] = decode(code, value)
 
-    for i in options:
-        print(i, options[i])
+    app.logger.info(str(handler_dict))
+    app.logger.info(str(options))
 
     run_task_async.apply_async(args=[handler_dict, options])
 

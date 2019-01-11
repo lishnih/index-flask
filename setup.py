@@ -37,6 +37,26 @@ for root, dirs, files in os.walk(start_point):
     data_files.append((root, [os.path.join(root, i) for i in files]))
 
 
+install_requires=[
+    'wtforms',
+    'flask_login',
+    'flask_principal',
+    'flask_bcrypt',
+    'flask_sqlalchemy',
+    'flask_mail',
+#   'flask_migrate',
+    'social-auth-app-flask-sqlalchemy',
+    'celery',       # For Windows: pip install https://github.com/celery/celery/zipball/master
+    'redis',
+    'markdown',
+    'dropbox',
+    'yadisk',
+#   'python-docx',
+#   'xlrd',
+#   'pyOpenSSL',
+]
+
+
 if __name__ == '__main__':
     setup(
         name=__pkgname__,
@@ -64,23 +84,7 @@ if __name__ == '__main__':
             'index_flask-standalone.py',
         ],
 
-        install_requires=[
-            'wtforms',
-            'flask_login',
-            'flask_principal',
-            'flask_bcrypt',
-            'flask_sqlalchemy',
-            'flask_mail',
-#           'flask_migrate',
-            'social-auth-app-flask-sqlalchemy',
-            'celery',       # For Windows: pip install https://github.com/celery/celery/zipball/master
-            'markdown',
-            'dropbox',
-            'yadisk',
-#           'python-docx',
-#           'xlrd',
-#           'pyOpenSSL',
-        ],
+        install_requires=install_requires,
 
         classifiers=[
             'Development Status :: 4 - Beta',

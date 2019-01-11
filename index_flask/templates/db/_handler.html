@@ -1,35 +1,5 @@
 {% macro user_handler_list(handlers, user_handlers) %}
 
-<h1>Public handlers:</h1>
-
-<table class="table table-bordered table-hover table-sm table-responsive">
-  <caption>List of public handlers</caption>
-  <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Name</th>
-      <th scope="col">Rev</th>
-      <th scope="col">Module</th>
-      <th scope="col">Entry</th>
-      <th scope="col">Created</th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
-  <tbody>
-{%- for handler in handlers %}
-    <tr>
-      <td><i class="inactive">{{ loop.index }}</i></td>
-      <th scope="row">{{ handler.name }}</th>
-      <td>{{ handler.rev }}</td>
-      <td>{{ handler.module }}</td>
-      <td>{{ handler.entry }}</td>
-      <td>{{ handler.created }}</td>
-      <td><a href="{{ url_for('user_handler_configure', uid=handler.uid, name=handler.name) }}">Configure</a></td>
-    </tr>
-{%- endfor %}
-  </tbody>
-</table>
-
 <h1>User handlers:</h1>
 
 <table class="table table-bordered table-hover table-sm table-responsive">
@@ -47,6 +17,36 @@
   </thead>
   <tbody>
 {%- for handler in user_handlers %}
+    <tr>
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      <th scope="row">{{ handler.name }}</th>
+      <td>{{ handler.rev }}</td>
+      <td>{{ handler.module }}</td>
+      <td>{{ handler.entry }}</td>
+      <td>{{ handler.created }}</td>
+      <td><a href="{{ url_for('user_handler_configure', uid=handler.uid, name=handler.name) }}">Configure</a></td>
+    </tr>
+{%- endfor %}
+  </tbody>
+</table>
+
+<h1>Public handlers:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>List of public handlers</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Rev</th>
+      <th scope="col">Module</th>
+      <th scope="col">Entry</th>
+      <th scope="col">Created</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{%- for handler in handlers %}
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
       <th scope="row">{{ handler.name }}</th>

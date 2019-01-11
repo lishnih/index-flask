@@ -49,7 +49,7 @@ def user_handler_configure():
 @app.route('/handler/append', methods=['GET', 'POST'])
 @login_required
 def user_handler_append():
-    return ""
+    return "under construction"
 
 
 @app.route('/handler/append_test', methods=['GET', 'POST'])

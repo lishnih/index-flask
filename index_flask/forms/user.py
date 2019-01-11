@@ -133,6 +133,12 @@ class ChangePasswordForm(Form):
     format = StringField()
     submit = SubmitField('Change password')
 
+    def __init__(self, form, user, **kargs):
+        super(ChangePasswordForm, self).__init__(form, **kargs)
+
+        if not form:
+            self.email.data = user.email
+
     def validate(self):
         rv = Form.validate(self)
         if not rv:
@@ -143,8 +149,7 @@ class ChangePasswordForm(Form):
             self.current.errors.append("User doesn't exist")
             return False
 
-        current = user.get_password(self.current.data)
-        if current != user.password:
+        if not bcrypt.check_password_hash(user.password, self.current.data):
             self.current.errors.append('Invalid password')
             return False
 

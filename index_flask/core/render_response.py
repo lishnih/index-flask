@@ -11,13 +11,13 @@ from werkzeug.wrappers import Response
 
 from flask_principal import Permission, RoleNeed
 
-from ..core.types23 import *
+from .types23 import *
 
 
 debug_permission = Permission(RoleNeed('debug'))
 
 
-def render_ext(template_name_or_list=None, default=None, message="",
+def render_ext(template_name_or_list=None, message="", default=None,
         format=None, form=None, **context):
     format = format or request.values.get('format')
 
