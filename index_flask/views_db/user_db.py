@@ -9,7 +9,7 @@ from flask import request, render_template, redirect, url_for, jsonify, flash
 
 from flask_login import login_required, current_user
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
 from ..forms.database import AddDatabaseForm
 from ..models.database import Database

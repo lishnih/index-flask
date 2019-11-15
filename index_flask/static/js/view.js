@@ -18,18 +18,18 @@ jQuery( function($) {
   /*** Dialogs ***/
 
   // Common dialog
-  $( "#dialog" ).dialog({
-    autoOpen: false,
-    width: 400,
-    buttons: [
-      {
-        text: "Ok",
-        click: function() {
-          $( this ).dialog( "close" );
-        }
-      },
-    ],
-  });
+//   $( "#dialog" ).dialog({
+//     autoOpen: false,
+//     width: 400,
+//     buttons: [
+//       {
+//         text: "Ok",
+//         click: function() {
+//           $( this ).dialog( "close" );
+//         }
+//       },
+//     ],
+//   });
 
 
   /*** EVENTS ***/
@@ -134,7 +134,7 @@ jQuery( function($) {
       },
       error: function(data) {
         debug(data.responseText);
-        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+        show_info(`Some server issues on request!<br />\n${data.statusText}`);
       },
     });
   } );
@@ -159,7 +159,7 @@ jQuery( function($) {
       },
       error: function(data) {
         debug(data.responseText);
-        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+        show_info(`Some server issues on request!<br />\n${data.statusText}`);
       },
     };
 
@@ -186,7 +186,7 @@ jQuery( function($) {
       },
       error: function(data) {
         debug(data.responseText);
-        show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+        show_info(`Some server issues on request!<br />\n${data.statusText}`);
       },
     };
 
@@ -269,7 +269,7 @@ function get_rows(td, unlim) {
     'offset': offset + limit,
     'limit':  unlim ? 0 : limit,
     'format': 'json',
-    'query_json': $.toJSON(query),
+    'query_json': query ? JSON.parse(query) : '',
   };
 
   $.ajax({
@@ -364,7 +364,7 @@ function ud_request(data, f1, f2) {
     },
     error: function(data) {
       debug(data.responseText);
-      show_info("Some server issues on request!<br />\n{0}".format(data.statusText));
+      show_info(`Some server issues on request!<br />\n${data.statusText}`);
       if (f2)
         f2();
     },
@@ -399,7 +399,7 @@ function udr_save(db, type, name, rows, mode, f1, f2) {
     'type':   type,
     'name':   name,
     'mode':   mode,
-    'data_json': $.toJSON(rows),
+    'data_json': JSON.parse(rows),
   };
 
   ud_request(data, f1, f2)

@@ -17,7 +17,7 @@ from flask_principal import Permission, RoleNeed
 from sqlalchemy.sql import select, text
 from wtforms import Form, StringField, TextAreaField, validators
 
-from ..main import app, db
+from ..app import app, db
 from ..core.db import init_db, get_dbs_list, get_rows_plain
 from ..core.functions import get_next
 from ..core.render_response import render_format

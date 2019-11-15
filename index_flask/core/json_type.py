@@ -9,6 +9,9 @@ import json
 
 from sqlalchemy.types import UserDefinedType, TypeDecorator, Text
 
+from ..app import app
+from ..core.report_error import report_error
+
 
 class JsonType(TypeDecorator):
     impl = Text
@@ -17,21 +20,13 @@ class JsonType(TypeDecorator):
         return json.dumps(value, ensure_ascii=False)
 
     def process_result_value(self, value, dialect):
-        return json.loads(value)
+        try:
+            d = json.loads(value)
 
+        except:
+            d = {}
+#           app.logger.exception("JsonType converting error!",
+#               exc_info=1, extra={'email': True})
+            report_error("JsonType converting error: '{0}'".format(value), True)
 
-# class JsonType(UserDefinedType):
-#     def get_col_spec(self, **kw):
-#         return "JSON"
-#
-#     def bind_processor(self, dialect):
-#         def process(value):
-#             return json.dumps(value, ensure_ascii=False).encode('utf8')
-#
-#         return process
-#
-#     def result_processor(self, dialect, coltype):
-#         def process(value):
-#             return json.loads(value)
-#
-#         return process
+        return d

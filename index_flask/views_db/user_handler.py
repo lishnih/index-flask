@@ -9,7 +9,7 @@ from flask import request, redirect
 
 from flask_login import login_required, current_user
 
-from ..main import app, db
+from ..app import app, db
 from ..core.functions import get_next
 from ..core.render_response import render_ext
 from ..models.handler import Handler

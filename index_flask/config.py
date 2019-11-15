@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import os
+import platform
 
 
 APPLICATION_ROOT = '/index'
@@ -9,6 +10,9 @@ APPLICATION_ROOT = '/index'
 INDEX_CONFIG_DIR = '~'
 INDEX_USERS_DIR = '~/.config/index'
 INDEX_SQLITE_HOME = '~/.config/index/id1'
+
+REPORT_MAIL = 'lishnih@gmail.com'
+REPORT_ID = platform.uname()[1]
 
 
 # Flask

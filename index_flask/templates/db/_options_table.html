@@ -10,6 +10,7 @@
     </tr>
   </thead>
   <tbody>
+{%- if options %}
 {%- for key, value in options | dictsort %}
     <tr>
       <td><i class="inactive">{{ loop.index }}</i></td>
@@ -17,6 +18,9 @@
       <td>{{ value }}</td>
     </tr>
 {%- endfor %}
+{%- else %}
+      <td colspan="3">No data</td>
+{%- endif %}
   </tbody>
 </table>
 

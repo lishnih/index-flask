@@ -9,7 +9,7 @@ from flask import request, jsonify
 
 from flask_login import login_required
 
-from ..main import app
+from ..app import app
 from .. import view_j2
 
 

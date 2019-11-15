@@ -13,7 +13,7 @@ from ..models.source import Source
 from ..models.handler import Handler
 
 
-class AddSourceTaskForm(Form):
+class AddUserTaskForm(Form):
     source = SelectField('Source', [validators.Required()],
         render_kw={"class": "custom-select"}
     )
@@ -26,7 +26,7 @@ class AddSourceTaskForm(Form):
     )
 
     def __init__(self, form, sources, handlers, **kargs):
-        super(AddSourceTaskForm, self).__init__(form, **kargs)
+        super(AddUserTaskForm, self).__init__(form, **kargs)
 
         fields = [[str(i.id), "{0} ({1}: {2})".format(i.name, i.get_provider(), i.path)] for i in sources]
         fields.insert(0, ['', ''])

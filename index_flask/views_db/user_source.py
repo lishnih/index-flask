@@ -13,7 +13,7 @@ from sqlalchemy.sql import select, func, text, column, table, and_
 
 from requests.exceptions import *
 
-from ..main import app, db
+from ..app import app, db
 from ..core.cloud_interface import get_cloud_files
 from ..core.functions import get_next
 from ..core.render_response import render_ext
@@ -163,7 +163,7 @@ def user_source_append():
             db.session.add(user_source)
             db.session.commit()
 
-#           source_task_create(user_source, 'scan_files', 'auto')
+#           user_task_create(user_source, 'scan_files', 'auto')
 
             message = "Successfully append {0}".format(form.name.data)
 

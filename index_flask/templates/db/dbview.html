@@ -1,0 +1,53 @@
+{% extends "_layout.html" %}
+
+{%- block body %}
+
+{%- if total %}
+{%- if shown %}
+<div><i>Shown {{ shown }} of {{ filtered }} (total: {{ total }})</i></div>
+{%- else %}
+<div><i>Total: {{ total }}</i></div>
+{%- endif %}
+{%- endif %}
+
+{%- from "_debug.html" import dump_table, dump_table_unsafe %}
+{%- if rows %}
+{{ dump_table_unsafe(names, rows) }}
+{%- endif %}
+
+
+{%- if html %}
+{%- autoescape false %}
+{{ html }}
+{%- endautoescape %}
+{%- endif %}
+
+{%- if text %}
+<pre>
+{{ text }}
+</pre>
+{%- endif %}
+
+
+{%- for names, rows, description, after in obj %}
+
+{%- autoescape false %}
+<b><i style="background-color: #efefcf">{{ description }}</i></b>
+{%- endautoescape %}
+<br />
+{{ dump_table(names, rows) }}
+{%- autoescape false %}
+{{ after }}
+{%- endautoescape %}
+<hr />
+
+{%- endfor %}
+
+{%- endblock %}
+
+
+{%- block script %}
+
+  <script src="{{ app_root }}/js/view.js" async></script>
+
+{%- endblock %}

@@ -14,7 +14,7 @@ from flask_principal import Permission, RoleNeed
 from sqlalchemy import desc, distinct, func, and_, or_, not_
 # from sqlalchemy.sql import text
 
-from ..main import app, db
+from ..app import app, db
 from ..core.db import get_rows_model
 from ..core.dump_html import html
 from ..forms.dbview import TableCondForm

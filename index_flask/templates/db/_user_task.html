@@ -1,0 +1,75 @@
+{% macro user_task_list(user_tasks) %}
+
+<h1>Source tasks:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>List of user tasks</caption>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Source</th>
+      <th scope="col">Handler</th>
+      <th scope="col">Name</th>
+      <th scope="col">Mode</th>
+      <th scope="col">Status</th>
+      <th scope="col">Created</th>
+      <th scope="col">Finished</th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+{%- for user_task in user_tasks %}
+    <tr>
+      <td><i class="inactive">{{ loop.index }}</i></td>
+      <td>{{ user_task.source.name }}</td>
+      <td>{{ user_task.handler.name }}</td>
+      <th scope="row">{{ user_task.name }}</th>
+      <td>{{ user_task.mode }}</td>
+      <td>{{ user_task.status }}</td>
+      <td>{{ user_task.created }}</td>
+      <td>{{ user_task.finished }}</td>
+      <td><a href="{{ url_for('user_task_configure', uid=user_task.uid, name=user_task.name) }}">Configure</a></td>
+      <td><a href="{{ url_for('user_task_run', uid=user_task.uid, name=user_task.name) }}">Run</a></td>
+      <td><a href="{{ url_for('user_task', uid=user_task.uid) }}">Result</a></td>
+    </tr>
+{%- endfor %}
+  </tbody>
+</table>
+
+{%- endmacro %}
+
+
+{% macro user_task_info(user_task) %}
+
+<h1>Source task:</h1>
+
+<table class="table table-bordered table-hover table-sm table-responsive">
+  <caption>User source task</caption>
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="col">Name</th><td>{{ user_task.name }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Mode</th><td>{{ user_task.mode }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Status</th><td>{{ user_task.status }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Created</th><td>{{ user_task.created }}</td>
+    </tr>
+    <tr>
+      <th scope="col">Finished</th><td>{{ user_task.finished }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{%- endmacro %}

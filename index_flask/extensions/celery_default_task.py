@@ -14,6 +14,9 @@ from ..app import app, celery
 
 @celery.task(bind=True)
 def run_task_async(self, handler_dict, options):
+    app.logger.debug("Starting...")
+    app.logger.info(handler_dict)
+    app.logger.info(options)
 #   message = 'File {0} in progress...'.format(i)
 #   self.update_state(state='PROGRESS', meta={
 #       'current': i,
@@ -21,39 +24,53 @@ def run_task_async(self, handler_dict, options):
 #       'status': message,
 #   })
 
-    name = handler_dict.get('name')
-    rev = handler_dict.get('rev')
+#   name = handler_dict.get('name')
+#   rev = handler_dict.get('rev')
     module = handler_dict.get('module')
     entry = handler_dict.get('entry')
     key = handler_dict.get('key')
 
-    error = ''
+    error = exception = ''
     while True:
         # Load module
         try:
             mod = import_module(module)
 
         except Exception as e:
-            error = "Error during loading: {0}".format(e)
+            exception = "Error during loading: {0}".format(e)
             break
 
-        # Load function, options and run
-        func = getattr(mod, entry) if hasattr(mod, entry) else None
-        if func:
-            if task.handler.key:
-                status = func(**{task.handler.key: options})
+        # Load function
+        if hasattr(mod, entry):
+            func = getattr(mod, entry)
+
+        else:
+            error = "Wrong entry: {0}".format(entry)
+            break
+
+        # Run
+        try:
+            if key:
+                status = func(**{key: options})
 
             else:
                 status = func(options)
 
-        else:
-            app.logger.warning("Wrong entry: {0}".format(task.handler.entry))
+        except Exception as e:
+            exception = "Error during running: {0}".format(e)
+            break
 
         break
+
+    if error:
+        app.logger.error(error)
+
+    elif exception:
+        app.logger.exception(exception)
 
     return {
         'current': 100,
         'total': 100,
         'status': 'Task completed!',
-        'result': "{0}".format('Completed'),
+        'result': "{0} (Error: {1} / Exception {2})".format('Completed', error, exception),
     }

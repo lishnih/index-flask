@@ -13,9 +13,15 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from .types23 import *
 
 
+def getUserDbUri(user, config):
+    dbhome = os.path.expanduser(user.home)
+    dbname = config.get("dbname", "default")
+    return "{0}:///{1}/{2}.sqlite".format('sqlite', dbhome, dbname)
+
+
 def getDbUri(config={}):
     dbhome = os.path.expanduser(config.get("dbhome", "~"))
-    dbname = config.get("dbname", "default")
+    dbname = config.get("dbname")
     if dbname:
         return "{0}:///{1}/{2}.sqlite".format('sqlite', dbhome, dbname)
 

@@ -15,7 +15,7 @@ from flask_login import login_required, current_user
 from sqlalchemy import not_, and_
 from sqlalchemy.sql import select, text
 
-from ..main import app
+from ..app import app
 from ..core.db import (init_db, get_dbs_list, get_rows_base, get_rows_ext,
                        get_primary_tables)
 from ..core.db_session import db_session, db_session_metadata

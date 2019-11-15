@@ -11,7 +11,7 @@ from datetime import datetime
 from flask import url_for
 
 from ..app import app, db, bcrypt
-from ..extensions.celery_mail_task import send_email_async
+from ..extensions.celery_send_email_task import send_email_async
 
 
 class User(db.Model):
@@ -84,7 +84,7 @@ class User(db.Model):
 
     def send_verification(self):
         send_email_async.delay(
-            email = self.email,
+            recipients = [self.email],
             subject = "Index.net.ru :: Account Activation",
             message = """Welcome {0}!
 
