@@ -13,8 +13,8 @@ from flask_login import login_required, login_user, logout_user, current_user
 from flask_principal import Identity, AnonymousIdentity, identity_changed
 
 from ..app import app, db
-from ..core.functions import get_next
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_ext
 from ..forms.user import RegistrationForm, LoginForm, ChangePasswordForm
 from ..models.user import User
 

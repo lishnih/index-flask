@@ -14,8 +14,8 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import select, func, text, column, table, and_
 
 from ..app import app, db
-from ..core.functions import get_next
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_ext
 from ..extensions.celery_default_task import run_task_async
 from ..extensions.celery_send_csv_task import send_csv_async
 from ..forms.user_task import AddUserTaskForm

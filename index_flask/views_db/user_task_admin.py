@@ -13,7 +13,7 @@ from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
 from ..app import app, db
-from ..core.render_response import render_ext
+from ..core_flask.render_response import render_ext
 from ..forms.user_task import AddUserTaskForm
 from ..models.handler import Handler
 from ..models.source import Source

@@ -10,7 +10,7 @@ from flask import request, redirect, flash
 from flask_login import login_required, current_user
 
 from ..app import app, db
-from ..core.render_response import render_ext
+from ..core_flask.render_response import render_ext
 from ..extensions.celery_send_csv_task import send_csv_async
 from ..models.user_task import UserTask
 

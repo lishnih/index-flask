@@ -19,9 +19,9 @@ from wtforms import Form, StringField, TextAreaField, validators
 
 from ..app import app, db
 from ..core.db import init_db, get_dbs_list, get_rows_plain
-from ..core.functions import get_next
-from ..core.render_response import render_format
-from ..core.user_templates import get_user_templates
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_format
+from ..core_flask.user_templates import get_user_templates
 from ..forms.dbview import TableCondForm
 
 

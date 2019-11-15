@@ -28,8 +28,6 @@ def get_cloud_files(cloud, dir_):
 
     dirs = []
     files = []
-#     return [{'name': "Public", 'path_id': "d1", 'path': "Public"}, {'name': "github", 'path_id': "d2", 'path': "github"}], \
-#            [{'name': "This is your Dropbox.txt", 'path_id': "f1", 'path': "f"}, {'name': "clean_pyc.bat", 'path_id': "f2", 'path': "f"}, {'name': "Репозитории.xls", 'path_id': "f3", 'path': "f"}]
 
     parsed = json.loads(cloud.extra_data)
 
@@ -65,7 +63,7 @@ def get_cloud_files(cloud, dir_):
                 pass
 
             if not dir_:
-                dir_ = "/"      # "app:/"
+                dir_ = "/"      # "disk:/" | "app:/"
             response = ya.listdir(dir_)
             dir_list, file_list = get_files_yandex(response)
             dirs += dir_list

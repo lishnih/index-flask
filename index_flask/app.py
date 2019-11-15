@@ -14,12 +14,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 # from flask_migrate import Migrate
 
-from celery import Celery
-
-from . import config
+# from celery import Celery
 
 
 app = Flask(__name__, static_url_path='')
+
+from . import config
 app.config.from_object(config)
 
 credential_cfg = '../credentials_cfg.py'
@@ -34,5 +34,5 @@ mail = Mail(app)
 # migrate = Migrate(app, db)
 
 # Initialize Celery
-celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-celery.conf.update(app.config)
+# celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+# celery.conf.update(app.config)

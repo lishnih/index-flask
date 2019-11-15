@@ -26,7 +26,7 @@ from .extensions import *
 
 
 # ===== Import views =====
-from .core.load_modules import load_modules, require_ext
+from .core_flask.load_modules import load_modules, require_ext
 
 load_modules('views_user')
 load_modules('views_db')

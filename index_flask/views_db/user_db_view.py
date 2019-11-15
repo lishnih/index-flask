@@ -17,9 +17,9 @@ from sqlalchemy.sql import select, text
 
 from ..app import app
 from ..core.dump_html import html
-from ..core.functions import debug_query
-from ..core.render_response import render_format
-from ..core.user_templates import get_user_templates
+from ..core_flask.functions import debug_query
+from ..core_flask.render_response import render_format
+from ..core_flask.user_templates import get_user_templates
 from ..forms.dbview import TableCondForm
 from ..core_obsolete.db101 import (init_db, get_dbs_list, get_rows_base,
                                    get_rows_ext, get_primary_tables)

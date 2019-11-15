@@ -20,9 +20,9 @@ from ..core.db import (init_db, get_dbs_list, get_rows_base, get_rows_ext,
                        get_primary_tables)
 from ..core.db_session import db_session, db_session_metadata
 from ..core.dump_html import html
-from ..core.functions import debug_query
-from ..core.render_response import render_format
-from ..core.user_templates import get_user_templates
+from ..core_flask.functions import debug_query
+from ..core_flask.render_response import render_format
+from ..core_flask.user_templates import get_user_templates
 from ..views_db.user_db import get_db_list, get_db
 
 

@@ -15,8 +15,8 @@ from requests.exceptions import *
 
 from ..app import app, db
 from ..core.cloud_interface import get_cloud_files
-from ..core.functions import get_next
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_ext
 from ..forms.source import AddSourceForm
 from ..models.source import Source
 

@@ -10,8 +10,9 @@ from datetime import datetime
 
 from flask import url_for
 
+from .. import messages
 from ..app import app, db, bcrypt
-from ..extensions.celery_send_email_task import send_email_async
+from ..core_flask.send_email import send_email
 
 
 class User(db.Model):
@@ -83,21 +84,10 @@ class User(db.Model):
             self.set_verified()
 
     def send_verification(self):
-        send_email_async.delay(
+        send_email.delay(
             recipients = [self.email],
             subject = "Index.net.ru :: Account Activation",
-            message = """Welcome {0}!
-
-Thank you for registering for an Index.net.ru account.
-To activate your account, simply click on the link below or paste this link into the URL field of your favorite browser:
-
-{1}
-
-If you have trouble confirming or accessing your account, please answer this email.
-
-Best regards,
-Index.net.ru Team
-""".format(self.username, url_for('user_confirm', code=self.verified)))
+            message = messages.SEND_VERIFICATION.format(self.username, url_for('user_confirm', code=self.verified)))
 
     def get_verification(self, data):
         double = True

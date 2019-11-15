@@ -11,7 +11,7 @@ from werkzeug.wrappers import Response
 
 from flask_principal import Permission, RoleNeed
 
-from .types23 import *
+from ..core.types23 import *
 
 
 debug_permission = Permission(RoleNeed('debug'))

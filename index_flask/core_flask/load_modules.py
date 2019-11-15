@@ -14,7 +14,7 @@ from flask import jsonify
 
 from ..app import app, db
 from ..models.module import Module
-from .types23 import *
+from ..core.types23 import *
 
 
 # === Interface ===

@@ -14,8 +14,8 @@ from flask_login import login_required, current_user
 from sqlalchemy.sql import select, func, text, column, table, and_
 
 from ..app import app, db
-from ..core.functions import get_next
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_ext
 from ..forms.user_task import AddUserTaskForm
 from ..models.handler import Handler
 from ..models.source import Source

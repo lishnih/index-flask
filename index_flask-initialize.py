@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 # Stan 2016-06-20
 
@@ -13,10 +13,15 @@ from sqlalchemy import and_
 # ===== Create INDEX_SQLITE_HOME directory =====
 from index_flask.config import *
 
+print('INDEX_CONFIG_DIR:', INDEX_CONFIG_DIR)
+_dir = os.path.expanduser(INDEX_CONFIG_DIR)
+if not os.path.isdir(_dir):
+    os.makedirs(_dir)
+
 print('INDEX_SQLITE_HOME:', INDEX_SQLITE_HOME)
 _dir = os.path.expanduser(INDEX_SQLITE_HOME)
 if not os.path.isdir(_dir):
-    os.mkdir(_dir)
+    os.makedirs(_dir)
 
 
 # ===== Import =====
@@ -56,7 +61,7 @@ def init_admin():
         user = User(
             username = 'root',
             email = 'root@localhost',
-            password = '1234',
+            password = 'zvc4tnw-tv',
             name = 'root',
             id = user_id,
         )
@@ -79,7 +84,7 @@ def init_user():
         user = User(
             username = 'user',
             email = 'user@localhost',
-            password = '1234',
+            password = 'um_wvbx8tm',
             name = 'user',
             id = user_id,
         )

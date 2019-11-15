@@ -14,9 +14,9 @@ from flask_login import login_required
 from flask_principal import Permission, RoleNeed
 
 from ..app import app, db
-from ..core.functions import get_next
-from ..core.load_modules import is_loaded
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.load_modules import is_loaded
+from ..core_flask.render_response import render_ext
 from ..forms.user import RegistrationForm
 from ..models.user import User
 

@@ -5,24 +5,26 @@ import os
 import platform
 
 
+# Index configuration
+INDEX_CONFIG_ID = 'index_flask'
+INDEX_CONFIG_DIR = os.path.join('~', '.index', INDEX_CONFIG_ID)
+INDEX_USERS_DIR = os.path.join(INDEX_CONFIG_DIR, 'users')
+INDEX_SQLITE_HOME = os.path.join(INDEX_USERS_DIR, 'id1')
+INDEX_CONFIG = '../credentials_cfg.py'
+
+INDEX_REPORT_MAIL = 'lishnih@yandex.ru'
+INDEX_REPORT_ID = platform.uname()[1]
+
+
+# Flask configuration
 APPLICATION_ROOT = '/index'
-
-INDEX_CONFIG_DIR = '~'
-INDEX_USERS_DIR = '~/.config/index'
-INDEX_SQLITE_HOME = '~/.config/index/id1'
-
-REPORT_MAIL = 'lishnih@gmail.com'
-REPORT_ID = platform.uname()[1]
-
-
-# Flask
 CSRF_ENABLED = True
-SECRET_KEY = 'your-secret-key_\xfb+\x14-\xdf_\xbb=\x8f'
+SECRET_KEY = 'index_\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 
-# SQL Alchemy
+# SQL Alchemy configuration
 _dir = os.path.expanduser(INDEX_CONFIG_DIR)
-SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(os.path.join(_dir, 'index_app.db'))
+SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(os.path.join(_dir, 'app.db'))
 SQLALCHEMY_MIGRATE_REPO = os.path.join(_dir, 'db_repository')
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = True

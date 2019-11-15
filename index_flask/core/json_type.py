@@ -9,7 +9,6 @@ import json
 
 from sqlalchemy.types import UserDefinedType, TypeDecorator, Text
 
-from ..app import app
 from ..core.report_error import report_error
 
 
@@ -25,8 +24,6 @@ class JsonType(TypeDecorator):
 
         except:
             d = {}
-#           app.logger.exception("JsonType converting error!",
-#               exc_info=1, extra={'email': True})
             report_error("JsonType converting error: '{0}'".format(value), True)
 
         return d
