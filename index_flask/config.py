@@ -12,6 +12,7 @@ INDEX_USERS_DIR = os.path.join(INDEX_CONFIG_DIR, 'users')
 INDEX_SQLITE_HOME = os.path.join(INDEX_USERS_DIR, 'id1')
 INDEX_CONFIG = '../credentials_cfg.py'
 
+INDEX_PORTAL_NAME = 'Index.net.ru'
 INDEX_REPORT_MAIL = 'lishnih@yandex.ru'
 INDEX_REPORT_ID = platform.uname()[1]
 
@@ -37,11 +38,6 @@ SQLALCHEMY_BINDS = {
 }
 
 
-# Celery configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-
 # Flask-Mail configuration
 MAIL_SERVER = 'smtp.yandex.com'
 MAIL_PORT = 587
@@ -51,12 +47,26 @@ MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
 MAIL_DEFAULT_SENDER = 'support@index.net.ru'
 
 
+# Celery configuration
+CELERY_ENABLED = False
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+
+# Yandex Database configuration
+YDB_ENABLED = True
+YDB_SA_PRIVATE_KEY_FILE = "~/private.ppk"
+YDB_SSL_ROOT_CERTIFICATES_FILE = "~/.ydb/CA.pem"
+YDB_SA_ID = os.environ.get('YDB_SA_ID')
+YDB_SA_ACCESS_KEY_ID = os.environ.get('YDB_SA_ACCESS_KEY_ID')
+
+
 # ===================
 # === social_auth ===
 # ===================
 
-SOCIAL_AUTH_LOGIN_URL = '/index/'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/index/accounts'
+SOCIAL_AUTH_LOGIN_URL = APPLICATION_ROOT
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '{0}/accounts'.format(APPLICATION_ROOT)
 SOCIAL_AUTH_USER_MODEL = 'index_flask.models.user.User' # !!! index_flask
 SOCIAL_AUTH_STORAGE = 'social_flask_sqlalchemy.models.FlaskStorage'
 SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (

@@ -5,12 +5,10 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-
-# ===== Import Application and App DB =====
-from .app import app, db
+from .app import db
 
 
-# ===== Import models and create tables =====
+# ===== Load models and create tables =====
 from .models import check_model
 from .models import *
 
@@ -21,11 +19,11 @@ for c in db.Model._decl_class_registry.values():
         check_model(c)
 
 
-# ===== Import extensions =====
+# ===== Load extensions =====
 from .extensions import *
 
 
-# ===== Import views =====
+# ===== Load views =====
 from .core_flask.load_modules import load_modules, require_ext
 
 load_modules('views_user')

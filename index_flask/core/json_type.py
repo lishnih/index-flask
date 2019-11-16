@@ -6,10 +6,9 @@ from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
 import json
+import logging
 
-from sqlalchemy.types import UserDefinedType, TypeDecorator, Text
-
-from ..core.report_error import report_error
+from sqlalchemy.types import TypeDecorator, Text
 
 
 class JsonType(TypeDecorator):
@@ -24,6 +23,6 @@ class JsonType(TypeDecorator):
 
         except:
             d = {}
-            report_error("JsonType converting error: '{0}'".format(value), True)
+            logging.error("JsonType converting error: '{0}'".format(value))
 
         return d

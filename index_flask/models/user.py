@@ -12,7 +12,7 @@ from flask import url_for
 
 from .. import messages
 from ..app import app, db, bcrypt
-from ..core_flask.send_email import send_email
+from ..tools.send_email import send_email
 
 
 class User(db.Model):
@@ -84,10 +84,11 @@ class User(db.Model):
             self.set_verified()
 
     def send_verification(self):
-        send_email.delay(
-            recipients = [self.email],
-            subject = "Index.net.ru :: Account Activation",
-            message = messages.SEND_VERIFICATION.format(self.username, url_for('user_confirm', code=self.verified)))
+        send_email(
+            message = messages.SEND_VERIFICATION.format(self.username, url_for('user_confirm', code=self.verified)),
+            recipients = [self.email, app.config.get('INDEX_REPORT_MAIL')],
+            subject = "{} :: Account Activation".format(app.config.get('INDEX_PORTAL_NAME'))
+        )
 
     def get_verification(self, data):
         double = True

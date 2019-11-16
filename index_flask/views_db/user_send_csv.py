@@ -11,8 +11,9 @@ from flask_login import login_required, current_user
 
 from ..app import app, db
 from ..core_flask.render_response import render_ext
-from ..extensions.celery_send_csv_task import send_csv_async
 from ..models.user_task import UserTask
+
+from ..tools.send_csv import send_csv
 
 
 @app.route("/user_task/send_csv")
@@ -30,7 +31,7 @@ def utask_send_csv():
     options = dict(utask.options)
     options['dbhome'] = current_user.home
 
-    send_csv_async.delay(current_user.id, options)
+    send_csv.delay(current_user.id, options)
 
     flash('Sending CSV...')
     return redirect(get_next(back=True))
