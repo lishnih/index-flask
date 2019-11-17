@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="keywords" content="python flask">
-  <meta name="description" content="index">
-  <meta name="author" content="">
-  <meta name="google" value="notranslate">
-  <base target="_self">
-  <link rel="shortcut icon" href="{{ app_root }}/favicon.ico">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <meta name="keywords" content="python flask" />
+  <meta name="description" content="index" />
+  <meta name="author" content="" />
+  <meta name="google" value="notranslate" />
+  <base target="_self" />
+  <link rel="shortcut icon" href="{{ app_root }}/favicon.ico" />
 
 {%- if title %}
   <title>{{ title }}</title>
@@ -20,12 +20,12 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+  <!-- Font Awesome core CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
 
   <!-- Site-specified styles -->
-  <link href="{{ app_root }}/css/default.css" rel="stylesheet">
-  <link href="{{ app_root }}/debug/default.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ app_root }}/css/default.css" />
 
 {%- block head %}
 {%- endblock %}
@@ -34,90 +34,127 @@
 {%- if app_debug %}
   <!-- Debug styles -->
   <link href="{{ app_root }}/css/debug/debug.css" rel="stylesheet">
+  <!-- Site-specified styles -->
+  <link rel="stylesheet" href="{{ app_root }}/debug/default.css" />
 {%- endif %}
 </head>
 
 <body>
-{%- from "_common.html" import text_navbar, text_status, text_ia_modal, text_info_modal, text_sidebar, text_flashes, text_debug with context %}
+{%- from "_common.html" import text_navbar, text_status, text_ia_modal, text_info_modal, text_flashes, text_gdpr, text_debug with context %}
+{%- from "_common_sidebar.html" import text_sidebar with context %}
 
 
-
-<!-- HEADER: NavBar, User dialogs -->
+<!-- HEADER: Bootstrap NavBar -->
 <header>
 
-<!-- Bootstrap NavBar -->
 {{ text_navbar() }}
-<!-- NavBar END -->
 
 </header>
+<!-- HEADER: Bootstrap NavBar END -->
 
 
+<!-- User dialogs -->
 {{ text_status() }}
 {{ text_ia_modal() }}
 {{ text_info_modal() }}
+<!-- User dialogs END -->
 
 
+<!-- Page content -->
+<div class="container-fluid">
+  <div class="row flex-xl-nowrap2">
 
-<!-- Bootstrap row -->
-<div class="row" id="body-row">
-{%- if not without_sidebar %}
-  <!-- Sidebar col -->
+    <!-- Sidebar -->
 {{ text_sidebar() }}
+    <!-- Sidebar END -->
+
+    <!-- Content -->
+    <div class="py-1 px-3 bd-content">
+
+
+      <!-- Flashes -->
+{{ text_flashes() }}
+      <!-- Flashes END -->
+
+
+{%- if utilities_bar %}
+      <!-- Utilities bar -->
+      <div role="group" class="btn-group btn-group-sm mt-2 mb-0 mb-lg-2">
+{%- for url, text in utilities_bar %}
+        <a rel="noopener" target="_blank" href="{{ url }}" class="btn btn-light">{{ text }}</a>
+{%- endfor %}
+      </div>
+      <div class="clearfix d-block d-lg-none"></div>
+      <!-- Utilities bar END -->
 {%- endif %}
 
-  <!-- MAIN col -->
-  <div class="col py-3">
-    <h2>
-      {{ content_head }}
-      <small class="text-muted">
-      {{ content_head_muted }}
-      </small>
-    </h2>
+      <!-- User content -->
+      <main class="bd-main">
+        <section class="bd-content">
+
+          <h2>
+            {{ content_head }}
+            <small class="text-muted">
+            {{ content_head_muted }}
+            </small>
+          </h2>
 
 {%- if card_head %}
-    <div class="card">
-      <h4 class="card-header">
-        {{ card_head }}
-      </h4>
-      <div class="card-body">
-        <ul>
+          <div class="card">
+            <h4 class="card-header">
+              {{ card_head }}
+            </h4>
+            <div class="card-body">
+              <ul>
 {%- for row in card_rows %}
-          <li>{{ row }}</li>
+                <li>{{ row }}</li>
 {%- endfor %}
-        </ul>
-      </div>
-    </div>
-    <hr>
+              </ul>
+            </div>
+          </div>
+          <hr />
 {%- endif %}
 
 
+<div id="i3x_content">
 
-    <div id="content">
 {%- block body %}
 {%- endblock %}
 {%- block body_base %}
 {%- endblock %}
 {%- block body_footer %}
 {%- endblock %}
-    </div>
+
+</div>
 
 
+          <div class="container">
+            <span class="text-muted">{{ sticky_footer }}</span>
+          </div>
 
-    <div class="container">
-      <span class="text-muted">{{ sticky_footer }}</span>
-    </div>
+        </section>
+      </main>
+      <!-- User content END -->
 
 
-{{ text_flashes() }}
+      <!-- Debug -->
 {{ text_debug() }}
+      <!-- Debug END -->
 
 
+    </div>
+    <!-- Content END -->
+
+    <!-- TOC -->
+    <div class="bd-toc col-xl-2 d-none d-xl-block">
+      <ul class="section-nav nav flex-column">
+      </ul>
+    </div>
+    <!-- TOC END-->
 
   </div>
-  <!-- MAIN Col END -->
 </div>
-<!-- Bootstrap row END -->
-
+<!-- Page content END -->
 
 
 <!-- Bootstrap core JavaScript -->
@@ -125,7 +162,6 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-
 
 
 <!-- Site-specified scripts -->
@@ -136,15 +172,16 @@
 <script src="{{ app_root }}/js/modal.js"></script>
 <script src="{{ app_root }}/js/debug.js"></script>
 <script src="{{ app_root }}/js/functions.js"></script>
-<script src="{{ app_root }}/js/user.js"></script>
+<script src="{{ app_root }}/js/view.js"></script>
 
+
+{{ text_gdpr() }}
 
 
 {%- block script %}
 {%- endblock %}
 {%- block script_base %}
 {%- endblock %}
-
 
 
 </body>

@@ -132,7 +132,7 @@ def get_rows_plain(session, sql, offset=0, limit=None, criterion=None, order=Non
     return names, rows, total, filtered, shown, page, pages, s
 
 
-def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plain=1):
+def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plain=1, skip_sys=False):
     s = model.query
     total = s.count()
 
@@ -149,7 +149,8 @@ def get_rows_model(model, offset=0, limit=None, criterion=None, order=None, plai
         s = s.limit(limit)
 
     res = s.all()
-    names = [i.name for i in model.__table__.c]
+    names = [i.name for i in model.__table__.c if i.name != 'id' and not i.name.startswith('_')] if skip_sys else \
+            [i.name for i in model.__table__.c]
 
     if plain:
         rows = [[row.__dict__.get(i) for i in names] for row in res]

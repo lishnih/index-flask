@@ -68,3 +68,29 @@
     <button type="submit" class="btn btn-primary">{{ field.label.text|safe }}</button>
   </div>
 {%- endmacro %}
+
+
+{% macro render_radio(field) %}
+{{ field.label(class="form-control-label")|safe }}
+{%- for subfield in field %}
+  <div class="form-check">
+    {{ subfield(class="form-check-input", **kwargs)|safe }}
+    {{ subfield.label(class="form-check-label", **kwargs)|safe }}
+{%- for error in field.errors %}
+    <div class="invalid-feedback">{{ error|safe }}</div>
+{%- endfor %}
+  </div>
+{%- endfor %}
+{%- endmacro %}
+
+
+
+{% macro render_radio_advanced(field, class_list) %}
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+{%- for subfield in field %}
+  <label class="btn btn-secondary active">
+    <input type="radio" name="options" id="{{ subfield.id }}" autocomplete="off">{{ subfield.label.text }}
+  </label>
+{%- endfor %}
+</div>
+{%- endmacro %}

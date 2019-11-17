@@ -58,17 +58,6 @@ def debug():
     )
 
 
-@app.route('/debug/app')
-def debug_app():
-    if not debug_permission.can():
-        abort(404)
-
-    return render_template('base.html',
-        without_sidebar = True,
-        html = html(app),
-    )
-
-
 @app.route('/debug/current_user')
 def debug_current_user():
     if not debug_permission.can():

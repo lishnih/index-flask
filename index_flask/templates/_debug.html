@@ -2,7 +2,7 @@
 {%- if value is mapping %}
   {{ dump_dict(value) }}
 {%- elif value is none %}
-  <i class="inactive">null</i>
+  <i class="text-muted">null</i>
 {%- else %}
   {{ value|safe }}
 {%- endif %}
@@ -14,7 +14,7 @@
 {%- if value is mapping %}
   {{ dump_dict(value) }}
 {%- elif value is none %}
-  <i class="inactive">null</i>
+  <i class="text-muted">null</i>
 {%- else %}
   {{ value|safe }}
 {%- endif %}
@@ -85,6 +85,7 @@
 
 {% macro dump_table(names, rows) %}
 <div class="table">
+{%- if rows %}
 <table class="table table-bordered table-hover table-sm table-responsive">
   <thead>
     {%- if names %}
@@ -101,7 +102,7 @@
     {%- if rows %}
     {%- for row in rows %}
     <tr>
-      <td><i class="inactive">{{ loop.index }}</i></td>
+      <td><i class="text-muted">{{ loop.index }}</i></td>
       {%- for col in row %}
       <td>
       {{ dump_value(col) }}
@@ -112,8 +113,8 @@
     {%- endif %}
   </tbody>
 </table>
-{%- if not rows %}
-<i>Нет данных</i>
+{%- else %}
+<i class="text-muted">No data!</i>
 {%- endif %}
 </div>
 {%- endmacro %}
@@ -122,6 +123,7 @@
 {% macro dump_table_unsafe(names, rows) %}
 {%- autoescape false %}
 <div class="table">
+{%- if rows %}
 <table class="table table-bordered table-hover table-sm table-responsive">
   <thead>
     {%- if names %}
@@ -138,7 +140,7 @@
     {%- if rows %}
     {%- for row in rows %}
     <tr>
-      <td><i class="inactive">{{ loop.index }}</i></td>
+      <td><i class="text-muted">{{ loop.index }}</i></td>
       {%- for col in row %}
       <td>
       {{ dump_value_unsafe(col) }}
@@ -149,8 +151,8 @@
     {%- endif %}
   </tbody>
 </table>
-{%- if not rows %}
-<i>Нет данных</i>
+{%- else %}
+<i class="text-muted">No data!</i>
 {%- endif %}
 </div>
 {%- endautoescape %}

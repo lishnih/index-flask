@@ -8,8 +8,7 @@ $('.interactive').on('show.bs.modal', function (e) {
     var url = new URL(a.href);
     url.searchParams.set('format', 'modal');
 
-    var reload_on_close = a.dataset.reload_on_close ? a.dataset.reload_on_close : '';
-    this.dataset.reload_on_close = reload_on_close;
+    this.dataset.reload_after_close = a.dataset.reload_after_close ? a.dataset.reload_after_close : '';
 
     modal
       .addClass('modal-scrollfix')
@@ -28,14 +27,17 @@ $('.interactive').on('show.bs.modal', function (e) {
 
 
 $('.interactive').on('hide.bs.modal', function() {
-  reload_on_close = this.dataset.reload_on_close
+  var reload_after_close = this.dataset.reload_after_close;
+  var needtoreload = $(this).hasClass('needtoreload');
 
-  if ( reload_on_close == 'location' )
-    location.reload();
+  if ( reload_after_close && needtoreload ) {
+    if ( reload_after_close == 'location' )
+      location.reload();
 
-  else if ( reload_on_close ) {
-    var table = $('table#table1').DataTable();
-    table.draw();
+    else {
+      var table = $('table#table1').DataTable();
+      table.draw();
+    } // if
   } // if
 });
 
@@ -59,6 +61,7 @@ function submit_form(e) {
   $.post(url, formData).done(function (data) {
     var modal = form.parents('.modal');
     modal
+      .addClass('needtoreload')
       .find('.modal-body')
       .html(data);
 

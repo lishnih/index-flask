@@ -17,6 +17,10 @@ from ..app import app
 test_d = dict(
     content_head = '<b>content_head</b>',
     content_head_muted = '<b>content_head_muted</b>',
+    utilities_bar = [
+        ('/', 'Home'),
+        ('ya.ru', 'Yandex'),
+    ],
     card_head = '<b>card_head</b>',
     card_rows = [
         '<b>card row 1</b>',
@@ -66,7 +70,7 @@ test_d = dict(
 def test_base():
     flash("Info flash message", 'info')
     flash("Warning flash message", 'warning')
-    flash("Error flash message", 'error')
+    flash("Error flash message", 'danger')
 
     return render_template('base.html',
         title = '<b>title</b>',

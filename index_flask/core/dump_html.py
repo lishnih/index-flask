@@ -26,10 +26,10 @@ def plain_val(obj):
     if obj is None:
         buf = '/is None/'
     elif isinstance(obj, numeric_types):
-        buf = unicode(obj)
+        buf = str(obj)
     else:
         try:
-            buf = unicode(obj)
+            buf = str(obj)
         except:
             buf = repr(obj)
             buf = buf.replace(r'\n', '\n')

@@ -13,7 +13,7 @@ if sys.version_info >= (3,):
 #   range = range
 
 #   bytes = bytes
-    unicode = type    # the trick: any unused type
+    unicode = str
 #   str = str
 
     string_types = str,

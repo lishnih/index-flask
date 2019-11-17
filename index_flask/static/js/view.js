@@ -15,6 +15,13 @@ jQuery( function($) {
   } );
 
 
+  /*** tooltips initializing ***/
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+  })
+
+
   /*** Dialogs ***/
 
   // Common dialog
@@ -269,7 +276,7 @@ function get_rows(td, unlim) {
     'offset': offset + limit,
     'limit':  unlim ? 0 : limit,
     'format': 'json',
-    'query_json': query ? JSON.parse(query) : '',
+    'query_json': query,
   };
 
   $.ajax({
@@ -307,7 +314,7 @@ function append_rows(tr, rows) {
     var td = "<td></td>";
     entry.forEach(function(i) {
       if ( i == null )
-        td += '<td><i class="inactive">null<i></td>';
+        td += '<td><i class="text-muted">null<i></td>';
       else
         td += "<td>" + i + "</td>";
     });
@@ -317,9 +324,9 @@ function append_rows(tr, rows) {
 
 
 function show_info(text, event) {
-  $( "#dialog #dialog_content" ).html(text);
-  $( "#dialog" ).attr( "title", "info" );
-  $( "#dialog" ).dialog( "open" );
+  $( "#InfoModal" ).modal();
+  $( "#InfoModal #modal_title" ).html('Info');
+  $( "#InfoModal #modal_message" ).html(text);
 
   if (typeof event != "undefined")
     event.preventDefault();
@@ -327,9 +334,9 @@ function show_info(text, event) {
 
 
 function show_error(text, event) {
-  $( "#dialog #dialog_content" ).html(text);
-  $( "#dialog" ).attr( "title", "error" );
-  $( "#dialog" ).dialog( "open" );
+  $( "#InfoModal" ).modal();
+  $( "#InfoModal #modal_title" ).html('Error');
+  $( "#InfoModal #modal_message" ).html(text);
 
   if (typeof event != "undefined")
     event.preventDefault();

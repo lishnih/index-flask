@@ -5,16 +5,18 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
+from . import config
 
-SEND_VERIFICATION = """Welcome {0}!
 
-Thank you for registering for an Index.net.ru account.
+SEND_VERIFICATION = """Welcome {{0}}!
+
+Thank you for registering for an {INDEX_PORTAL_NAME} account.
 To activate your account, simply click on the link below or paste this link into the URL field of your favorite browser:
 
-{1}
+{{1}}
 
 If you have trouble confirming or accessing your account, please answer this email.
 
 Best regards,
-Index.net.ru Team
-"""
+{INDEX_PORTAL_NAME} Team
+""".format(INDEX_PORTAL_NAME = config.INDEX_PORTAL_NAME)

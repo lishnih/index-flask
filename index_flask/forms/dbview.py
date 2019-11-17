@@ -25,7 +25,7 @@ class TableCondForm(Form):
 
     conditions = [[i, i] for i in [
         '', '=', '!=', '=(int)', '!=(int)', '~', '!~', '>', '>=', '<', '<=',
-        'consist', 'starts with', 'ends with',
+        'contains', 'starts with', 'ends with',
         'in', 'not in', 'between', 'not between',
         'is None', 'not is None', 'is empty', 'not is empty',
 
@@ -219,7 +219,7 @@ class TableCondForm(Form):
                     clause = "{0} <= '{1}'".format(column, value)
                 mclause = mcolumn <= value if mt else clause
 
-            elif condition == 'consist':
+            elif condition == 'contain':
                 clause = "{0} like '%{1}%'".format(column, value)
                 mclause = mcolumn.like("%{0}%".format(value)) if mt else clause
             elif condition == 'starts with':

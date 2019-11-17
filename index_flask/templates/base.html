@@ -28,7 +28,7 @@
 {%- endif %}
 
 {%- from "_debug.html" import dump_table %}
-{%- if rows %}
+{%- if names or rows %}
 {{ dump_table(names, rows) }}
 {%- endif %}
 

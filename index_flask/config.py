@@ -12,8 +12,8 @@ INDEX_USERS_DIR = os.path.join(INDEX_CONFIG_DIR, 'users')
 INDEX_SQLITE_HOME = os.path.join(INDEX_USERS_DIR, 'id1')
 INDEX_CONFIG = '../credentials_cfg.py'
 
-INDEX_PORTAL_NAME = 'Index.net.ru'
-INDEX_REPORT_MAIL = 'lishnih@yandex.ru'
+INDEX_PORTAL_NAME = 'Indexing Portal'
+INDEX_REPORT_MAIL = 'support@ndt.to'
 INDEX_REPORT_ID = platform.uname()[1]
 
 
@@ -44,7 +44,7 @@ MAIL_PORT = 587
 MAIL_USE_TLS = True
 MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
 MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-MAIL_DEFAULT_SENDER = 'support@index.net.ru'
+MAIL_DEFAULT_SENDER = 'support@ndt.to'
 
 
 # Celery configuration

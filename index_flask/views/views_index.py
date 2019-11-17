@@ -54,7 +54,6 @@ def about():
         import flask_sqlalchemy
         import social_core
         import markdown
-        import celery
         from flask_login import __about__
 
         additionals = dict(
@@ -73,7 +72,6 @@ def about():
 
             social_core_version = social_core.__version__,
             markdown_version = markdown.version,
-            celery_version = celery.__version__,
             version = __version__,
         )
 

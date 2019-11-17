@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{%- from "_formhelpers.html" import render_submit, render_field %}
+
+{%- block body %}
+
+{%- if form %}
+<h3>Add a page to favorites</h3>
+
+<form method="post" action="?next={{ next }}">
+  {{ render_field(form.name, size=40) }}
+  {{ render_field(form.url, size=120) }}
+  {{ render_submit(form.submit) }}
+</form>
+{%- endif %}
+
+{%- endblock %}

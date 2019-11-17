@@ -10,7 +10,7 @@
 </table>
 
 <p>
-  <a href="{{ url_for('user_edit') }}" data-toggle="modal" data-target="#iaModal2" data-dismiss="modal" data-reload_on_close="location">
+  <a href="{{ url_for('user_edit') }}" data-toggle="modal" data-target="#iaModal2" data-dismiss="modal" data-reload_after_close="location">
     <i class="fa fa-user-edit"></i> Edit profile
   </a>
 </p>
@@ -26,7 +26,7 @@
   <table class="table table-bordered table-hover table-sm table-responsive">
   {%- for group in groups %}
     <tr>
-      <td><i class="inactive">{{ loop.index }}</i></td>
+      <td><i class="text-muted">{{ loop.index }}</i></td>
       <td>{{ group.name }}</td>
     </tr>
   {%- endfor %}

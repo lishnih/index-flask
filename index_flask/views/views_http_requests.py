@@ -7,7 +7,7 @@ from __future__ import (division, absolute_import,
 
 import json
 
-from flask import request, render_template
+from flask import request
 from flask_login import login_required, current_user
 from flask_principal import Permission, RoleNeed
 
@@ -17,6 +17,7 @@ from sqlalchemy import desc, distinct, func, and_, or_, not_
 from ..app import app, db
 from ..core.db import get_rows_model
 from ..core.dump_html import html
+from ..core.render_response import render_ext
 from ..forms.dbview import TableCondForm
 from ..models.http_request import HttpRequest
 
@@ -98,7 +99,7 @@ def requests():
     ))
 
     # Выводим
-    return render_template('db/table.html',
+    return render_ext('db/table.html',
         title = 'Request log',
         form = form,
         names = names,

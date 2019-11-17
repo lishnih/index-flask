@@ -43,7 +43,7 @@ function append_rows(tr, rows) {
     var td = "<td></td>";
     entry.forEach(function(i) {
       if ( i == null )
-        td += '<td><i class="inactive">null<i></td>';
+        td += '<td><i class="text-muted">null<i></td>';
       else
         td += "<td>" + i + "</td>";
     });
@@ -53,7 +53,7 @@ function append_rows(tr, rows) {
 
 
 function show_info(text, event) {
-  $('#modal_title').html('<span class="fa fa-info-circle"></span> Info');
+  $('#modal_title').html('<i class="fa fa-info-circle"></i> Info');
   $('#modal_message').text(text);
   $('#InfoModal').modal('toggle');
 
@@ -63,7 +63,7 @@ function show_info(text, event) {
 
 
 function show_error(text, event, debug) {
-  $('#modal_title').html('<span class="fa fa-warning"></span> Error');
+  $('#modal_title').html('<i class="fa fa-warning"></i> Error');
   $('#modal_message').text(text);
   $('#modal_debug').text(debug);
   $('#InfoModal').modal('toggle');
