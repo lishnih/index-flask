@@ -20,7 +20,7 @@ class AddUserTaskForm(Form):
     handler = SelectField('Handler', [validators.Required()],
         render_kw={"class": "custom-select"}
     )
-    handling = SelectField('Handling', [validators.Required()],
+    handling = SelectField('Processing', [validators.Required()],
         choices=[['auto', 'Auto'], ['manual', 'Manual']],
         render_kw={"class": "custom-select"}
     )

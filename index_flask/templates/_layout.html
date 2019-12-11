@@ -31,11 +31,10 @@
 {%- endblock %}
 {%- block head_base %}
 {%- endblock %}
+
 {%- if app_debug %}
   <!-- Debug styles -->
   <link href="{{ app_root }}/css/debug/debug.css" rel="stylesheet">
-  <!-- Site-specified styles -->
-  <link rel="stylesheet" href="{{ app_root }}/debug/default.css" />
 {%- endif %}
 </head>
 
@@ -60,33 +59,41 @@
 <!-- User dialogs END -->
 
 
-<!-- Page content -->
-<div class="container-fluid">
-  <div class="row flex-xl-nowrap2">
+<!-- Wrapper -->
 
+<div class="wrapper">
     <!-- Sidebar -->
 {{ text_sidebar() }}
     <!-- Sidebar END -->
 
-    <!-- Content -->
-    <div class="py-1 px-3 bd-content">
-
+    <!-- Page Content  -->
+    <div id="content">
 
       <!-- Flashes -->
 {{ text_flashes() }}
       <!-- Flashes END -->
 
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <button type="button" id="sidebarCollapse" class="btn btn-info">
+            <i class="fa fa-align-left"></i>
+          </button>
 
 {%- if utilities_bar %}
       <!-- Utilities bar -->
-      <div role="group" class="btn-group btn-group-sm mt-2 mb-0 mb-lg-2">
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="nav navbar-nav ml-auto">
 {%- for url, text in utilities_bar %}
-        <a rel="noopener" target="_blank" href="{{ url }}" class="btn btn-light">{{ text }}</a>
+              <li class="nav-item active">
+                <a rel="noopener" target="_blank" href="{{ url }}" class="nav-link">{{ text }}</a>
+              </li>
 {%- endfor %}
-      </div>
-      <div class="clearfix d-block d-lg-none"></div>
+            </ul>
+          </div>
       <!-- Utilities bar END -->
 {%- endif %}
+        </div>
+      </nav>
 
       <!-- User content -->
       <main class="bd-main">
@@ -136,37 +143,36 @@
       </main>
       <!-- User content END -->
 
-
       <!-- Debug -->
 {{ text_debug() }}
       <!-- Debug END -->
 
-
     </div>
-    <!-- Content END -->
-
-    <!-- TOC -->
-    <div class="bd-toc col-xl-2 d-none d-xl-block">
-      <ul class="section-nav nav flex-column">
-      </ul>
-    </div>
-    <!-- TOC END-->
-
-  </div>
 </div>
-<!-- Page content END -->
+<!-- Wrapper END -->
 
 
-<!-- Bootstrap core JavaScript -->
-<!-- Placed at the end of the document so the pages load faster -->
+<!-- jQuery CDN -->
 <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+
+<!-- Popper.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JS -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#sidebarCollapse').on('click', function () {
+            $('#sidebar').toggleClass('active');
+        });
+    });
+</script>
+
+
+
 <!-- Site-specified scripts -->
-<script src="{{ app_root }}/debug/debug.js" async></script>
-<script src="{{ app_root }}/debug/jquery-debug.js" async></script>
 <script src="{{ app_root }}/js/ajaxerror.js" async></script>
 
 <script src="{{ app_root }}/js/modal.js"></script>

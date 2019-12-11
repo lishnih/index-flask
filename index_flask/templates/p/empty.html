@@ -1,0 +1,17 @@
+{% extends "_layout_nojs.html" %}
+
+{%- block title %}
+  <title>Plain</title>
+{%- endblock %}
+
+{%- block body %}
+
+{%- autoescape false %}
+{{ output }}
+{%- endautoescape %}
+
+{%- if t %}
+<i>Time: {{ t }}</i>
+{%- endif %}
+
+{%- endblock %}

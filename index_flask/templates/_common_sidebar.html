@@ -1,0 +1,206 @@
+{%- macro text_sidebar() %}
+  <!-- sidebar-container -->
+  <nav id="sidebar">
+    <!-- d-* hiddens the Sidebar in smaller devices. Its items can be kept on the Navbar 'Menu' -->
+    <!-- Bootstrap List Group -->
+    <ul class="list-group sticky-offset">
+
+      <!-- Menu with submenu -->
+      <a href="#submenu1" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-database fa-fw"></i>
+          <span class="menu-collapsed">Databases</span>
+          <i class="fa fa-angle-right fa-fw ml-1"></i>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu1" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/dbview/" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">View</span>
+        </a>
+        <a href="{{ app_root }}/db_info/" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Info</span>
+        </a>
+        <a href="{{ app_root }}/query/" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Queries</span>
+        </a>
+      </div>
+
+      <!-- Menu with submenu -->
+      <a href="#submenu2" data-toggle="collapse" aria-expanded="false" class=" list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-cloud-download fa-fw"></i>
+          <span class="menu-collapsed">Sources</span>
+          <i class="fa fa-angle-right fa-fw ml-1"></i>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu2" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/handlers" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Handlers</span>
+        </a>
+        <a href="{{ app_root }}/sources" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Sources</span>
+        </a>
+        <a href="{{ app_root }}/source/schedule" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Tasks</span>
+        </a>
+        <a href="{{ app_root }}/accounts" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Accounts</span>
+        </a>
+      </div>
+
+      <!-- Menu with submenu -->
+      <a href="#submenu3" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-user fa-fw"></i>
+          <span class="menu-collapsed">Profile</span>
+          <i class="fa fa-angle-right fa-fw ml-1"></i>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu3" class="collapse sidebar-submenu">
+{%- if name %}
+        <a href="{{ app_root }}/profile" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Profile</span>
+        </a>
+        <!--a href="{{ app_root }}/settings" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Settings</span>
+        </a-->
+        <a href="{{ app_root }}/change_password" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Password</span>
+        </a>
+{%- else %}
+        <a href="{{ url_for('user_signin') }}" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">
+            <i class="fa fa-sign-in"></i> Sign in
+          </span>
+        </a>
+        <a href="{{ url_for('user_signup') }}" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">
+            <i class="fa fa-user-plus"></i> Sign up
+          </span>
+        </a>
+{%- endif %}
+      </div>
+
+{%- if p_admin %}
+      <!-- Menu with submenu -->
+      <a href="#submenu4" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-puzzle-piece fa-fw"></i>
+          <span class="menu-collapsed">Admin</span>
+          <i class="fa fa-angle-right fa-fw ml-1"></i>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu4" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/admin/users" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Users</span>
+        </a>
+        <a href="{{ app_root }}/admin/groups" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Groups</span>
+        </a>
+        <a href="{{ app_root }}/admin/modules" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Modules</span>
+        </a>
+      </div>
+{%- endif %}
+
+{%- if p_debug %}
+      <!-- Menu with submenu -->
+      <a href="#submenu5" data-toggle="collapse" aria-expanded="false" class="list-group-item list-group-item-action flex-column align-items-start">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-bug fa-fw"></i>
+          <span class="menu-collapsed">Debug</span>
+          <i class="fa fa-angle-right fa-fw ml-1"></i>
+        </div>
+      </a>
+      <!-- Submenu content -->
+      <div id="submenu5" class="collapse sidebar-submenu">
+        <a href="{{ app_root }}/debug/" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Debug</span>
+        </a>
+        <a href="{{ app_root }}/test/" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">/test/</span>
+        </a>
+        <a href="{{ app_root }}/test_dump" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Test dump</span>
+        </a>
+        <a href="{{ app_root }}/test_base" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Test base</span>
+        </a>
+        <a href="{{ app_root }}/test_injected" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Test injected</span>
+        </a>
+        <a href="{{ app_root }}/test_layout2" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Test layout2</span>
+        </a>
+        <a href="{{ app_root }}/p/ver" class="list-group-item list-group-item-action">
+          <span class="menu-collapsed">Libraries version</span>
+        </a>
+      </div>
+{%- endif %}
+
+{%- if p_statistics %}
+      <!-- Menu -->
+      <a href="{{ app_root }}/requests" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-tasks fa-fw"></i>
+          <span class="menu-collapsed">Statistics</span>
+        </div>
+      </a>
+{%- endif %}
+
+{%- if events %}
+      <!-- Separator with title -->
+      <li class="list-group-item sidebar-separator-title text-muted d-flex align-items-center menu-collapsed">
+        <small>EVENTS</small>
+      </li>
+      <!-- /END Separator -->
+
+      <!-- Menu -->
+      <a href="#" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-calendar fa-fw"></i>
+          <span class="menu-collapsed">Calendar</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="#" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-envelope-o fa-fw"></i>
+          <span class="menu-collapsed">
+            Messages
+            <span class="badge badge-pill badge-primary ml-2">5</span>
+          </span>
+        </div>
+      </a>
+{%- endif %}
+
+      <!-- Separator without title -->
+      <li class="list-group-item sidebar-separator menu-collapsed"></li>
+      <!-- /END Separator -->
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/p/help" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-book fa-fw"></i>
+          <span class="menu-collapsed">Help</span>
+        </div>
+      </a>
+
+      <!-- Menu -->
+      <a href="{{ app_root }}/about" class="list-group-item list-group-item-action">
+        <div class="d-flex w-100 justify-content-start align-items-center">
+          <i class="fa fa-flask fa-fw"></i>
+          <span class="menu-collapsed">About</span>
+        </div>
+      </a>
+
+    </ul>
+    <!-- List Group END-->
+  </nav>
+  <!-- sidebar-container END -->
+{%- endmacro %}

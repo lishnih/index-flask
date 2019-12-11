@@ -8,7 +8,7 @@ from __future__ import (division, absolute_import,
 from flask_login import login_required, current_user
 
 from ..app import app
-from ..core.render_response import render_ext
+from ..core_flask.render_response import render_ext
 
 
 # ===== Functions =====

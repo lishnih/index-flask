@@ -13,8 +13,8 @@ from flask_login import login_required, current_user
 
 from ..app import app, db
 from ..core.db import get_rows_model
-from ..core.functions import get_next
-from ..core.render_response import render_ext
+from ..core_flask.functions import get_next
+from ..core_flask.render_response import render_ext
 from ..forms.favorite import AddFavoriteForm
 from ..models.favorite import Favorite
 

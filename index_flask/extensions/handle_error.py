@@ -11,21 +11,28 @@ from werkzeug.exceptions import HTTPException
 from ..app import app
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    app.logger.warning('Page not found')
+
+    return jsonify(code=404, url=request.url), 404
+
+
 if app.debug:
-    @app.errorhandler(404)
-    def page_not_found(e):
-        code = 404
+    @app.errorhandler(500)
+    def internal_error(e):
+        return jsonify(code=500, url=request.url), 500
 
-        app.logger.exception("Not Found ({0}): ({1})".format(code, str(e)))
-
-        return jsonify(error=str(e),
-            url=request.url, root=request.url_root), code
 
 else:
     @app.errorhandler(Exception)
     def handle_error(e):
-        code = e.code if isinstance(e, HTTPException) else 500
+        if isinstance(e, HTTPException):
+            code = e.code
+            app.logger.exception("HTTP Exception ({0}): ({1})".format(code, str(e)))
 
-        app.logger.exception("HTTP Exception ({0}): ({1})".format(code, str(e)))
+        else:
+            code = 500
+            app.logger.exception("Exception ({0}): ({1})".format(code, str(e)))
 
-        return jsonify(error=str(e)), code
+        return jsonify(code=code), code

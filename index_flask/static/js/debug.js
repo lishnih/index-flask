@@ -3,10 +3,10 @@
 
 const preLog = document.querySelector('pre#debug');
 
-function log(text) {
-	if (preLog)
+function debug(text) {
+  if (preLog)
     preLog.textContent += ('\n' + text);
-	else
+  else
     console.log(text);
 }
 

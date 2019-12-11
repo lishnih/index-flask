@@ -46,7 +46,6 @@ def load_modules(folder):
 
                 except Exception as e:
                     tb_msg = traceback.format_exc()
-                    message = "Error: {0!r}".format(e)
                     module.error = tb_msg
                     print(tb_msg)
 

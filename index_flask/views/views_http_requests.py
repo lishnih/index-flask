@@ -17,7 +17,7 @@ from sqlalchemy import desc, distinct, func, and_, or_, not_
 from ..app import app, db
 from ..core.db import get_rows_model
 from ..core.dump_html import html
-from ..core.render_response import render_ext
+from ..core_flask.render_response import render_ext
 from ..forms.dbview import TableCondForm
 from ..models.http_request import HttpRequest
 

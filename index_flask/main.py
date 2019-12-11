@@ -5,7 +5,7 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from .app import db
+from .app import app, db
 
 
 # ===== Load models and create tables =====
@@ -14,9 +14,9 @@ from .models import *
 
 db.create_all(bind='__all__')
 
-for c in db.Model._decl_class_registry.values():
-    if hasattr(c, '__tablename__'):
-        check_model(c)
+for Model in db.Model._decl_class_registry.values():
+    if hasattr(Model, '__tablename__'):
+        check_model(Model)
 
 
 # ===== Load extensions =====
