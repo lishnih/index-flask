@@ -8,6 +8,9 @@ from __future__ import (division, absolute_import,
 import os
 from datetime import datetime
 
+from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import true
+
 from flask import url_for
 
 from .. import messages
@@ -23,14 +26,14 @@ class User(db.Model):
 
     username = db.Column(db.String, nullable=False, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
-    name = db.Column(db.String, nullable=False)
-    company = db.Column(db.String, nullable=False, default='')
-    password = db.Column(db.String, nullable=False)
-    active = db.Column(db.Boolean, nullable=False, default=True)
-    verified = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    home = db.Column(db.String, nullable=False, default='')
+    name = db.Column(db.String, nullable=False, server_default='')
+    company = db.Column(db.String, nullable=False, server_default='')
+    password = db.Column(db.String, nullable=False, server_default='-')
+    active = db.Column(db.Boolean, nullable=False, server_default=true())
+    verified = db.Column(db.String, nullable=False, server_default='-')
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=datetime.utcnow)
+    home = db.Column(db.String, nullable=False, server_default='')
 
     @property
     def is_anonymous(self):

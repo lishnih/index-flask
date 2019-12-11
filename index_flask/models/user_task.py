@@ -44,13 +44,13 @@ class UserTask(db.Model):
 
     type = db.Column(db.Integer, nullable=False, server_default='1')
     mode = db.Column(db.String, nullable=False, server_default='manual')
-    options = db.Column(JsonType, nullable=False, server_default='{}', default={})
+    options = db.Column(JsonType, nullable=False, server_default='{}')
     command = db.Column(db.String, nullable=False, server_default='')
     pid = db.Column(db.Integer, nullable=False, server_default='0')
     status = db.Column(db.Integer, nullable=False, server_default='0')
     send_when_finished = db.Column(db.Boolean, nullable=False, server_default=false())
-    created = db.Column(db.DateTime, nullable=False, server_default=func.now())
-    finished = db.Column(db.DateTime)
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    finished = db.Column(db.DateTime(timezone=True), nullable=False, server_default='2000-01-01 12:00:00')
 
     next = db.Column(db.Integer, nullable=False, server_default='0')
     next_uid = db.Column(db.String, nullable=False, server_default='')

@@ -5,7 +5,8 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from datetime import datetime
+from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import false
 
 from ..app import db
 
@@ -15,7 +16,7 @@ relationship_user_group = db.Table('rs_user_group',   # Rev. 2018-09-14
         onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
     db.Column('_group_id', db.Integer, db.ForeignKey('groups.id',
         onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
-    db.Column('manage', db.Boolean, default=False, nullable=False),
+    db.Column('manage', db.Boolean, nullable=False, server_default=false()),
     db.PrimaryKeyConstraint('_user_id', '_group_id'),
 )
 
@@ -30,10 +31,10 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String, nullable=False, unique=True)
-    description = db.Column(db.String, nullable=False, default='')
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.String, nullable=False, server_default='')
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    def __init__(self, name, description=''):
+    def __init__(self, name, description='', **kargs):
         self.name = name.lower()
         self.description = description
 

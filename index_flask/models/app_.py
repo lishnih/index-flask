@@ -7,18 +7,20 @@ from __future__ import (division, absolute_import,
 
 import uuid
 import random
-from datetime import datetime
 
-from ..core.json_type import JsonType
+from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import false
+
 from ..app import db, bcrypt
 from . import StrType
+from ..core.json_type import JsonType
 
 
 relationship_user_app = db.Table('rs_user_app',
     db.Column('_user_id', db.Integer, db.ForeignKey('users.id',
-        onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+        onupdate="CASCADE", ondelete="CASCADE")),
     db.Column('_app_id', db.Integer, db.ForeignKey('apps.id',
-        onupdate="CASCADE", ondelete="CASCADE"), nullable=False),
+        onupdate="CASCADE", ondelete="CASCADE")),
 #   db.PrimaryKeyConstraint('_user_id', '_app_id'),
 )
 
@@ -29,20 +31,19 @@ class RS_App(db.Model):
     __rev__ = '2016-07-23'
 
     id = db.Column(db.Integer, primary_key=True)
-    _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    _app_id = db.Column(db.Integer, db.ForeignKey('apps.id'), nullable=False)
+    _user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    _app_id = db.Column(db.Integer, db.ForeignKey('apps.id'))
 
-    token = db.Column(db.String, nullable=False, default='')
-    sticked = db.Column(db.Boolean, nullable=False, default=True)
-    options = db.Column(db.PickleType, nullable=False, default={})
-    attached = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    token = db.Column(db.String, nullable=False, server_default='')
+    sticked = db.Column(db.Boolean, nullable=False, server_default=false())
+    options = db.Column(db.PickleType, nullable=False, server_default='{}')
+    attached = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    def __init__(self):
+    def __init__(self, **kargs):
         self.token = self.suit_code(self._user_id, self._app_id)
 
     def get_token(self, user, app):
-    #   rnd = datetime.now().strftime("%Y%m%d%H%M%S.%f")
-        rnd = random.randint(0, 100000000000000)
+        rnd = "{0}/{1}/{2}".format(user, app, random.randint(0, 100000000000000))
         return bcrypt.generate_password_hash(rnd)
 
     def suit_code(self, user, app):
@@ -64,13 +65,13 @@ class App(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String, nullable=False, unique=True)
-    uid = db.Column(StrType, nullable=False, default=uuid.uuid4)
-    deleted = db.Column(db.Boolean, nullable=False, default=False)
+    uid = db.Column(StrType, nullable=False, server_default='', default=uuid.uuid4)
+    deleted = db.Column(db.Boolean, nullable=False, server_default=false())
 
-    description = db.Column(db.String, nullable=False)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    description = db.Column(db.String, nullable=False, server_default='')
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
 
-    def __init__(self, id, name, description=''):
+    def __init__(self, name, id=None, description='', **kargs):
         self.id = id
         self.name = name.lower()
         self.description = description

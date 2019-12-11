@@ -5,8 +5,6 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from datetime import datetime
-
 from ..app import db
 
 
@@ -25,8 +23,8 @@ class Favorite(db.Model):
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id',
         onupdate="CASCADE", ondelete="CASCADE"))
 
-    name = db.Column(db.String, nullable=False, default='')
-    url = db.Column(db.String, nullable=False, default='')
+    name = db.Column(db.String, nullable=False, server_default='')
+    url = db.Column(db.String, nullable=False, server_default='')
 
     db.Index('favorite_', _user_id, _group_id, name, unique=True)
 

@@ -5,11 +5,7 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-import uuid
-from datetime import datetime
-
 from ..app import db
-from . import StrType
 from .user import User
 
 
@@ -28,9 +24,9 @@ class UserOption(db.Model):
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id',
         onupdate="CASCADE", ondelete="CASCADE"))
 
-    name = db.Column(db.String, nullable=False)
-    type = db.Column(db.String, nullable=False, default='')
-    value = db.Column(db.String, nullable=False, default='')
+    name = db.Column(db.String, nullable=False, server_default='')
+    type = db.Column(db.String, nullable=False, server_default='')
+    value = db.Column(db.String, nullable=False, server_default='')
 
     def __repr__(self):
         return '<UserOption {0!r}>'.format(self.name)

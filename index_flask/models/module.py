@@ -5,7 +5,8 @@
 from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
-from datetime import datetime
+from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import true
 
 from ..app import db
 
@@ -15,13 +16,13 @@ class Module(db.Model):
     __rev__ = '2018-09-14'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    folder = db.Column(db.String, nullable=False, default='views')
-    priority = db.Column(db.Integer, nullable=False, default=1)
-    active = db.Column(db.Boolean, nullable=False, default=True)
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    loaded = db.Column(db.DateTime, nullable=False, default=datetime(2000, 1, 1))
-    error = db.Column(db.String, nullable=False, default='')
+    name = db.Column(db.String, nullable=False, server_default='')
+    folder = db.Column(db.String, nullable=False, server_default='views')
+    priority = db.Column(db.Integer, nullable=False, server_default='1')
+    active = db.Column(db.Boolean, nullable=False, server_default=true())
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    loaded = db.Column(db.DateTime(timezone=True), nullable=False, server_default='2000-01-01 12:00:00')
+    error = db.Column(db.String, nullable=False, server_default='')
 
     db.Index('module_', name, folder, unique=True)
 

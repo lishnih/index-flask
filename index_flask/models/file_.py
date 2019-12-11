@@ -20,7 +20,7 @@ class File(db.Model):
     path = db.Column(db.String, nullable=False, server_default='')
     ext = db.Column(db.String, nullable=False, server_default='')
     size = db.Column(db.Integer, nullable=False, server_default='0')
-    modified = db.Column(db.DateTime)
+    modified = db.Column(db.DateTime(timezone=True), nullable=False, server_default='2000-01-01 12:00:00')
     state = db.Column(db.Integer, nullable=False, server_default='1')
 
     # Аттрибуты облачных объектов

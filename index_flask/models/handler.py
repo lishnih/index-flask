@@ -6,9 +6,10 @@ from __future__ import (division, absolute_import,
                         print_function, unicode_literals)
 
 import uuid
-from datetime import datetime
 
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.sql import func
+from sqlalchemy.sql.expression import false
 
 from ..app import db
 from . import StrType
@@ -33,17 +34,17 @@ class Handler(db.Model):
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id',
         onupdate="CASCADE", ondelete="CASCADE"))
 
-    name = db.Column(db.String, nullable=False, default='')
-    uid = db.Column(StrType, nullable=False, default=uuid.uuid4)
-    deleted = db.Column(db.Boolean, nullable=False, default=False)
+    name = db.Column(db.String, nullable=False, server_default='')
+    uid = db.Column(StrType, nullable=False, server_default='', default=uuid.uuid4)
+    deleted = db.Column(db.Boolean, nullable=False, server_default=false())
 
-    rev = db.Column(db.String, nullable=False, default='')
-    module = db.Column(db.String, nullable=False, default='')
-    entry = db.Column(db.String, nullable=False, default='')
-    key = db.Column(db.String, nullable=False, default='options')
-    options = db.Column(JsonType, nullable=False, default={})
-    description = db.Column(db.String, nullable=False, default='')
-    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    rev = db.Column(db.String, nullable=False, server_default='')
+    module = db.Column(db.String, nullable=False, server_default='')
+    entry = db.Column(db.String, nullable=False, server_default='')
+    key = db.Column(db.String, nullable=False, server_default='options')
+    options = db.Column(JsonType, nullable=False, server_default='{}')
+    description = db.Column(db.String, nullable=False, server_default='')
+    created = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
 
     db.Index('handler_', _user_id, _group_id, name, unique=True)
 

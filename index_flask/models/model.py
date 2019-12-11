@@ -7,7 +7,7 @@ from __future__ import (division, absolute_import,
 
 from sqlalchemy.sql import func
 
-from . import db
+from ..app import db
 
 
 class Model(db.Model):
